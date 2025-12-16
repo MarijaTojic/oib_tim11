@@ -50,6 +50,8 @@ export class AuthService implements IAuthService {
       role: data.role,
       password: hashedPassword,
       profileImage: data.profileImage ?? null,
+      name: data.name,
+      surname: data.surname
     });
 
     const savedUser = await this.userRepository.save(newUser);

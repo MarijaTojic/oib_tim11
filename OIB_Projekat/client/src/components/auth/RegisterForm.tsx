@@ -16,6 +16,8 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ authAPI }) => {
     password: "",
     role: UserRole.SELLER,
     profileImage: "",
+    name: "",
+    surname: ""
   });
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string>("");
@@ -48,6 +50,27 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ authAPI }) => {
       setError("Password must be at least 6 characters long.");
       return;
     }
+    
+    // Validation for first name and last name (no numbers)
+    const containsNumber = (str: string) => {
+      for (let i = 0; i < str.length; i++) {
+        if (!isNaN(Number(str[i]))) {
+          return true;
+        }
+      }
+      return false;
+    };
+
+    if (!formData.name || containsNumber(formData.name)) {
+      setError("First name cannot contain numbers.");
+      return;
+    }
+
+    if (!formData.surname || containsNumber(formData.surname)) {
+      setError("Last name cannot contain numbers.");
+      return;
+    }
+
 
     setIsLoading(true);
 
@@ -122,6 +145,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ authAPI }) => {
         >
           <option value={UserRole.SELLER}>Seller</option>
           <option value={UserRole.ADMIN}>Admin</option>
+          <option value={UserRole.MANAGER}>Manager</option>
         </select>
       </div>
 

@@ -20,7 +20,7 @@ export class GatewayController {
 
     // Users
     this.router.get("/users", authenticate, authorize("admin"), this.getAllUsers.bind(this));
-    this.router.get("/users/:id", authenticate, authorize("admin", "seller"), this.getUserById.bind(this));
+    this.router.get("/users/:id", authenticate, authorize("admin", "seller", "manager"), this.getUserById.bind(this));
   }
 
   // Auth
