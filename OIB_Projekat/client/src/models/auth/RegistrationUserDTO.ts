@@ -6,4 +6,6 @@ export interface RegistrationUserDTO {
     password: string;
     email: string;
     profileImage: string;
+    name: string;
+    surname: string;
 }

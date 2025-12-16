@@ -24,6 +24,35 @@ export class UsersService implements IUsersService {
   }
 
   /**
+   * Create a new user
+   */
+  async createUser(user: User): Promise<UserDTO> {
+    const newUser = this.userRepository.create(user);
+    const savedUser = await this.userRepository.save(newUser);
+    return this.toDTO(savedUser);
+  }
+
+  /**
+   * Update existing user
+   */
+  async updateUser(id: number, user: User): Promise<UserDTO> {
+    const existingUser = await this.userRepository.findOne({ where: { id } });
+    if (!existingUser) throw new Error(`User with ID ${id} not found`);
+
+    const updated = { ...existingUser, ...user };
+    const savedUser = await this.userRepository.save(updated);
+    return this.toDTO(savedUser);
+  }
+
+  /**
+   * Delete a user
+   */
+  async deleteUser(id: number): Promise<boolean> {
+    const result = await this.userRepository.delete(id);
+    return result.affected !== undefined && result.affected !== null && result.affected > 0;
+  }
+
+  /**
    * Convert User entity to UserDTO
    */
   private toDTO(user: User): UserDTO {
@@ -33,6 +62,8 @@ export class UsersService implements IUsersService {
       email: user.email,
       role: user.role,
       profileImage: user.profileImage ?? "",
+      name: user.name,
+      surname: user.surname
     };
   }
 }

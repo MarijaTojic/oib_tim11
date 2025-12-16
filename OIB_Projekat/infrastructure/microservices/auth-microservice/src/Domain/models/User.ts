@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 import { UserRole } from "../enums/UserRole";
 
-@Entity("users")
+@Entity("korisnici")
 export class User {
   @PrimaryGeneratedColumn()
   id!: number;
@@ -20,4 +20,10 @@ export class User {
 
   @Column({ type: "longtext", nullable: true })
   profileImage!: string | null;
+
+  @Column({ type: "varchar", unique: true, length: 100 })
+  name!: string;  
+
+  @Column({ type: "varchar", unique: true, length: 100 })
+  surname!: string;
 }
