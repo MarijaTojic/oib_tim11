@@ -6,6 +6,18 @@ import { PlantDTO } from "../Domain/DTOs/PlantDTO";
 export class PlantsService implements IPlantsService {
   constructor(private plantRepository: Repository<Plant>) {}
 
+  /* Get all plants */
+  async getAllPlants(): Promise<PlantDTO[]> {
+    const plants = await this.plantRepository.find();
+    return plants.map((plant) => this.toDTO(plant));
+  }
+
+  /** Get a single plant by ID */
+  async getPlantById(id: number): Promise<PlantDTO> {
+    const plant = await this.plantRepository.findOne({ where: { id } });
+    if (!plant) throw new Error(`Plant with ID ${id} not found`);
+    return this.toDTO(plant);
+  }
   /**
    * Create / plant new plant
    */

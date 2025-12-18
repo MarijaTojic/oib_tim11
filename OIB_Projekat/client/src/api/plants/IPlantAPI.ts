@@ -1,9 +1,23 @@
 import { PlantDTO } from "../../models/plants/PlantDTO";
 
 export interface IPlantAPI {
-  getAllPlants(token: string): Promise<PlantDTO[]>;
-  getPlantById(id: number, token: string): Promise<PlantDTO>;
-  createPlant(plant: PlantDTO, token: string): Promise<PlantDTO>;
-  updatePlant(id: number, plant: PlantDTO, token: string): Promise<PlantDTO>;
-  deletePlant(id: number, token: string): Promise<void>;
+
+  getAllPlants(): Promise<PlantDTO[]>;
+  getPlantById(id: number): Promise<PlantDTO>;
+  /**
+   * Create / plant a new plant
+   * Aromatic oil strength is generated randomly
+   */
+  createPlant(plant: PlantDTO): Promise<PlantDTO>;
+
+  /**
+   * Change aromatic oil strength by percentage
+   */
+  changeAromaticOilStrength(id: number,percentage: number): Promise<PlantDTO>;
+
+  /**
+   * Harvest plants by common name and quantity
+   */
+  harvestPlants(commonName: string, quantity: number): Promise<PlantDTO[]>;
+
 }

@@ -1,10 +1,26 @@
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 import { PlantStatus } from "../enums/PlantStatus";
 
-export interface Plant {
-  id?: number;
-  commonName: string;
-  latinName: string;
-  aromaticOilStrength: number; // 1.0 to 5.0
-  countryOfOrigin: string;
-  status: PlantStatus;
+@Entity()
+export class Plant {
+  @PrimaryGeneratedColumn()
+  id!: number;
+
+  @Column()
+  commonName!: string;
+
+  @Column()
+  latinName!: string;
+
+  @Column("float")
+  aromaticOilStrength!: number;
+
+  @Column()
+  countryOfOrigin!: string;
+
+  @Column({
+    type: "enum",
+    enum: PlantStatus
+  })
+  status!: PlantStatus;
 }

@@ -2,6 +2,8 @@ import { PlantDTO } from "../DTOs/PlantDTO";
 
 export interface IPlantsService {
 
+  getAllPlants(): Promise<PlantDTO[]>;
+  getPlantById(id: number): Promise<PlantDTO>;
   /**
    * Create / plant a new plant
    * Aromatic oil strength is generated randomly

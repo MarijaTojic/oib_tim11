@@ -1,54 +1,49 @@
-import axios, { AxiosInstance, AxiosResponse } from "axios";
-import { PlantDTO } from "../../models/plants/PlantDTO";
 import { IPlantAPI } from "./IPlantAPI";
+import { PlantDTO } from "../../models/plants/PlantDTO";
 
 export class PlantAPI implements IPlantAPI {
-  private readonly axiosInstance: AxiosInstance;
+  private baseUrl = "/api/v1/plants";
 
-  constructor() {
-    this.axiosInstance = axios.create({
-      baseURL: import.meta.env.VITE_GATEWAY_URL,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+  async getAllPlants(): Promise<PlantDTO[]> {
+    const res = await fetch(this.baseUrl);
+    if (!res.ok) throw new Error("Failed to fetch plants");
+    return res.json();
   }
 
-  private getAuthHeaders(token: string) {
-    return { Authorization: `Bearer ${token}` };
+  async getPlantById(id: number): Promise<PlantDTO> {
+    const res = await fetch(`${this.baseUrl}/${id}`);
+    if (!res.ok) throw new Error("Plant not found");
+    return res.json();
   }
 
-  async getAllPlants(token: string): Promise<PlantDTO[]> {
-    const response: AxiosResponse<PlantDTO[]> = await this.axiosInstance.get("/plants", {
-      headers: this.getAuthHeaders(token),
+  async createPlant(plant: PlantDTO): Promise<PlantDTO> {
+    const plantToSend = { ...plant, aromaticOilStrength: Number((Math.random() * 4 + 1).toFixed(2)) };
+    const res = await fetch(this.baseUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(plantToSend),
     });
-    return response.data;
+    if (!res.ok) throw new Error("Failed to create plant");
+    return res.json();
   }
 
-  async getPlantById(id: number, token: string): Promise<PlantDTO> {
-    const response: AxiosResponse<PlantDTO> = await this.axiosInstance.get(`/plants/${id}`, {
-      headers: this.getAuthHeaders(token),
+  async changeAromaticOilStrength(id: number, percentage: number): Promise<PlantDTO> {
+    const res = await fetch(`${this.baseUrl}/${id}/aromatic`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ percentage }),
     });
-    return response.data;
+    if (!res.ok) throw new Error("Failed to change aromatic oil strength");
+    return res.json();
   }
 
-  async createPlant(plant: PlantDTO, token: string): Promise<PlantDTO> {
-    const response: AxiosResponse<PlantDTO> = await this.axiosInstance.post("/plants", plant, {
-      headers: this.getAuthHeaders(token),
+  async harvestPlants(commonName: string, quantity: number): Promise<PlantDTO[]> {
+    const res = await fetch(`${this.baseUrl}/harvest`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ commonName, quantity }),
     });
-    return response.data;
-  }
-
-  async updatePlant(id: number, plant: PlantDTO, token: string): Promise<PlantDTO> {
-    const response: AxiosResponse<PlantDTO> = await this.axiosInstance.put(`/plants/${id}`, plant, {
-      headers: this.getAuthHeaders(token),
-    });
-    return response.data;
-  }
-
-  async deletePlant(id: number, token: string): Promise<void> {
-    await this.axiosInstance.delete(`/plants/${id}`, {
-      headers: this.getAuthHeaders(token),
-    });
+    if (!res.ok) throw new Error("Failed to harvest plants");
+    return res.json();
   }
 }
