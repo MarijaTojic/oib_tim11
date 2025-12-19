@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { IPlantsAPI } from "../api/plants/IPlantAPI";
+import { IPlantAPI } from "../api/plants/IPlantAPI";
 import { PlantDTO } from "../models/plants/PlantDTO";
 import { PlantsTable } from "../components/plants/PlantsTable";
 import { CreatePlantForm } from "../components/plants/CreatePlantForm";
 
 type Props = {
-  plantsAPI: IPlantsAPI;
+  plantsAPI: IPlantAPI;
 };
 
 export const ProductionPage: React.FC<Props> = ({ plantsAPI }) => {

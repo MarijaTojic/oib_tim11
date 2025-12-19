@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { IPlantsAPI } from "../../api/plants/IPlantAPI";
+import { IPlantAPI } from "../../api/plants/IPlantAPI";
 import { PlantStatus } from "../../enums/PlantStatus";
 
 type Props = {
-  plantsAPI: IPlantsAPI;
+  plantsAPI: IPlantAPI;
   onSuccess: () => void;
 };
 
