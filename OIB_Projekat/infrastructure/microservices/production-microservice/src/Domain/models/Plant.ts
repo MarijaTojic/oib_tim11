@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 import { PlantStatus } from "../enums/PlantStatus";
 
-@Entity()
+@Entity() //dodaj naziv tabele
 export class Plant {
   @PrimaryGeneratedColumn()
   id!: number;
