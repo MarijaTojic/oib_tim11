@@ -3,6 +3,7 @@ import { IUserAPI } from "../api/users/IUserAPI";
 import { IPlantAPI } from "../api/plants/IPlantAPI";
 import { PlantDTO } from "../models/plants/PlantDTO";
 import { UserDTO } from "../models/users/UserDTO";
+import { DashboardNavbar } from "../components/dashboard/navbar/Navbar";
 
 type DashboardPageProps = {
   userAPI: IUserAPI;
@@ -13,36 +14,46 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ userAPI, plantAPI 
   const [users, setUsers] = useState<UserDTO[]>([]);
   const [plants, setPlants] = useState<PlantDTO[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string>("");
+  const [errorUsers, setErrorUsers] = useState<string>("");
+  const [errorPlants, setErrorPlants] = useState<string>("");
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        setLoading(true);
-        const token = localStorage.getItem("token") || "";
-        const [usersData, plantsData] = await Promise.all([
-          userAPI.getAllUsers(token),
-          plantAPI.getAllPlants(),
-        ]);
-        setUsers(usersData);
-        setPlants(plantsData);
-      } catch (err) {
-        setError((err as Error).message);
-      } finally {
-        setLoading(false);
+      setLoading(true);
+      setErrorUsers("");
+      setErrorPlants("");
+
+      const token = localStorage.getItem("authToken") || "";
+      console.log(localStorage.getItem("authToken"));
+
+      try{
+        const userData = await userAPI.getAllUsers(token);
+        setUsers(userData);
+      } catch(err: any){
+        setErrorUsers(err.response?.data?.message || err.message ||  "Failed to load users");
+        setUsers([]);
       }
+
+      try{
+        const plantsData = await plantAPI.getAllPlants();
+        setPlants(plantsData);
+      } catch(err: any){
+        setErrorPlants(err.response?.data?.message || err.message ||  "Failed to load plants");
+        setPlants([]);
+      }
+
+      setLoading(false);
     };
 
     fetchData();
   }, [userAPI, plantAPI]);
 
-  if (loading) return <div>Loading dashboard...</div>;
-  if (error) return <div>Error: {error}</div>;
+  if(loading) return <div>Loading dashboard...</div>
 
   return (
     <div style={{ padding: 20 }}>
+      <DashboardNavbar userAPI={userAPI} />
       <h1>Dashboard</h1>
-
       <section style={{ marginBottom: 40 }}>
         <h2>Users</h2>
         <table border={1} cellPadding={5}>

@@ -45,7 +45,7 @@ export class AuthController {
 
       if (result.authenificated) {
         const token = jwt.sign(
-          { id: result.userData?.id, username: result.userData?.username, role: result.userData?.role },
+          { id: result.userData?.id, username: result.userData?.username, role: result.userData?.role},
           process.env.JWT_SECRET ?? "",
           { expiresIn: '6h' }
         );
@@ -81,7 +81,7 @@ export class AuthController {
 
       if (result.authenificated) {
         const token = jwt.sign(
-          { id: result.userData?.id, username: result.userData?.username, role: result.userData?.role },
+          { id: result.userData?.id, username: result.userData?.username, role: result.userData?.role, name: result.userData?.name, surname: result.userData?.surname },
           process.env.JWT_SECRET ?? "",
           { expiresIn: '6h' }
         );

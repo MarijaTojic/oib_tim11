@@ -100,6 +100,38 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ authAPI }) => {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <div>
+         <label htmlFor="name" style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600 }}>
+              First Name
+            </label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="Enter your first name"
+              required
+              disabled={isLoading}
+          />
+        </div>
+
+      <div>
+  <label htmlFor="surname" style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600 }}>
+    Last Name
+  </label>
+  <input
+    type="text"
+    id="surname"
+    name="surname"
+    value={formData.surname}
+    onChange={handleChange}
+    placeholder="Enter your last name"
+    required
+    disabled={isLoading}
+  />
+</div>
+
+      <div>
         <label htmlFor="username" style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600 }}>
           Username
         </label>

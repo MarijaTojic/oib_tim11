@@ -27,6 +27,8 @@ export class AuthService implements IAuthService {
         id: user.id,
         username: user.username,
         role: user.role,
+        name: user.name,
+        surname: user.surname,
       },
     };
   }
@@ -62,6 +64,8 @@ export class AuthService implements IAuthService {
         id: savedUser.id,
         username: savedUser.username,
         role: savedUser.role,
+        name: savedUser.name,
+        surname: savedUser.surname,
       },
     };
   }

@@ -21,9 +21,9 @@ export class User {
   @Column({ type: "longtext", nullable: true })
   profileImage!: string | null;
 
-  @Column({ type: "varchar", unique: true, length: 100 })
+  @Column({ type: "varchar", length: 100 })
   name!: string;  
 
-  @Column({ type: "varchar", unique: true, length: 100 })
+  @Column({ type: "varchar", length: 100 })
   surname!: string;
 }
