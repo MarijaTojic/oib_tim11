@@ -21,6 +21,9 @@ export class GatewayController {
     // Users
     this.router.get("/users", authenticate, authorize("admin"), this.getAllUsers.bind(this));
     this.router.get("/users/:id", authenticate, authorize("admin", "seller", "manager"), this.getUserById.bind(this));
+
+    //Perfumes
+    this.router.get("/perfumes", this.getAllPerfumes.bind(this));
   }
 
   // Auth
@@ -58,6 +61,16 @@ export class GatewayController {
       res.status(200).json(user);
     } catch (err) {
       res.status(404).json({ message: (err as Error).message });
+    }
+  }
+
+  //Perfumes
+   private async getAllPerfumes(req: Request, res: Response): Promise<void> {
+    try {
+      const perfumes = await this.gatewayService.getAllPerfumes();
+      res.status(200).json(perfumes);
+    } catch (err) {
+      res.status(500).json({ message: (err as Error).message });
     }
   }
 

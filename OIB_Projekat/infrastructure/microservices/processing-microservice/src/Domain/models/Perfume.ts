@@ -6,13 +6,13 @@ export class Perfume {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ type: "varchar", unique: true, length: 100 })
+  @Column({ type: "varchar", length: 100 })
   name!: string;
 
   @Column({type: "enum", enum: PerfumeType, default: PerfumeType.PERFUME })
   type!: PerfumeType;
 
-  @Column({ type: "decimal", precision: 2 })
+  @Column({ type: "int"})
   netQuantity!: number;
 
  @Column({ type: "varchar", unique: true, length: 100 })

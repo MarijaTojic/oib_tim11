@@ -15,7 +15,7 @@ export class GatewayService implements IGatewayService {
   constructor() {
     const authBaseURL = process.env.AUTH_SERVICE_API;
     const userBaseURL = process.env.USER_SERVICE_API;
-    const processingURL = process.env.PERFUME_SERVICE_API;
+    const processingURL = process.env.PROCESSING_SERVICE_API;
 
     this.authClient = axios.create({
       baseURL: authBaseURL,
@@ -70,8 +70,10 @@ export class GatewayService implements IGatewayService {
   // TODO: ADD MORE API CALLS
 
   //Processing microservice
-  async getPerfumeByTypeAndQuantity(type : PerfumeType, quantity : number): Promise<PerfumeDTO>{
-    const response = await this.processingClient.get<PerfumeDTO>(`/perfumes/${type}/${quantity}`);
+  async getAllPerfumes(): Promise<PerfumeDTO[]>{
+     console.log("Pozivam Processing mikroservis...");
+    const response = await this.processingClient.get<PerfumeDTO[]>("/perfumes");
+    console.log("Odgovor od Processing servisa:", response.data);
     return response.data;
   }
 }

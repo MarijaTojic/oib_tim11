@@ -18,7 +18,7 @@ const app = express();
 
 // Read CORS settings from environment
 const corsOrigin = process.env.CORS_ORIGIN ?? "*";
-const corsMethods = process.env.CORS_METHODS?.split(",").map(m => m.trim()) ?? ["POST"];
+const corsMethods = process.env.CORS_METHODS?.split(",").map(m => m.trim()) ?? ["GET"];
 
 // Protected microservice from unauthorized access
 app.use(cors({
@@ -41,7 +41,6 @@ const logerService: ILogerService = new LogerService();
 const perfumeController = new PerfumeController(perfumeService, logerService);
 
 // Registering routes
-app.use('/api/v1', perfumeController
-  .getRouter());
+app.use('/api/v1', perfumeController.getRouter());
 
 export default app;

@@ -1,4 +1,5 @@
 import { LoginUserDTO } from "../DTOs/LoginUserDTO";
+import { PerfumeDTO } from "../DTOs/PerfumeDTO";
 import { RegistrationUserDTO } from "../DTOs/RegistrationUserDTO";
 import { UserDTO } from "../DTOs/UserDTO";
 import { AuthResponseType } from "../types/AuthResponse";
@@ -11,4 +12,7 @@ export interface IGatewayService {
   // Users
   getAllUsers(): Promise<UserDTO[]>;
   getUserById(id: number): Promise<UserDTO>;
+
+  //Perfumes
+  getAllPerfumes(): Promise<PerfumeDTO[]>;
 }

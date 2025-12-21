@@ -1,6 +1,6 @@
 import { PerfumeType } from "../../enums/PerfumeType";
 
-export interface PlantDTO {
+export interface PerfumeDTO {
   id?: number;
   name: string;
   type: PerfumeType;

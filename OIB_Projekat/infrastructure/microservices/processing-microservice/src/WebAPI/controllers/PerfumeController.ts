@@ -16,7 +16,7 @@ export class PerfumeController {
 
   private initializeRoutes(): void {
     this.router.get("/perfumes/:type/:quantity", this.getPerfumeByTypeAndQuantity.bind(this));
-    this.router.get("perfumes", this.getAllPerfumes.bind(this));
+    this.router.get("/perfumes", this.getAllPerfumes.bind(this));
   }
 
   private async getPerfumeByTypeAndQuantity(req: Request, res: Response): Promise<void>{
