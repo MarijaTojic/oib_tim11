@@ -98,6 +98,7 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ userAPI }) => 
       <div className="flex gap-3">
         <button onClick={() => navigate("/dashboard")}>Dashboard</button>
         <button onClick={() => navigate("/perfumes")}>Perfumes</button>
+        <button onClick={() => navigate("/processing")}>Plant processing</button>
       </div>
     </nav>
   );

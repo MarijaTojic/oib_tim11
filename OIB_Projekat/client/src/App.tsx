@@ -6,6 +6,7 @@ import { AuthPage } from "./pages/AuthPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { ProductionPage } from "./pages/ProductionPage";
 import { PerfumesPage } from "./pages/PerfumesPage";
+import {ProcessingPage} from "./pages/ProcessingPage";
 
 import { IAuthAPI } from "./api/auth/IAuthAPI";
 import { AuthAPI } from "./api/auth/AuthAPI";
@@ -56,6 +57,16 @@ function App() {
           element={
             <ProtectedRoute requiredRole="admin,seller">
               <PerfumesPage perfumeAPI={perfumeAPI} />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Protected ProcessingPage */}
+        <Route
+          path="/processing"
+          element={
+            <ProtectedRoute requiredRole="admin,seller">
+              <ProcessingPage perfumeAPI={perfumeAPI} />
             </ProtectedRoute>
           }
         />

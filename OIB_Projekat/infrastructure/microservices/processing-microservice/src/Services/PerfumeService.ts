@@ -3,9 +3,18 @@ import { IPerfumeService } from "../Domain/services/IPerfumeService";
 import { Perfume } from "../Domain/models/Perfume";
 import { PerfumeDTO } from "../Domain/DTOs/PerfumeDTO";
 import { PerfumeType } from "../Domain/enums/PerfumeType";
+import { calculateNumberOfPlants } from "../helpers/NumberOfPlants"
 
 export class PerfumeService implements IPerfumeService {
   constructor(private perfumeRepository: Repository<Perfume>) {}
+
+  /**
+   * Plant processing
+   */
+  plantProcessing(Perfume: PerfumeDTO, quantityBottle: number, volumeBottle: number): Promise<void> {
+    const numberOfBottles = calculateNumberOfPlants(quantityBottle, volumeBottle);
+    throw new Error("Metoda još nije implementirana");
+  }
 
   /**
    * Get all perfumes
