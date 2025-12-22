@@ -18,9 +18,14 @@ export class Plant {
   @Column()
   countryOfOrigin!: string;
 
+  @Column()
+  quantity!: number;
+
   @Column({
     type: "enum",
     enum: PlantStatus
   })
   status!: PlantStatus;
+
+
 }
