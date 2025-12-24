@@ -11,8 +11,8 @@ export class PerfumeService implements IPerfumeService {
   /**
    * Plant processing
    */
-  plantProcessing(Perfume: PerfumeDTO, quantityBottle: number, volumeBottle: number): Promise<void> {
-    const numberOfBottles = calculateNumberOfPlants(quantityBottle, volumeBottle);
+  async plantProcessing(Perfume: PerfumeDTO, quantityBottle: number, volumeBottle: number): Promise<void> {
+    const numberOfPlants = calculateNumberOfPlants(quantityBottle, volumeBottle);
     throw new Error("Metoda još nije implementirana");
   }
 

@@ -11,10 +11,10 @@ export interface ILogService {
   getAllLogs(): Promise<LogDTO[]>;
 
   
-  getLogById(id: number): Promise<LogDTO | null>;
+  //getLogById(id: number): Promise<LogDTO | null>;
 
  
-  updateLog(id: number, log: Partial<LogDTO>): Promise<LogDTO>;
+  //updateLog(id: number, log: Partial<LogDTO>): Promise<LogDTO>;
 
   
   deleteLog(id: number): Promise<boolean>;

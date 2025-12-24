@@ -2,6 +2,7 @@ import { Repository } from "typeorm";
 import { ILogService } from "../Domain/services/ILogService";
 import { Log } from "../Domain/models/Log";
 import { LogDTO } from "../Domain/DTOs/LogDTO";
+import { LogInfo } from "../Domain/enums/Log";
 
 export class LogService implements ILogService {
   constructor(private auditRepository: Repository<LogDTO>) {
@@ -14,9 +15,9 @@ export class LogService implements ILogService {
   async log(message: string, type: "INFO" | "WARNING" | "ERROR" = "INFO"): Promise<boolean> {
     try {
       const log = this.auditRepository.create({
-        type,
-        message,
-        timestamp: new Date(),
+        logtype: LogInfo.INFO,
+        description: "",
+        datetime: new Date(),
       });
       await this.auditRepository.save(log);
       console.log(`\x1b[35m[Logger@1.0.0]\x1b[0m ${type}: ${message}`);
@@ -30,9 +31,9 @@ export class LogService implements ILogService {
 
   async createLog(log: LogDTO): Promise<LogDTO> {
     const newLog = this.auditRepository.create({
-      type: log.logtype,
-      message: log.description,
-      timestamp: log.datetime ? new Date(log.datetime) : new Date(),
+      logtype: log.logtype,
+      description: log.description,
+      datetime: log.datetime ? new Date(log.datetime) : new Date(),
     });
     const savedLog = await this.auditRepository.save(newLog);
     return this.toDTO(savedLog);
@@ -45,7 +46,7 @@ export class LogService implements ILogService {
   }
 
   
-  async getLogById(id: number): Promise<LogDTO | null> {
+  /*async getLogById(id: number): Promise<LogDTO | null> {
     const log = await this.auditRepository.findOne({ where: { id } });
     return log ? this.toDTO(log) : null;
   }
@@ -56,11 +57,11 @@ export class LogService implements ILogService {
     if (!existingLog) throw new Error(`Log with ID ${id} not found`);
 
     const updated = { ...existingLog, ...logData };
-    if (logData.datetime) updated.timestamp = new Date(logData.datetime);
+    if (logData.datetime) updated.datetime = new Date(logData.datetime);
 
     const savedLog = await this.auditRepository.save(updated);
     return this.toDTO(savedLog);
-  }
+  }*/
 
 
   async deleteLog(id: number): Promise<boolean> {
