@@ -17,6 +17,7 @@ export class PerfumeController {
   private initializeRoutes(): void {
     this.router.get("/perfumes/:type/:quantity", this.getPerfumeByTypeAndQuantity.bind(this));
     this.router.get("/perfumes", this.getAllPerfumes.bind(this));
+    this.router.post("/processing", this.plantProcessing.bind(this));
   }
 
   private async getPerfumeByTypeAndQuantity(req: Request, res: Response): Promise<void>{
@@ -38,6 +39,23 @@ export class PerfumeController {
       this.logger.log("Fetching all perfumes");
       const perfumes = await this.perfumesService.getAllPerfumes();
       res.status(200).json(perfumes);
+    } catch (err){
+      this.logger.log((err as Error).message);
+      res.status(400).json({message: (err as Error).message});
+    }
+  }
+
+  private async plantProcessing(req: Request, res: Response): Promise<void>{
+    try{
+        const { Perfume, quantityBottle, volumeBottle } = req.body;
+
+        if(!Perfume || !quantityBottle || !volumeBottle){
+          res.status(400).json({message: "Missing parameters!"});
+          return;
+        }
+
+        const processedPerfumes = await this.perfumesService.plantProcessing(Perfume, Number(quantityBottle), Number(volumeBottle));
+        res.status(200).json(processedPerfumes);
     } catch (err){
       this.logger.log((err as Error).message);
       res.status(400).json({message: (err as Error).message});

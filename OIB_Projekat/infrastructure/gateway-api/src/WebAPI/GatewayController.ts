@@ -24,6 +24,7 @@ export class GatewayController {
 
     //Perfumes
     this.router.get("/perfumes", this.getAllPerfumes.bind(this));
+    this.router.post("/processing", this.plantProcessing.bind(this));
   }
 
   // Auth
@@ -69,6 +70,22 @@ export class GatewayController {
     try {
       const perfumes = await this.gatewayService.getAllPerfumes();
       res.status(200).json(perfumes);
+    } catch (err) {
+      res.status(500).json({ message: (err as Error).message });
+    }
+  }
+
+  private async plantProcessing(req: Request, res: Response): Promise<void>{
+    try{
+       const { Perfume, quantityBottle, volumeBottle } = req.body;
+
+        if(!Perfume || !quantityBottle || !volumeBottle){
+          res.status(400).json({message: "Missing parameters!"});
+          return;
+        }
+
+        const processedPerfumes = await this.gatewayService.plantProcessing(Perfume, Number(quantityBottle), Number(volumeBottle));
+         res.status(200).json(processedPerfumes);
     } catch (err) {
       res.status(500).json({ message: (err as Error).message });
     }

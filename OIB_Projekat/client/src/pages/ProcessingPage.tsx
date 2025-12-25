@@ -66,7 +66,32 @@ export const ProcessingPage: React.FC<Props> = ({perfumeAPI}) => {
       </div>
 
       <div>
-        <button>Start processing</button>
+        <button
+          onClick={async () => {
+            if (selectedPerfume === null) {
+              alert("Please select a perfume");
+              return;
+            }
+
+            const perfumeObj = perfumes.find((p) => p.id === selectedPerfume);
+            if (!perfumeObj) return;
+
+            try {
+              const result = await perfumeAPI.plantProcessing(
+                perfumeObj,
+                bottleCount,
+                bottleVolume
+              );
+              console.log("Processing result:", result);
+              alert("Processing completed!");
+            } catch (err: any) {
+              console.error(err);
+              alert(err.message || "Something went wrong");
+            }
+          }}
+        >
+          Start processing
+        </button>
       </div>
     </div>
   );

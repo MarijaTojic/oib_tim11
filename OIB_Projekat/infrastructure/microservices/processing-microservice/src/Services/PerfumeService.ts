@@ -4,6 +4,7 @@ import { Perfume } from "../Domain/models/Perfume";
 import { PerfumeDTO } from "../Domain/DTOs/PerfumeDTO";
 import { PerfumeType } from "../Domain/enums/PerfumeType";
 import { calculateNumberOfPlants } from "../helpers/NumberOfPlants"
+import { LogerService } from "./LogerService";
 
 export class PerfumeService implements IPerfumeService {
   constructor(private perfumeRepository: Repository<Perfume>) {}
@@ -11,10 +12,35 @@ export class PerfumeService implements IPerfumeService {
   /**
    * Plant processing
    */
-  async plantProcessing(Perfume: PerfumeDTO, quantityBottle: number, volumeBottle: number): Promise<void> {
+  async plantProcessing(Perfume: PerfumeDTO, quantityBottle: number, volumeBottle: number): Promise<PerfumeDTO[]> {
+    const logger = new LogerService();
     const numberOfPlants = calculateNumberOfPlants(quantityBottle, volumeBottle);
-    throw new Error("Metoda još nije implementirana");
+    await logger.log(`Number of plants needed: ${numberOfPlants}`);
+
+    const perfumes: Perfume[] = [];
+    const typeEnum: PerfumeType = PerfumeType[Perfume.type as keyof typeof PerfumeType];
+
+    await logger.log(`Starting plant processing for ${Perfume.name} (${quantityBottle} bottles of ${volumeBottle} ml)`);
+
+    for (let i = 0; i < quantityBottle; i++) {
+    let perfume = this.perfumeRepository.create({
+      name: Perfume.name,
+      type: typeEnum,
+      netQuantity: volumeBottle,
+      plantId: Perfume.plantId,
+      expirationDate: new Date(
+      new Date().setFullYear(new Date().getFullYear() + 2)
+      )
+    });
+
+    perfume = await this.perfumeRepository.save(perfume);
+    perfume.serialNumber = `PP-2025-${perfume.id}`;
+    perfume = await this.perfumeRepository.save(perfume);
+
+    perfumes.push(perfume);
   }
+  return perfumes.map(p => this.toDTO(p));
+}
 
   /**
    * Get all perfumes

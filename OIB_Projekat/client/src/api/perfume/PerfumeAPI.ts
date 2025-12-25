@@ -19,4 +19,10 @@ export class PerfumeAPI implements IPerfumeAPI{
        return response;
     }
     
+    async plantProcessing(Perfume : PerfumeDTO, quantityBottle: number, volumeBottle : number) : Promise<PerfumeDTO[]>{
+        const response = (await this.axiosInstance.post<PerfumeDTO[]>("/processing", {
+            Perfume, quantityBottle, volumeBottle
+        })).data;
+        return response;
+    }
 }

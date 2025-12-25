@@ -15,4 +15,5 @@ export interface IGatewayService {
 
   //Perfumes
   getAllPerfumes(): Promise<PerfumeDTO[]>;
+  plantProcessing(Perfume : PerfumeDTO, quantityBottle: number, volumeBottle : number) : Promise<PerfumeDTO[]>; 
 }

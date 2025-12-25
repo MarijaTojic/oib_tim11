@@ -13,7 +13,8 @@ export const CreatePlantForm: React.FC<Props> = ({ plantsAPI, onSuccess }) => {
     latinName: "",
     aromaticOilStrength: 1,
     countryOfOrigin: "",
-    status: PlantStatus.PROCESSED
+    status: PlantStatus.PROCESSED,
+    quantity: 1
   });
 
   const submit = async () => {

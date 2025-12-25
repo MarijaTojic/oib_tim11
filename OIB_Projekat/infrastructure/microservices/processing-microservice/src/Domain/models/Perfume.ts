@@ -15,7 +15,7 @@ export class Perfume {
   @Column({ type: "int"})
   netQuantity!: number;
 
- @Column({ type: "varchar", unique: true, length: 100 })
+ @Column({ type: "varchar", unique: true, length: 100, nullable: true })
   serialNumber!: string;
 
   @Column({ type: "int"})

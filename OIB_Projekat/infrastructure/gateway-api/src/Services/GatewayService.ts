@@ -76,4 +76,11 @@ export class GatewayService implements IGatewayService {
     console.log("Odgovor od Processing servisa:", response.data);
     return response.data;
   }
+
+  async plantProcessing(Perfume : PerfumeDTO, quantityBottle: number, volumeBottle : number) : Promise<PerfumeDTO[]>{
+    const response = await this.processingClient.post<PerfumeDTO[]>("/processing", {
+      Perfume, quantityBottle, volumeBottle
+    });
+    return response.data;
+  }
 }
