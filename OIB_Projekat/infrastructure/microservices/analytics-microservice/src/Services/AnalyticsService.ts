@@ -58,7 +58,7 @@ export class AnalyticsService implements IAnalyticsService {
   async deleteReceipt(id: number): Promise<boolean> {
     try {
       const result = await this.receiptRepository.delete(id);
-      const isDeleted = result.affected !== undefined && result.affected > 0;
+      const isDeleted = (result.affected ?? 0) > 0;
       console.log(
         `\x1b[36m[Analytics@1.0.0]\x1b[0m Receipt ${id} ${isDeleted ? 'deleted' : 'not found'}`
       );
@@ -110,7 +110,7 @@ export class AnalyticsService implements IAnalyticsService {
   async deleteReportAnalysis(id: number): Promise<boolean> {
     try {
       const result = await this.reportRepository.delete(id);
-      const isDeleted = result.affected !== undefined && result.affected > 0;
+      const isDeleted = (result.affected ?? 0) > 0;
       console.log(
         `\x1b[36m[Analytics@1.0.0]\x1b[0m Report ${id} ${isDeleted ? 'deleted' : 'not found'}`
       );
