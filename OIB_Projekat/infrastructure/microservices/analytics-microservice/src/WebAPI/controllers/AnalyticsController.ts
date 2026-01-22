@@ -3,6 +3,7 @@ import { Request, Response, Router } from 'express';
 const PDFDocument = require('pdfkit');
 import { IAnalyticsService } from '../../Domain/services/IAnalyticsService';
 import { ILogerService } from '../../Domain/services/ILogerService';
+import { IValidatorService } from '../../Domain/services/IValidatorService';
 import { Receipt } from '../../Domain/models/Receipt';
 import { ReportAnalysis } from '../../Domain/models/ReportAnalysis';
 
@@ -10,11 +11,13 @@ export class AnalyticsController {
   private router: Router;
   private analyticsService: IAnalyticsService;
   private logerService: ILogerService;
+  private validatorService: IValidatorService;
 
-  constructor(analyticsService: IAnalyticsService, logerService: ILogerService) {
+  constructor(analyticsService: IAnalyticsService, logerService: ILogerService, validatorService: IValidatorService) {
     this.router = Router();
     this.analyticsService = analyticsService;
     this.logerService = logerService;
+    this.validatorService = validatorService;
     this.initializeRoutes();
   }
 
@@ -51,8 +54,11 @@ export class AnalyticsController {
 
       const receipt: Partial<Receipt> = req.body;
 
-      if (!receipt.saleType || !receipt.paymentType || !receipt.perfumeDetails || !receipt.totalAmount) {
-        res.status(400).json({ success: false, message: 'Missing required fields' });
+      // Validate receipt
+      const validation = this.validatorService.validateReceipt(receipt);
+      if (!validation.isValid) {
+        await this.logerService.log(`Receipt validation failed: ${validation.errors.join(', ')}`);
+        res.status(400).json({ success: false, message: 'Validation failed', errors: validation.errors });
         return;
       }
 
@@ -83,7 +89,7 @@ export class AnalyticsController {
       const start = startDate ? new Date(startDate as string) : undefined;
       const end = endDate ? new Date(endDate as string) : undefined;
 
-      const receipts = await this.analyticsService.getReceipts(parseInt(userId), start, end);
+      const receipts = await this.analyticsService.getReceipts(parseInt(userId as string), start, end);
 
       res.status(200).json({ success: true, data: receipts });
     } catch (error) {
@@ -105,7 +111,7 @@ export class AnalyticsController {
         return;
       }
 
-      const receipt = await this.analyticsService.getReceiptById(parseInt(id));
+      const receipt = await this.analyticsService.getReceiptById(parseInt(id as string));
 
       if (!receipt) {
         res.status(404).json({ success: false, message: 'Receipt not found' });
@@ -132,7 +138,7 @@ export class AnalyticsController {
         return;
       }
 
-      const isDeleted = await this.analyticsService.deleteReceipt(parseInt(id));
+      const isDeleted = await this.analyticsService.deleteReceipt(parseInt(id as string));
 
       if (!isDeleted) {
         res.status(404).json({ success: false, message: 'Receipt not found' });
@@ -157,8 +163,11 @@ export class AnalyticsController {
 
       const report: Partial<ReportAnalysis> = req.body;
 
-      if (!report.reportName || !report.analysisType || !report.salesData) {
-        res.status(400).json({ success: false, message: 'Missing required fields' });
+      // Validate report
+      const validation = this.validatorService.validateReportAnalysis(report);
+      if (!validation.isValid) {
+        await this.logerService.log(`Report validation failed: ${validation.errors.join(', ')}`);
+        res.status(400).json({ success: false, message: 'Validation failed', errors: validation.errors });
         return;
       }
 
@@ -203,7 +212,7 @@ export class AnalyticsController {
         return;
       }
 
-      const report = await this.analyticsService.getReportAnalysisById(parseInt(id));
+      const report = await this.analyticsService.getReportAnalysisById(parseInt(id as string));
 
       if (!report) {
         res.status(404).json({ success: false, message: 'Report not found' });
@@ -230,7 +239,7 @@ export class AnalyticsController {
         return;
       }
 
-      const isDeleted = await this.analyticsService.deleteReportAnalysis(parseInt(id));
+      const isDeleted = await this.analyticsService.deleteReportAnalysis(parseInt(id as string));
 
       if (!isDeleted) {
         res.status(404).json({ success: false, message: 'Report not found' });
@@ -258,7 +267,7 @@ export class AnalyticsController {
         return;
       }
 
-      const isUpdated = await this.analyticsService.updateReportAnalysisExportDate(parseInt(id));
+      const isUpdated = await this.analyticsService.updateReportAnalysisExportDate(parseInt(id as string));
 
       if (!isUpdated) {
         res.status(404).json({ success: false, message: 'Report not found' });
@@ -341,43 +350,110 @@ export class AnalyticsController {
         return;
       }
 
-      const report = await this.analyticsService.getReportAnalysisById(parseInt(id));
+      const report = await this.analyticsService.getReportAnalysisById(parseInt(id as string));
 
       if (!report) {
         res.status(404).json({ success: false, message: 'Report not found' });
         return;
       }
 
-      const doc = new PDFDocument();
+      const doc = new PDFDocument({
+        bufferPages: true,
+        margin: 50,
+      });
 
       res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `attachment; filename="report_${id}.pdf"`);
+      res.setHeader('Content-Disposition', `attachment; filename="sales_analysis_report_${id}.pdf"`);
 
       doc.pipe(res);
 
-      doc.fontSize(16).text(`Sales Analysis Report`, { underline: true });
-      doc.moveDown();
-      doc.fontSize(12).text(`Report Name: ${report.reportName}`);
-      doc.text(`Analysis Type: ${report.analysisType}`);
-      doc.text(`Created At: ${report.createdAt}`);
+      // Header
+      doc.fontSize(20).font('Helvetica-Bold').text('Sales Analysis Report', { align: 'center' });
+      doc.moveDown(0.5);
+      doc.fontSize(10).font('Helvetica').text(`Report ID: ${report.id}`, { align: 'center' });
+      doc.fontSize(10).text(`Generated: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`, {
+        align: 'center',
+      });
+      doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
       doc.moveDown();
 
-      doc.fontSize(14).text('Sales Data:', { underline: true });
-      doc.fontSize(11);
-      doc.text(`Total Sales: ${report.salesData.totalSales}`);
-      doc.text(`Total Revenue: $${report.salesData.totalRevenue}`);
+      // Report Details
+      doc.fontSize(12).font('Helvetica-Bold').text('Report Details');
+      doc.fontSize(10).font('Helvetica');
+      doc.text(`Name: ${report.reportName}`);
+      doc.text(`Type: ${report.analysisType.toUpperCase()}`);
+      doc.text(`Period: ${report.salesData.period || 'All Time'}`);
+      doc.text(`Created At: ${new Date(report.createdAt).toLocaleDateString()}`);
+      doc.moveDown();
 
+      // Sales Data Section
+      doc.fontSize(14).font('Helvetica-Bold').text('Sales Overview');
+      doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
+      doc.moveDown(0.5);
+      doc.fontSize(11).font('Helvetica');
+      doc.text(`Total Transactions: ${report.salesData.totalSales}`, { indent: 20 });
+      doc.text(`Total Revenue: €${parseFloat(report.salesData.totalRevenue.toString()).toFixed(2)}`, {
+        indent: 20,
+      });
+      doc.moveDown();
+
+      // Top 10 Perfumes
       if (report.topTenPerfumes && report.topTenPerfumes.length > 0) {
-        doc.moveDown();
-        doc.fontSize(14).text('Top 10 Perfumes:', { underline: true });
-        doc.fontSize(11);
+        doc.fontSize(14).font('Helvetica-Bold').text('Top 10 Best Selling Perfumes');
+        doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
+        doc.moveDown(0.5);
+
+        // Table Headers
+        doc.fontSize(10).font('Helvetica-Bold');
+        const tableTop = doc.y;
+        doc.text('Rank', 55, tableTop);
+        doc.text('Perfume Name', 95, tableTop);
+        doc.text('Qty Sold', 320, tableTop);
+        doc.text('Revenue', 420, tableTop);
+
+        doc.moveTo(50, doc.y + 5).lineTo(550, doc.y + 5).stroke();
+        doc.moveDown(0.5);
+
+        // Table Rows
+        doc.fontSize(9).font('Helvetica');
         report.topTenPerfumes.forEach((perfume, index) => {
-          doc.text(`${index + 1}. ${perfume.perfumeName} - Qty: ${perfume.quantity}, Revenue: $${perfume.revenue}`);
+          const yPosition = doc.y;
+          doc.text(`${index + 1}`, 55, yPosition);
+          doc.text(perfume.perfumeName.substring(0, 30), 95, yPosition);
+          doc.text(`${perfume.quantity}`, 320, yPosition);
+          doc.text(`€${parseFloat(perfume.revenue.toString()).toFixed(2)}`, 420, yPosition);
+          doc.moveDown();
         });
+        doc.moveDown();
       }
 
+      // Sales Trend Section
+      if (report.salesTrend && report.salesTrend.length > 0) {
+        doc.fontSize(14).font('Helvetica-Bold').text('Sales Trend (Last 30 Days)');
+        doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
+        doc.moveDown(0.5);
+
+        // Show only last 10 entries for space
+        const trendEntries = report.salesTrend.slice(-10);
+        doc.fontSize(9).font('Helvetica');
+        trendEntries.forEach((trend) => {
+          doc.text(`${trend.date}: ${trend.sales} sales - €${parseFloat(trend.revenue.toString()).toFixed(2)}`, {
+            indent: 20,
+          });
+        });
+        doc.moveDown();
+      }
+
+      // Footer
+      doc.fontSize(8).font('Helvetica').text(
+        'This report was automatically generated by the Analytics Microservice - O\'Seignel De Or Perfumery',
+        50,
+        doc.page.height - 30,
+        { align: 'center' }
+      );
+
       doc.end();
-      await this.logerService.log(`PDF generated for report ${id}`);
+      await this.logerService.log(`PDF generated successfully for report ${id}`);
     } catch (error) {
       await this.logerService.log(`Error generating PDF: ${error}`);
       res.status(500).json({ success: false, message: 'Error generating PDF' });

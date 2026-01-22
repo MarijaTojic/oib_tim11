@@ -12,6 +12,8 @@ import { AnalyticsService } from './Services/AnalyticsService';
 import { AnalyticsController } from './WebAPI/controllers/AnalyticsController';
 import { ILogerService } from './Domain/services/ILogerService';
 import { LogerService } from './Services/LogerService';
+import { IValidatorService } from './Domain/services/IValidatorService';
+import { ValidatorService } from './Services/ValidatorService';
 
 dotenv.config({ quiet: true });
 
@@ -40,9 +42,10 @@ const reportRepository: Repository<ReportAnalysis> = Db.getRepository(ReportAnal
 // Services
 const analyticsService: IAnalyticsService = new AnalyticsService(receiptRepository, reportRepository);
 const logerService: ILogerService = new LogerService();
+const validatorService: IValidatorService = new ValidatorService();
 
 // WebAPI routes
-const analyticsController = new AnalyticsController(analyticsService, logerService);
+const analyticsController = new AnalyticsController(analyticsService, logerService, validatorService);
 
 // Registering routes
 app.use('/api/v1', analyticsController.getRouter());
