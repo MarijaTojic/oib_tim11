@@ -23,4 +23,7 @@ export class Perfume {
 
   @Column({ type: "timestamp"})
   expirationDate!: Date;
+
+  @Column({ type: "int"})
+  perfumeAromaticOilStrength!: number;
 }

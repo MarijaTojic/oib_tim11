@@ -8,4 +8,6 @@ export interface PerfumeDTO {
   serialNumber: string; // PP-2025-ID_PARFEMA
   plantId: number;
   expirationDate: Date;
+  perfumeAromaticOilStrength: number; //in percentage
+
 }

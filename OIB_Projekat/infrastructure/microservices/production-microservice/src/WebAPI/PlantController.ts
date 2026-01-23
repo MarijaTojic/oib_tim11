@@ -22,56 +22,73 @@ export class PlantsController {
 
 
   /** POST create new plant */
-  private async createPlant(req: Request, res: Response): Promise<void> {
-    try {
-      const plantDTO: PlantDTO = req.body;
-      this.logger.log("Creating new plant");
-      const createdPlant = await this.plantsService.createPlant(plantDTO);
-      res.status(201).json(createdPlant);
-    } catch (err) {
-      this.logger.log((err as Error).message);
-      res.status(500).json({ message: (err as Error).message });
+    private async createPlant(req: Request, res: Response): Promise<void> {
+      try {
+        const plantDTO: PlantDTO = req.body;
+
+        const createdPlant = await this.plantsService.createPlant(plantDTO);
+
+              await this.logger.log(
+                    `[production] CREATE_PLANT - SUCCESS: Plant ${createdPlant.commonName} successfully planted`
+              );
+
+        res.status(201).json(createdPlant);
+      } catch (err) {
+              await this.logger.log(
+                `[production] CREATE_PLANT - FAIL: ${(err as Error).message}`
+              );
+
+        res.status(500).json({ message: (err as Error).message });
+      }
     }
-  }
+
+
 
   /** PUT change aromatic oil strength by percentage */
-  private async changeAromaticOilStrength(req: Request, res: Response): Promise<void> {
-    try {
-      const id = parseInt(req.params.id, 10);
-      const { percentage } = req.body;
+      private async changeAromaticOilStrength(req: Request, res: Response): Promise<void> {
+        try {
+          const id = parseInt(req.params.id, 10);
+          const { percentage } = req.body;
 
-      this.logger.log(
-        `Changing aromatic oil strength for plant ${id} by ${percentage}%`
-      );
+          const updatedPlant =
+            await this.plantsService.changeAromaticOilStrength(id, percentage);
 
-      const updatedPlant =
-        await this.plantsService.changeAromaticOilStrength(id, percentage);
+          await this.logger.log(
+            `[production] CHANGE_AROMA - SUCCESS: Aromatic oil strength changed by ${percentage}% for plant ${id}`
+          );
 
-      res.status(200).json(updatedPlant);
-    } catch (err) {
-      this.logger.log((err as Error).message);
-      res.status(404).json({ message: (err as Error).message });
-    }
-  }
+          res.status(200).json(updatedPlant);
+        } catch (err) {
+          await this.logger.log(
+            `[production] CHANGE_AROMA - FAIL: ${(err as Error).message}`
+          );
+
+          res.status(404).json({ message: (err as Error).message });
+        }
+      }
 
   /** POST harvest plants */
-  private async harvestPlants(req: Request, res: Response): Promise<void> {
-    try {
-      const { commonName, quantity } = req.body;
+    private async harvestPlants(req: Request, res: Response): Promise<void> {
+      try {
+        const { commonName, quantity } = req.body;
 
-      this.logger.log(
-        `Harvesting ${quantity} plants with name ${commonName}`
-      );
+        const harvested =
+          await this.plantsService.harvestPlants(commonName, quantity);
 
-      const harvested =
-        await this.plantsService.harvestPlants(commonName, quantity);
+        await this.logger.log(
+          `[production] HARVEST - SUCCESS: Harvested ${quantity} plants of type ${commonName}`
+        );
 
-      res.status(200).json(harvested);
-    } catch (err) {
-      this.logger.log((err as Error).message);
-      res.status(400).json({ message: (err as Error).message });
+        res.status(200).json(harvested);
+      } catch (err) {
+        await this.logger.log(
+          `[production] HARVEST - FAIL: ${(err as Error).message}`
+        );
+
+        res.status(400).json({ message: (err as Error).message });
+      }
     }
-  }
+
 
 
   public getRouter(): Router {
