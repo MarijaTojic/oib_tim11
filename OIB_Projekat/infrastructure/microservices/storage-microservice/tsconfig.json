@@ -10,7 +10,13 @@
     "strict": true,
     "skipLibCheck": true,
     "emitDecoratorMetadata": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "*": [ "src/*", "node_modules/*" ]
+    }
   },
-  "include": ["./*.js", "src/**/*.ts", "test/**/*.ts"]
+  "include": [ "./*.js", "src/**/*.ts", "test/**/*.ts" ],
+  "exclude": [ "node_modules", "dist" ]
 }

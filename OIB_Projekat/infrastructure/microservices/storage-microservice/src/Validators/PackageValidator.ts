@@ -1,4 +1,4 @@
-import { CreatePackageDTO } from '../domain/DTOs/CreatePackageDTO';
+import { CreatePackageDTO } from '../Domain/DTOs/CreatePackageDTO';
 
 export interface ValidationResult {
     success: boolean;
