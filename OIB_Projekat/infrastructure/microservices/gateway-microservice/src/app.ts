@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 
 import { IGatewayService } from './Domain/services/IGatewayService';
 import { GatewayService } from './Services/GatewayService';
-import { GatewayController } from './WebAPI/GatewayController';
+import { GatewayController } from './WebAPI/controllers/GatewayController';
 
 dotenv.config({ quiet: true });
 
@@ -12,7 +12,7 @@ const app = express();
 
 // Read CORS settings from environment
 const corsOrigin = process.env.CORS_ORIGIN ?? "*";
-const corsMethods = process.env.CORS_METHODS?.split(",").map(m => m.trim()) ?? ["POST"];
+const corsMethods = process.env.CORS_METHODS?.split(",").map(m => m.trim()) ?? ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"];
 
 // Protected microservice from unauthorized access
 app.use(cors({
@@ -22,7 +22,7 @@ app.use(cors({
 
 app.use(express.json());
 
-// Services
+// Services (Dependency Injection)
 const gatewayService: IGatewayService = new GatewayService();
 
 // WebAPI routes

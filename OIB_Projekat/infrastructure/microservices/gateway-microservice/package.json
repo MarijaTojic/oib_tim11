@@ -1,6 +1,7 @@
 {
-  "name": "microservice-auth",
-  "version": "1.2.0",
+  "name": "gateway-microservice",
+  "version": "1.0.0",
+  "description": "Gateway mikroservis za rutiranje saobraćaja",
   "main": "src/index.ts",
   "scripts": {
     "start": "ts-node src/index.ts",
