@@ -4,10 +4,6 @@ import { AuthResponseType } from "../types/AuthResponse";
 import { UserDTO } from "../DTOs/UserDTO";
 import { PlantDTO } from "../DTOs/PlantDTO";
 import { PerfumeDTO } from "../DTOs/PerfumeDTO";
-import { PackagingDTO } from "../DTOs/PackagingDTO";
-import { StorageDTO } from "../DTOs/StorageDTO";
-import { ReceiptDTO } from "../DTOs/ReceiptDTO";
-import { LogDTO } from "../DTOs/LogDTO";
 
 export interface IGatewayService {
   // Auth microservice
@@ -32,28 +28,5 @@ export interface IGatewayService {
   getPerfumeById(id: number): Promise<PerfumeDTO>;
   startProcessing(plantId: number, quantity: number, volume: number, perfumeType: string): Promise<PerfumeDTO[]>;
   getPerfumesByType(type: string, quantity: number): Promise<PerfumeDTO[]>;
-
-  // Packaging microservice
-  getAllPackages(): Promise<PackagingDTO[]>;
-  getPackageById(id: number): Promise<PackagingDTO>;
-  packPerfumes(perfumeIds: number[], storageId: number): Promise<PackagingDTO>;
-  sendPackageToStorage(packageId: number): Promise<PackagingDTO>;
-
-  // Storage microservice
-  getAllStorages(): Promise<StorageDTO[]>;
-  getStorageById(id: number): Promise<StorageDTO>;
-  sendPackagesFromStorage(quantity: number): Promise<PackagingDTO[]>;
-
-  // Sales microservice
-  getAllReceipts(): Promise<ReceiptDTO[]>;
-  getReceiptById(id: number): Promise<ReceiptDTO>;
-  createSale(saleData: ReceiptDTO): Promise<ReceiptDTO>;
-
-  // Log microservice
-  getAllLogs(): Promise<LogDTO[]>;
-  getLogById(id: number): Promise<LogDTO>;
-  
-  // Analytics microservice
-  getSalesAnalytics(params?: any): Promise<any>;
-  getPerformanceAnalytics(): Promise<any>;
 }
+
