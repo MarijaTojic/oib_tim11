@@ -1,12 +1,12 @@
-import { Db } from './DbConnectionPool';
-import { DatabaseSeeder } from './DatabaseSeeder';
-import { Receipt } from '../Domain/models/Receipt';
-import { ReportAnalysis } from '../Domain/models/ReportAnalysis';
+import { Db } from "./DbConnectionPool";
+import { DatabaseSeeder } from "./DatabaseSeeder";
+import { Receipt } from "../Domain/models/Receipt";
+import { ReportAnalysis } from "../Domain/models/ReportAnalysis";
 
 export async function initialize_database() {
   try {
     await Db.initialize();
-    console.log('\x1b[34m[DbConn@1.0.0]\x1b[0m Analytics database connected');
+    console.log("\x1b[34m[DbConn@1.12.4]\x1b[0m Database connected");
 
     // Run seeder
     const receiptRepository = Db.getRepository(Receipt);
@@ -14,6 +14,6 @@ export async function initialize_database() {
     const seeder = new DatabaseSeeder(receiptRepository, reportRepository);
     await seeder.seed();
   } catch (err) {
-    console.error('\x1b[31m[DbConn@1.0.0]\x1b[0m Error during database initialization', err);
+    console.error("\x1b[31m[DbConn@1.12.4]\x1b[0m Error during DataSource initialization ", err);
   }
 }
