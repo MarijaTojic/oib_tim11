@@ -1,113 +1,53 @@
-import axios, { AxiosInstance } from "axios";
-import { ISalesService } from "../Domain/services/ISalesService";
+// src/Domain/services/SalesValidator.ts
+
 import { CreateSaleDTO } from "../Domain/DTOs/CreateSaleDTO";
-import { PerfumeDTO } from "../Domain/DTOs/perfumes/PerfumeDTO";
-import QRCode from "qrcode"; // npm install qrcode + npm i --save-dev @types/qrcode
 
-export class SalesService implements ISalesService {
-  private gateway: AxiosInstance;
-  private perfumeCache: PerfumeDTO[] | null = null;
-  private cacheTimestamp: number = 0;
-  private cacheTTL = 5 * 60 * 1000; // 5 minuta
+export interface ValidationResult {
+  success: boolean;
+  message?: string;
+}
 
-  constructor() {
-    this.gateway = axios.create({
-      baseURL: process.env.GATEWAY_API,
-      timeout: 5000,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
-
-  async getCatalogue(): Promise<PerfumeDTO[]> {
-    if (this.perfumeCache && Date.now() - this.cacheTimestamp < this.cacheTTL) {
-      return this.perfumeCache;
+export class SalesValidator {
+  /**
+   * Validira CreateSaleDTO prije slanja prodaje
+   */
+  static validateSaleDto(dto: CreateSaleDTO): ValidationResult {
+    if (!dto.userId || typeof dto.userId !== "number") {
+      return { success: false, message: "Invalid or missing userId" };
     }
 
-    try {
-      const res = await this.gateway.get<PerfumeDTO[]>("/perfumes");
-      this.perfumeCache = res.data;
-      this.cacheTimestamp = Date.now();
-      return res.data;
-    } catch (err: any) {
-      await this.log("ERROR", `Failed to fetch catalogue: ${err.message}`);
-      throw new Error("Could not fetch catalogue");
+    if (!dto.perfumes || !Array.isArray(dto.perfumes) || dto.perfumes.length === 0) {
+      return { success: false, message: "perfumes array is required and cannot be empty" };
     }
-  }
 
-  async sell(dto: CreateSaleDTO): Promise<{ success: boolean; message?: string; qrCode?: string }> {
-    try {
-      await this.log("INFO", `Sale started for user ${dto.userId}`);
-
-      const perfumes = await this.getCatalogue(); // koristi cache
-
-      // Provjera da svi parfemi postoje
-      for (const p of dto.perfumes) {
-        if (!perfumes.find(x => x.id === p.perfumeId)) {
-          const msg = `Perfume ${p.perfumeId} not found`;
-          await this.log("ERROR", msg);
-          throw new Error(msg);
-        }
+    for (let i = 0; i < dto.perfumes.length; i++) {
+      const p = dto.perfumes[i];
+      if (!p.perfumeId || typeof p.perfumeId !== "number") {
+        return { success: false, message: `Perfume at index ${i} must have a valid perfumeId` };
       }
-
-      const perfumeIds = dto.perfumes.map(p => p.perfumeId);
-
-      const storageRes = await this.gateway.post("/storage/send", {
-        perfumeIds,
-        userRole: "manager",
-        userId: dto.userId
-      });
-
-      if (!storageRes.data.success) {
-        await this.log("ERROR", "Storage send failed");
-        throw new Error("Storage failed");
+      if (!p.quantity || typeof p.quantity !== "number" || p.quantity <= 0) {
+        return { success: false, message: `Perfume at index ${i} must have a positive quantity` };
       }
-
-      const packages = storageRes.data.packages;
-
-      // Priprema podataka za Analytics
-      const perfumesSold = packages.map((pkg: any) => ({
-        perfumeId: pkg.perfumeId,
-        userId: dto.userId
-      }));
-
-      // Pošalji na Analytics i dobiješ "račun"
-      const receipt = await this.gateway.post("/analytics/sale", perfumesSold);
-
-      // Generisanje QR koda sa podacima iz računa
-      const qrData = receipt.data.perfumeDetails.map((p: any) => ({
-        perfumeId: p.perfumeId,
-        perfumeName: p.perfumeName,
-        quantity: p.quantity,
-        price: p.price,
-        totalPrice: p.totalPrice
-      }));
-
-      const qrString = JSON.stringify({
-        userId: dto.userId,
-        totalAmount: receipt.data.totalAmount,
-        perfumes: qrData
-      });
-
-      const qrCode = await QRCode.toDataURL(qrString);
-
-      await this.log("INFO", `Sale success for user ${dto.userId}`);
-      return { success: true, qrCode };
-
-    } catch (error: any) {
-      await this.log("ERROR", `Sale failed: ${error.message}`);
-      return { success: false, message: error.message };
     }
+
+    return { success: true };
   }
 
-  private async log(type: "INFO" | "ERROR", message: string) {
-    try {
-      await this.gateway.post("/logs", {
-        logtype: type,
-        description: message,
-        datetime: new Date()
-      });
-    } catch (err) {
-      console.error(`[SalesService][${type}] ${message}`, err);
+  /**
+   * Validira pakete koje dobiješ od skladišta (da sadrže perfumeId)
+   */
+  static validatePackages(packages: any[]): ValidationResult {
+    if (!Array.isArray(packages) || packages.length === 0) {
+      return { success: false, message: "Packages array is empty or invalid" };
     }
+
+    for (let i = 0; i < packages.length; i++) {
+      const pkg = packages[i];
+      if (!pkg.perfumeId || typeof pkg.perfumeId !== "number") {
+        return { success: false, message: `Package at index ${i} must have a valid perfumeId` };
+      }
+    }
+
+    return { success: true };
   }
 }

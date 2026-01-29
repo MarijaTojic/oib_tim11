@@ -2,7 +2,7 @@ import axios, { AxiosInstance } from "axios";
 import { ISalesService } from "../Domain/services/ISalesService";
 import { CreateSaleDTO } from "../Domain/DTOs/CreateSaleDTO";
 import { PerfumeDTO } from "../Domain/DTOs/perfumes/PerfumeDTO";
-import { SalesValidator } from "../Services/SalesValidator";
+import QRCode from "qrcode"; // npm install qrcode + npm i --save-dev @types/qrcode
 
 export class SalesService implements ISalesService {
   private gateway: AxiosInstance;
@@ -34,59 +34,65 @@ export class SalesService implements ISalesService {
     }
   }
 
-  async sell(dto: CreateSaleDTO): Promise<{ success: boolean; message?: string }> {
+  async sell(dto: CreateSaleDTO): Promise<{ success: boolean; message?: string; qrCode?: string }> {
     try {
-      const validation = SalesValidator.validateSaleDto(dto);
-      if (!validation.success) {
-        await this.log("ERROR", `Sale validation failed: ${validation.message}`);
-        return { success: false, message: validation.message };
-      }
-
       await this.log("INFO", `Sale started for user ${dto.userId}`);
 
-      const perfumes = await this.getCatalogue();
+      const perfumes = await this.getCatalogue(); // koristi cache
 
       // Provjera da svi parfemi postoje
       for (const p of dto.perfumes) {
         if (!perfumes.find(x => x.id === p.perfumeId)) {
           const msg = `Perfume ${p.perfumeId} not found`;
           await this.log("ERROR", msg);
-          return { success: false, message: msg };
+          throw new Error(msg);
         }
       }
 
       const perfumeIds = dto.perfumes.map(p => p.perfumeId);
 
-      // Slanje zahtjeva u microservice za skladištenje
       const storageRes = await this.gateway.post("/storage/send", {
         perfumeIds,
         userRole: "manager",
-        userId: dto.userId,
+        userId: dto.userId
       });
 
       if (!storageRes.data.success) {
         await this.log("ERROR", "Storage send failed");
-        return { success: false, message: "Storage failed" };
+        throw new Error("Storage failed");
       }
 
-      const packages = storageRes.data.packages; //proveriti da ovako vraca
+      const packages = storageRes.data.packages;
 
-      const packageValidation = SalesValidator.validatePackages(packages);
-      if (!packageValidation.success) {
-        await this.log("ERROR", `Package validation failed: ${packageValidation.message}`);
-        return { success: false, message: packageValidation.message };
-      }
-
-      // Slanje prodanih parfema u microservice za analitiku
+      // Priprema podataka za Analytics
       const perfumesSold = packages.map((pkg: any) => ({
         perfumeId: pkg.perfumeId,
-        userId: dto.userId,
+        userId: dto.userId
       }));
 
-      await this.gateway.post("/analytics/sale", perfumesSold);
+      // Pošalji na Analytics i dobiješ "račun"
+      const receipt = await this.gateway.post("/analytics/sale", perfumesSold);
+
+      // Generisanje QR koda sa podacima iz računa
+      const qrData = receipt.data.perfumeDetails.map((p: any) => ({
+        perfumeId: p.perfumeId,
+        perfumeName: p.perfumeName,
+        quantity: p.quantity,
+        price: p.price,
+        totalPrice: p.totalPrice
+      }));
+
+      const qrString = JSON.stringify({
+        userId: dto.userId,
+        totalAmount: receipt.data.totalAmount,
+        perfumes: qrData
+      });
+
+      const qrCode = await QRCode.toDataURL(qrString);
 
       await this.log("INFO", `Sale success for user ${dto.userId}`);
-      return { success: true };
+      return { success: true, qrCode };
+
     } catch (error: any) {
       await this.log("ERROR", `Sale failed: ${error.message}`);
       return { success: false, message: error.message };
@@ -98,7 +104,7 @@ export class SalesService implements ISalesService {
       await this.gateway.post("/logs", {
         logtype: type,
         description: message,
-        datetime: new Date(),
+        datetime: new Date()
       });
     } catch (err) {
       console.error(`[SalesService][${type}] ${message}`, err);
