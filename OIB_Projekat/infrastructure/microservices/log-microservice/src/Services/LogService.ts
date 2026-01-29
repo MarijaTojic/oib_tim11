@@ -46,7 +46,7 @@ export class LogService implements ILogService {
   }
 
   
-  /*async getLogById(id: number): Promise<LogDTO | null> {
+  async getLogById(id: number): Promise<LogDTO | null> {
     const log = await this.auditRepository.findOne({ where: { id } });
     return log ? this.toDTO(log) : null;
   }
@@ -61,7 +61,7 @@ export class LogService implements ILogService {
 
     const savedLog = await this.auditRepository.save(updated);
     return this.toDTO(savedLog);
-  }*/
+  }
 
 
   async deleteLog(id: number): Promise<boolean> {
@@ -72,6 +72,7 @@ export class LogService implements ILogService {
 
   private toDTO(log: LogDTO): LogDTO {
     return {
+      id: log.id,
       logtype: log.logtype,
       description: log.description,
       datetime: log.datetime,
