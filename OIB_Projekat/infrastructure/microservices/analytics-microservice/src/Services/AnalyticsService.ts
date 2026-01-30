@@ -2,6 +2,7 @@ import { Repository } from 'typeorm';
 import { IAnalyticsService } from '../Domain/services/IAnalyticsService';
 import { Receipt } from '../Domain/models/Receipt';
 import { ReportAnalysis } from '../Domain/models/ReportAnalysis';
+import { CreateReceiptDTO, CreateReportAnalysisDTO } from '../Domain/DTOs';
 
 export class AnalyticsService implements IAnalyticsService {
   constructor(
@@ -11,9 +12,9 @@ export class AnalyticsService implements IAnalyticsService {
     console.log('\x1b[36m[Analytics@1.0.0]\x1b[0m Service started');
   }
 
-  async createReceipt(receipt: Partial<Receipt>): Promise<Receipt> {
+  async createReceipt(receiptData: CreateReceiptDTO): Promise<Receipt> {
     try {
-      const newReceipt = this.receiptRepository.create(receipt);
+      const newReceipt = this.receiptRepository.create(receiptData);
       const savedReceipt = await this.receiptRepository.save(newReceipt);
       console.log(`\x1b[36m[Analytics@1.0.0]\x1b[0m Receipt created with ID: ${savedReceipt.id}`);
       return savedReceipt;
@@ -69,9 +70,9 @@ export class AnalyticsService implements IAnalyticsService {
     }
   }
 
-  async createReportAnalysis(report: Partial<ReportAnalysis>): Promise<ReportAnalysis> {
+  async createReportAnalysis(reportData: CreateReportAnalysisDTO): Promise<ReportAnalysis> {
     try {
-      const newReport = this.reportRepository.create(report);
+      const newReport = this.reportRepository.create(reportData);
       const savedReport = await this.reportRepository.save(newReport);
       console.log(`\x1b[36m[Analytics@1.0.0]\x1b[0m Report created with ID: ${savedReport.id}`);
       return savedReport;

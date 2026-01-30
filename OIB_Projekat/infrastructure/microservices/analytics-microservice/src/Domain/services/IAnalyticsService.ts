@@ -1,13 +1,20 @@
 import { Receipt } from '../models/Receipt';
 import { ReportAnalysis } from '../models/ReportAnalysis';
+import { 
+  CreateReceiptDTO, 
+  CreateReportAnalysisDTO, 
+  SalesAnalysisResponseDTO, 
+  TopPerfumeDTO, 
+  SalesTrendDTO 
+} from '../DTOs';
 
 export interface IAnalyticsService {
-  createReceipt(receipt: Partial<Receipt>): Promise<Receipt>;
+  createReceipt(receipt: CreateReceiptDTO): Promise<Receipt>;
   getReceipts(userId: number, startDate?: Date, endDate?: Date): Promise<Receipt[]>;
   getReceiptById(id: number): Promise<Receipt | null>;
   deleteReceipt(id: number): Promise<boolean>;
 
-  createReportAnalysis(report: Partial<ReportAnalysis>): Promise<ReportAnalysis>;
+  createReportAnalysis(report: CreateReportAnalysisDTO): Promise<ReportAnalysis>;
   getReportAnalysisList(limit?: number): Promise<ReportAnalysis[]>;
   getReportAnalysisById(id: number): Promise<ReportAnalysis | null>;
   deleteReportAnalysis(id: number): Promise<boolean>;
@@ -16,26 +23,9 @@ export interface IAnalyticsService {
   calculateSalesAnalysis(
     analysisType: 'monthly' | 'weekly' | 'yearly' | 'total',
     period?: string
-  ): Promise<{
-    totalSales: number;
-    totalRevenue: number;
-    period?: string;
-  }>;
+  ): Promise<SalesAnalysisResponseDTO>;
 
-  calculateTopTenPerfumes(): Promise<
-    Array<{
-      perfumeId: number;
-      perfumeName: string;
-      quantity: number;
-      revenue: number;
-    }>
-  >;
+  calculateTopTenPerfumes(): Promise<TopPerfumeDTO[]>;
 
-  calculateSalesTrend(days?: number): Promise<
-    Array<{
-      date: string;
-      sales: number;
-      revenue: number;
-    }>
-  >;
+  calculateSalesTrend(days?: number): Promise<SalesTrendDTO[]>;
 }

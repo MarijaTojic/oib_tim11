@@ -1,7 +1,8 @@
 import { IValidatorService } from '../Domain/services/IValidatorService';
+import { CreateReceiptDTO, CreateReportAnalysisDTO } from '../Domain/DTOs';
 
 export class ValidatorService implements IValidatorService {
-  validateReceipt(receipt: any): { isValid: boolean; errors: string[] } {
+  validateReceipt(receipt: CreateReceiptDTO): { isValid: boolean; errors: string[] } {
     const errors: string[] = [];
 
   
@@ -57,7 +58,7 @@ export class ValidatorService implements IValidatorService {
     };
   }
 
-  validateReportAnalysis(report: any): { isValid: boolean; errors: string[] } {
+  validateReportAnalysis(report: CreateReportAnalysisDTO): { isValid: boolean; errors: string[] } {
     const errors: string[] = [];
 
     

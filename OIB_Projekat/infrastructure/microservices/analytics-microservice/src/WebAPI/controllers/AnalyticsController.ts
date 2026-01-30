@@ -4,8 +4,7 @@ const PDFDocument = require('pdfkit');
 import { IAnalyticsService } from '../../Domain/services/IAnalyticsService';
 import { ILogerService } from '../../Domain/services/ILogerService';
 import { IValidatorService } from '../../Domain/services/IValidatorService';
-import { Receipt } from '../../Domain/models/Receipt';
-import { ReportAnalysis } from '../../Domain/models/ReportAnalysis';
+import { CreateReceiptDTO, CreateReportAnalysisDTO, SalesAnalysisRequestDTO } from '../../Domain/DTOs';
 
 export class AnalyticsController {
   private router: Router;
@@ -52,17 +51,17 @@ export class AnalyticsController {
     try {
       await this.logerService.log('Receipt creation request received');
 
-      const receipt: Partial<Receipt> = req.body;
+      const receiptData: CreateReceiptDTO = req.body;
 
       // Validate receipt
-      const validation = this.validatorService.validateReceipt(receipt);
+      const validation = this.validatorService.validateReceipt(receiptData);
       if (!validation.isValid) {
         await this.logerService.log(`Receipt validation failed: ${validation.errors.join(', ')}`);
         res.status(400).json({ success: false, message: 'Validation failed', errors: validation.errors });
         return;
       }
 
-      const newReceipt = await this.analyticsService.createReceipt(receipt);
+      const newReceipt = await this.analyticsService.createReceipt(receiptData);
 
       await this.logerService.log(`Receipt created successfully with ID: ${newReceipt.id}`);
       res.status(201).json({ success: true, data: newReceipt });
@@ -161,17 +160,17 @@ export class AnalyticsController {
     try {
       await this.logerService.log('Report creation request received');
 
-      const report: Partial<ReportAnalysis> = req.body;
+      const reportData: CreateReportAnalysisDTO = req.body;
 
       // Validate report
-      const validation = this.validatorService.validateReportAnalysis(report);
+      const validation = this.validatorService.validateReportAnalysis(reportData);
       if (!validation.isValid) {
         await this.logerService.log(`Report validation failed: ${validation.errors.join(', ')}`);
         res.status(400).json({ success: false, message: 'Validation failed', errors: validation.errors });
         return;
       }
 
-      const newReport = await this.analyticsService.createReportAnalysis(report);
+      const newReport = await this.analyticsService.createReportAnalysis(reportData);
 
       await this.logerService.log(`Report created successfully with ID: ${newReport.id}`);
       res.status(201).json({ success: true, data: newReport });
@@ -288,7 +287,7 @@ export class AnalyticsController {
    */
   private async calculateSalesAnalysis(req: Request, res: Response): Promise<void> {
     try {
-      const { analysisType, period } = req.body;
+      const { analysisType, period }: SalesAnalysisRequestDTO = req.body;
 
       if (!analysisType) {
         res.status(400).json({ success: false, message: 'Analysis type is required' });
