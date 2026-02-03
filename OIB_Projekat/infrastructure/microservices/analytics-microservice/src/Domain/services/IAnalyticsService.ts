@@ -1,11 +1,15 @@
 import { Receipt } from '../models/Receipt';
 import { ReportAnalysis } from '../models/ReportAnalysis';
+import { PerformanceResult, LogisticsAlgorithm } from '../models/PerformanceResult';
 import { 
   CreateReceiptDTO, 
   CreateReportAnalysisDTO, 
   SalesAnalysisResponseDTO, 
   TopPerfumeDTO, 
-  SalesTrendDTO 
+  SalesTrendDTO,
+  SimulationRequestDTO,
+  PerformanceResultDTO,
+  SimulationComparisonDTO
 } from '../DTOs';
 
 export interface IAnalyticsService {
@@ -28,4 +32,12 @@ export interface IAnalyticsService {
   calculateTopTenPerfumes(): Promise<TopPerfumeDTO[]>;
 
   calculateSalesTrend(days?: number): Promise<SalesTrendDTO[]>;
+
+  // Performance simulation methods
+  runSimulation(request: SimulationRequestDTO): Promise<PerformanceResult[]>;
+  getPerformanceResults(limit?: number): Promise<PerformanceResult[]>;
+  getPerformanceResultById(id: number): Promise<PerformanceResult | null>;
+  deletePerformanceResult(id: number): Promise<boolean>;
+  compareAlgorithms(simulationId: number): Promise<SimulationComparisonDTO | null>;
+  updatePerformanceResultExportDate(id: number): Promise<boolean>;
 }
