@@ -36,7 +36,7 @@ export class GatewayController {
     // Processing routes (seller, manager)
     this.router.get("/perfumes", authenticate, authorize("seller", "manager"), this.getAllPerfumes.bind(this));
     this.router.get("/perfumes/:id", authenticate, authorize("seller", "manager"), this.getPerfumeById.bind(this));
-    this.router.post("/processing/start", authenticate, authorize("seller", "manager"), this.startProcessing.bind(this));
+    this.router.post("/processing", authenticate, authorize("seller", "manager"), this.startProcessing.bind(this));
     this.router.get("/perfumes/by-type", authenticate, authorize("seller", "manager"), this.getPerfumesByType.bind(this));
   }
 
@@ -205,6 +205,7 @@ export class GatewayController {
 
   private async startProcessing(req: Request, res: Response): Promise<void> {
     try {
+      console.log("💡 Backend received payload:", req.body);
       const { plantId, quantity, volume, perfumeType } = req.body;
       const perfumes = await this.gatewayService.startProcessing(plantId, quantity, volume, perfumeType);
       res.status(201).json(perfumes);

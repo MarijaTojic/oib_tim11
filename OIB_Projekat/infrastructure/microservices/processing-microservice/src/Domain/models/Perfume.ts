@@ -24,6 +24,6 @@ export class Perfume {
   @Column({ type: "timestamp"})
   expirationDate!: Date;
 
-  @Column({ type: "int"})
+  @Column({ type: "int", nullable: true})
   perfumeAromaticOilStrength!: number;
 }

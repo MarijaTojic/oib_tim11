@@ -78,10 +78,11 @@ export const ProcessingPage: React.FC<Props> = ({perfumeAPI}) => {
 
             try {
               const result = await perfumeAPI.plantProcessing(
-                perfumeObj,
+                perfumeObj.plantId,
                 bottleCount,
-                bottleVolume
-              );
+                bottleVolume,
+                perfumeObj.type
+              );  
               console.log("Processing result:", result);
               alert("Processing completed!");
             } catch (err: any) {

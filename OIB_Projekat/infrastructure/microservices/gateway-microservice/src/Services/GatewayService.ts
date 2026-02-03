@@ -126,7 +126,7 @@ export class GatewayService implements IGatewayService {
   }
 
   async startProcessing(plantId: number, quantity: number, volume: number, perfumeType: string): Promise<PerfumeDTO[]> {
-    const response = await this.processingClient.post<PerfumeDTO[]>("/processing/start", {
+    const response = await this.processingClient.post<PerfumeDTO[]>("/processing", {
       plantId,
       quantity,
       volume,

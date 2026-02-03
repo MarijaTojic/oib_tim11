@@ -47,14 +47,14 @@ export class PerfumeController {
 
   private async plantProcessing(req: Request, res: Response): Promise<void>{
     try{
-        const { Perfume, quantityBottle, volumeBottle } = req.body;
+        const { plantId, quantity, volume, perfumeType } = req.body;
 
-        if(!Perfume || !quantityBottle || !volumeBottle){
+        if(!plantId || !quantity || !volume || !perfumeType){
           res.status(400).json({message: "Missing parameters!"});
           return;
         }
 
-        const processedPerfumes = await this.perfumesService.plantProcessing(Perfume, Number(quantityBottle), Number(volumeBottle));
+        const processedPerfumes = await this.perfumesService.plantProcessing(plantId, Number(quantity), Number(volume), perfumeType);
         res.status(200).json(processedPerfumes);
     } catch (err){
       this.logger.log((err as Error).message);

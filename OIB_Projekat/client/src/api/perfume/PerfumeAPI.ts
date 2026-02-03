@@ -30,19 +30,16 @@ export class PerfumeAPI implements IPerfumeAPI{
         return response.data;
     }
     
-    async plantProcessing(
-    perfume: PerfumeDTO,
-    quantityBottle: number,
-    volumeBottle: number
-  ): Promise<PerfumeDTO[]> {
+    async plantProcessing(plantId: number, quantity: number, volume: number, perfumeType: string): Promise<PerfumeDTO[]> {
     const token = localStorage.getItem("authToken");
 
     const response = await this.axiosInstance.post<PerfumeDTO[]>(
       "/processing",
       {
-        perfume,
-        quantityBottle,
-        volumeBottle,
+        plantId,
+        quantity,
+        volume,
+        perfumeType,
       },
       {
         headers: {

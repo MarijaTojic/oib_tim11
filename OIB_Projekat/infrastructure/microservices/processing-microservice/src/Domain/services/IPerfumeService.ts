@@ -6,5 +6,5 @@ export interface IPerfumeService {
   createPerfume(perfume: Perfume): Promise<PerfumeDTO>;
   getAllPerfumes(): Promise<PerfumeDTO[]>;
   getPerfumeByTypeAndQuantity(type : PerfumeType, quantity : number): Promise<PerfumeDTO>;
-  plantProcessing(Perfume : PerfumeDTO, quantityBottle: number, volumeBottle : number) : Promise<PerfumeDTO[]>; 
+  plantProcessing(plantId: number, quantity: number, volume: number, perfumeType: string): Promise<PerfumeDTO[]>; 
 }

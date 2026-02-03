@@ -12,22 +12,28 @@ export class PerfumeService implements IPerfumeService {
   /**
    * Plant processing
    */
-  async plantProcessing(Perfume: PerfumeDTO, quantityBottle: number, volumeBottle: number): Promise<PerfumeDTO[]> {
+  async plantProcessing(plantId: number, quantity: number, volume: number, perfumeType: string): Promise<PerfumeDTO[]> {
     const logger = new LogerService();
-    const numberOfPlants = calculateNumberOfPlants(quantityBottle, volumeBottle);
+    const numberOfPlants = calculateNumberOfPlants(quantity, volume);
     await logger.log(`Number of plants needed: ${numberOfPlants}`);
 
+    const typeEnum = perfumeType as PerfumeType;
+    const perfumeFromDb = await this.perfumeRepository.findOne({where: {type: typeEnum}});
+
+    if (!perfumeFromDb) {
+      throw new Error(`Perfume with type ${perfumeType} not found`);
+    }
+
     const perfumes: Perfume[] = [];
-    const typeEnum: PerfumeType = PerfumeType[Perfume.type as keyof typeof PerfumeType];
-
-    await logger.log(`Starting plant processing for ${Perfume.name} (${quantityBottle} bottles of ${volumeBottle} ml)`);
-
-    for (let i = 0; i < quantityBottle; i++) {
+    
+    await logger.log(`Starting plant processing for ${Perfume.name} (${quantity} bottles of ${volume} ml)`);
+ 
+    for (let i = 0; i < quantity; i++) {
     let perfume = this.perfumeRepository.create({
-      name: Perfume.name,
+      name: perfumeFromDb.name,
       type: typeEnum,
-      netQuantity: volumeBottle,
-      plantId: Perfume.plantId,
+      netQuantity: volume,
+      plantId: plantId,
       expirationDate: new Date(
       new Date().setFullYear(new Date().getFullYear() + 2)
       )
