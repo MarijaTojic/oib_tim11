@@ -7,7 +7,7 @@ import { calculateNumberOfPlants } from "../helpers/NumberOfPlants"
 import { LogerService } from "./LogerService";
 
 export class PerfumeService implements IPerfumeService {
-  constructor(private perfumeRepository: Repository<Perfume>, private plantService: any) {}
+  constructor(private perfumeRepository: Repository<Perfume>){}//, private plantService: any) {}
 
   /**
    * Plant processing
@@ -36,16 +36,16 @@ export class PerfumeService implements IPerfumeService {
         const excess = perfume.perfumeAromaticOilStrength - 4.0;
         const percentage = excess * 100; // 0.65 → 65%
 
-        const newPlant = await this.plantService.createPlant({
+        /*const newPlant = await this.plantService.createPlant({
         commonName: Perfume.name
           });
 
         //smanji jačinu aromatičnih ulja nove biljke
-         await this.plantService.changeAromaticOilStrength(
+       /*  await this.plantService.changeAromaticOilStrength(
             newPlant.id,
             newPlant.id,
             percentage
-         );
+         );*/
       }
 
 

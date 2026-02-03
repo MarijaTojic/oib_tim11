@@ -15,14 +15,43 @@ export class PerfumeAPI implements IPerfumeAPI{
      }
 
     async getAllPerfumes(): Promise<PerfumeDTO[]> {
-       const response = (await this.axiosInstance.get<PerfumeDTO[]>("/perfumes")).data;
-       return response;
+       const token = localStorage.getItem("authToken");
+        console.log("TOKEN:", token);
+
+        const response = await this.axiosInstance.get<PerfumeDTO[]>(
+            "/perfumes",
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+
+        return response.data;
     }
     
-    async plantProcessing(Perfume : PerfumeDTO, quantityBottle: number, volumeBottle : number) : Promise<PerfumeDTO[]>{
-        const response = (await this.axiosInstance.post<PerfumeDTO[]>("/processing", {
-            Perfume, quantityBottle, volumeBottle
-        })).data;
-        return response;
-    }
+    async plantProcessing(
+    perfume: PerfumeDTO,
+    quantityBottle: number,
+    volumeBottle: number
+  ): Promise<PerfumeDTO[]> {
+    const token = localStorage.getItem("authToken");
+
+    const response = await this.axiosInstance.post<PerfumeDTO[]>(
+      "/processing",
+      {
+        perfume,
+        quantityBottle,
+        volumeBottle,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  }
+
 }
