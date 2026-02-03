@@ -1,13 +1,13 @@
 import { Router, Request, Response } from "express";
 import { ISalesService } from "../../Domain/services/ISalesService";
-import { ILogerService } from "../../Domain/services/ILogerService";
+import { ILogService } from "../../../../log-microservice/src/Domain/services/ILogService"
 
 export class SalesController {
   private readonly router: Router;
 
   constructor(
     private readonly salesService: ISalesService,
-    private readonly logger: ILogerService
+    private readonly logger: ILogService,
   ) {
     this.router = Router();
     this.initializeRoutes();
@@ -32,7 +32,6 @@ export class SalesController {
     try {
       const saleDto = req.body;
 
-      // Poziv glavne logike prodaje
       const result = await this.salesService.sell(saleDto);
 
       if (!result.success) {
@@ -40,7 +39,6 @@ export class SalesController {
         res.status(400).json(result);
       }
 
-      // Evidencija uspešne prodaje
       await this.logger.log(`INFO: Sale successful for user ${saleDto.userId}`);
       res.status(200).json(result);
 

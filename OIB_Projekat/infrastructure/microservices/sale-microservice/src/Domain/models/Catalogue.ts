@@ -1,9 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn } from "typeorm";
 import { PerfumeType } from "../enums/PerfumeType";
 
-// =========================
-// Perfume Entity
-// =========================
 @Entity("perfumes")
 export class Perfume {
   @PrimaryGeneratedColumn()
@@ -32,9 +29,6 @@ export class Perfume {
   catalogue!: Catalogue;
 }
 
-// =========================
-// Catalogue Entity
-// =========================
 @Entity("catalogues")
 export class Catalogue {
   @PrimaryGeneratedColumn()

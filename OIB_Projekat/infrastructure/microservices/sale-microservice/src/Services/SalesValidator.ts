@@ -1,5 +1,3 @@
-// src/Domain/services/SalesValidator.ts
-
 import { CreateSaleDTO } from "../Domain/DTOs/CreateSaleDTO";
 
 export interface ValidationResult {
@@ -8,9 +6,6 @@ export interface ValidationResult {
 }
 
 export class SalesValidator {
-  /**
-   * Validira CreateSaleDTO prije slanja prodaje
-   */
   static validateSaleDto(dto: CreateSaleDTO): ValidationResult {
     if (!dto.userId || typeof dto.userId !== "number") {
       return { success: false, message: "Invalid or missing userId" };
@@ -33,9 +28,6 @@ export class SalesValidator {
     return { success: true };
   }
 
-  /**
-   * Validira pakete koje dobiješ od skladišta (da sadrže perfumeId)
-   */
   static validatePackages(packages: any[]): ValidationResult {
     if (!Array.isArray(packages) || packages.length === 0) {
       return { success: false, message: "Packages array is empty or invalid" };

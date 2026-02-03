@@ -38,9 +38,8 @@ export class SalesService implements ISalesService {
     try {
       await this.log("INFO", `Sale started for user ${dto.userId}`);
 
-      const perfumes = await this.getCatalogue(); // koristi cache
+      const perfumes = await this.getCatalogue(); 
 
-      // Provjera da svi parfemi postoje
       for (const p of dto.perfumes) {
         if (!perfumes.find(x => x.id === p.perfumeId)) {
           const msg = `Perfume ${p.perfumeId} not found`;
@@ -64,16 +63,13 @@ export class SalesService implements ISalesService {
 
       const packages = storageRes.data.packages;
 
-      // Priprema podataka za Analytics
       const perfumesSold = packages.map((pkg: any) => ({
         perfumeId: pkg.perfumeId,
         userId: dto.userId
       }));
 
-      // Pošalji na Analytics i dobiješ "račun"
       const receipt = await this.gateway.post("/analytics/sale", perfumesSold);
 
-      // Generisanje QR koda sa podacima iz računa
       const qrData = receipt.data.perfumeDetails.map((p: any) => ({
         perfumeId: p.perfumeId,
         perfumeName: p.perfumeName,
