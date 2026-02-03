@@ -1,19 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { SalesAPI } from "../api/sale/SalesAPI";
+import { ISalesAPI } from "../api/sale/ISalesAPI";
 import { CatalogueDTO } from "../models/catalogues/CatalogueDTO";
 import { CatalogueTable } from "../components/catalogues/Sales";
+import { useNavigate } from "react-router-dom";
 
 type Props = {
+  salesAPI: ISalesAPI;
   userId: number;
-  onBackToDashboard: () => void;
 };
 
-export const SalesPage: React.FC<Props> = ({ userId, onBackToDashboard }) => {
+export const SalesPage: React.FC<Props> = ({ salesAPI, userId }) => {
   const [catalogue, setCatalogue] = useState<CatalogueDTO | null>(null);
   const [quantities, setQuantities] = useState<Record<number, number>>({});
   const [loading, setLoading] = useState<boolean>(false);
 
-  const salesAPI = new SalesAPI();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadCatalogue = async () => {
@@ -33,7 +34,7 @@ export const SalesPage: React.FC<Props> = ({ userId, onBackToDashboard }) => {
     };
 
     loadCatalogue();
-  }, []);
+  }, [salesAPI]);
 
   const handleQuantityChange = (perfumeId: number, value: number) => {
     setQuantities(prev => ({
@@ -82,52 +83,69 @@ export const SalesPage: React.FC<Props> = ({ userId, onBackToDashboard }) => {
     }
   };
 
+  const backToDashboard = () => {
+    navigate("/dashboard");
+  };
+
   return (
-    <div style={{ padding: "24px" }}>
-      <button onClick={onBackToDashboard} style={{ marginBottom: "16px" }}>
-        ← Back to dashboard
-      </button>
+    <div className="overlay-blur-none" style={{ position: "fixed" }}>
+      <div className="window" style={{ width: "900px" }}>
+        <div className="titlebar">
+          <span className="titlebar-title">Sales</span>
+        </div>
 
-      <h2>Catalogue</h2>
+        <div className="window-content" style={{ padding: "24px" }}>
+          {catalogue ? (
+            <>
+              <CatalogueTable catalogue={catalogue} />
 
-      {catalogue ? (
-        <>
-          <CatalogueTable catalogue={catalogue} />
+              <div style={{ marginTop: "24px" }}>
+                <table className="table" style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr>
+                      <th>Perfume</th>
+                      <th>Buy quantity</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {catalogue.allPerfumes.map(p => (
+                      <tr key={p.id}>
+                        <td>{p.name}</td>
+                        <td>
+                          <input
+                            type="number"
+                            min={0}
+                            value={quantities[p.id!] || 0}
+                            onChange={(e) => handleQuantityChange(p.id!, Number(e.target.value))}
+                            style={{ width: "70px" }}
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
 
-          <div style={{ marginTop: "24px" }}>
-            <table className="table" style={{ width: "100%", borderCollapse: "collapse" }}>
-              <thead>
-                <tr>
-                  <th>Perfume</th>
-                  <th>Buy quantity</th>
-                </tr>
-              </thead>
-              <tbody>
-                {catalogue.allPerfumes.map(p => (
-                  <tr key={p.id}>
-                    <td>{p.name}</td>
-                    <td>
-                      <input
-                        type="number"
-                        min={0}
-                        value={quantities[p.id!] || 0}
-                        onChange={(e) => handleQuantityChange(p.id!, Number(e.target.value))}
-                        style={{ width: "70px" }}
-                      />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                <button
+                  onClick={handleBuy}
+                  disabled={loading}
+                  style={{ marginTop: "16px", padding: "8px 16px", cursor: "pointer" }}
+                >
+                  {loading ? "Processing..." : "Buy"}
+                </button>
+              </div>
+            </>
+          ) : (
+            <p>Loading catalogue...</p>
+          )}
+        </div>
 
-            <button onClick={handleBuy} disabled={loading} style={{ marginTop: "16px" }}>
-              {loading ? "Processing..." : "Buy"}
-            </button>
-          </div>
-        </>
-      ) : (
-        <p>Loading catalogue...</p>
-      )}
+        <button
+          onClick={backToDashboard}
+          style={{ marginBottom: "16px", padding: "8px 16px", cursor: "pointer" }}
+        >
+          ← Back to Dashboard
+        </button>
+      </div>
     </div>
   );
 };
