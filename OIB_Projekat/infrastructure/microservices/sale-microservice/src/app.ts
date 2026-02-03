@@ -11,10 +11,11 @@ import { Catalogue } from './Domain/models/Catalogue';
 import { ISalesService } from './Domain/services/ISalesService';
 import { SalesService } from './Services/SaleService';
 
-import { ILogerService } from './Domain/services/ILogerService';
-import { LogerService } from './Services/LogerService';
+import { ILogService } from '../../log-microservice/src/Domain/services/ILogService';
+import { LogService } from '../../log-microservice/src/Services/LogService';
 
 import { SalesController } from './WebAPI/controllers/SalesController';
+import { Log } from '../../log-microservice/src/Domain/models/Log';
 
 dotenv.config({ quiet: true });
 
@@ -36,10 +37,11 @@ initialize_database();
 
 // ORM Repositories
 const catalogueRepository: Repository<Catalogue> = Db.getRepository(Catalogue);
+const auditRepository: Repository<Log> = Db.getRepository(Log);
 
 // Services
 const salesService: ISalesService = new SalesService(); 
-const logerService: ILogerService = new LogerService();
+const logerService: ILogService = new LogService(auditRepository);
 
 // WebAPI routes
 const salesController = new SalesController(salesService, logerService);

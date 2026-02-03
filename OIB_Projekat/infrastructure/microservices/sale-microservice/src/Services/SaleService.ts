@@ -2,6 +2,7 @@ import axios, { AxiosInstance } from "axios";
 import { ISalesService } from "../Domain/services/ISalesService";
 import { CreateSaleDTO } from "../Domain/DTOs/CreateSaleDTO";
 import { PerfumeDTO } from "../Domain/DTOs/perfumes/PerfumeDTO";
+import { CatalogueDTO } from "../Domain/DTOs/catalogues/CatalogueDTO";
 import QRCode from "qrcode"; // npm install qrcode + npm i --save-dev @types/qrcode
 
 export class SalesService implements ISalesService {
@@ -18,33 +19,37 @@ export class SalesService implements ISalesService {
     });
   }
 
-  async getCatalogue(): Promise<PerfumeDTO[]> {
-    if (this.perfumeCache && Date.now() - this.cacheTimestamp < this.cacheTTL) {
-      return this.perfumeCache;
-    }
-
+  async getCatalogue(): Promise<CatalogueDTO> {
     try {
+      if (this.perfumeCache && Date.now() - this.cacheTimestamp < this.cacheTTL) {
+        return {
+          allPerfumes: this.perfumeCache,
+          amount: this.perfumeCache.length,
+        };
+      }
+
       const res = await this.gateway.get<PerfumeDTO[]>("/perfumes");
       this.perfumeCache = res.data;
       this.cacheTimestamp = Date.now();
-      return res.data;
+
+      const catalogue: CatalogueDTO = {
+        allPerfumes: res.data,
+        amount: res.data.length,
+      };
+
+      return catalogue;
     } catch (err: any) {
-      await this.log("ERROR", `Failed to fetch catalogue: ${err.message}`);
       throw new Error("Could not fetch catalogue");
     }
   }
 
   async sell(dto: CreateSaleDTO): Promise<{ success: boolean; message?: string; qrCode?: string }> {
     try {
-      await this.log("INFO", `Sale started for user ${dto.userId}`);
-
-      const perfumes = await this.getCatalogue(); 
+      const perfumes = await this.getCatalogue();
 
       for (const p of dto.perfumes) {
-        if (!perfumes.find(x => x.id === p.perfumeId)) {
-          const msg = `Perfume ${p.perfumeId} not found`;
-          await this.log("ERROR", msg);
-          throw new Error(msg);
+        if (!perfumes.allPerfumes.find(x => x.id === p.perfumeId)) {
+          throw new Error(`Perfume ${p.perfumeId} not found`);
         }
       }
 
@@ -53,11 +58,10 @@ export class SalesService implements ISalesService {
       const storageRes = await this.gateway.post("/storage/send", {
         perfumeIds,
         userRole: "manager",
-        userId: dto.userId
+        userId: dto.userId,
       });
 
       if (!storageRes.data.success) {
-        await this.log("ERROR", "Storage send failed");
         throw new Error("Storage failed");
       }
 
@@ -65,7 +69,7 @@ export class SalesService implements ISalesService {
 
       const perfumesSold = packages.map((pkg: any) => ({
         perfumeId: pkg.perfumeId,
-        userId: dto.userId
+        userId: dto.userId,
       }));
 
       const receipt = await this.gateway.post("/analytics/sale", perfumesSold);
@@ -75,35 +79,20 @@ export class SalesService implements ISalesService {
         perfumeName: p.perfumeName,
         quantity: p.quantity,
         price: p.price,
-        totalPrice: p.totalPrice
+        totalPrice: p.totalPrice,
       }));
 
       const qrString = JSON.stringify({
         userId: dto.userId,
         totalAmount: receipt.data.totalAmount,
-        perfumes: qrData
+        perfumes: qrData,
       });
 
       const qrCode = await QRCode.toDataURL(qrString);
 
-      await this.log("INFO", `Sale success for user ${dto.userId}`);
       return { success: true, qrCode };
-
     } catch (error: any) {
-      await this.log("ERROR", `Sale failed: ${error.message}`);
       return { success: false, message: error.message };
-    }
-  }
-
-  private async log(type: "INFO" | "ERROR", message: string) {
-    try {
-      await this.gateway.post("/logs", {
-        logtype: type,
-        description: message,
-        datetime: new Date()
-      });
-    } catch (err) {
-      console.error(`[SalesService][${type}] ${message}`, err);
     }
   }
 }

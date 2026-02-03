@@ -100,6 +100,7 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ userAPI }) => 
         <button onClick={() => navigate("/perfumes")}>Perfumes</button>
         <button onClick={() => navigate("/processing")}>Plant processing</button>
         <button onClick={() => navigate("/production")}>Plant production</button>
+        <button onClick={() => navigate("/sales")}>Sales</button>
       </div>
     </nav>
   );
