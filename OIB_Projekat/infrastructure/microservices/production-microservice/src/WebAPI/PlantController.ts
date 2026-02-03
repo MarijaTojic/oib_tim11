@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { ILogerService } from "../Domain/services/ILogerService";
+import { ILogService } from "../../../log-microservice/src/Domain/services/ILogService";
 import { IPlantsService } from "../Domain/services/IPlantsService";
 import { PlantDTO } from "../Domain/DTOs/PlantDTO";
 
@@ -8,7 +8,7 @@ export class PlantsController {
 
   constructor(
     private readonly plantsService: IPlantsService,
-    private readonly logger: ILogerService
+    private readonly logger: ILogService
   ) {
     this.router = Router();
     this.initializeRoutes();
