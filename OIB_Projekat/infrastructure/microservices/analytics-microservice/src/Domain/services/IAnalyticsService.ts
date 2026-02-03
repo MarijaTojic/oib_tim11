@@ -1,6 +1,6 @@
 import { Receipt } from '../models/Receipt';
 import { ReportAnalysis } from '../models/ReportAnalysis';
-import { PerformanceResult, LogisticsAlgorithm } from '../models/PerformanceResult';
+import { PerformanceResult } from '../models/PerformanceResult';
 import { 
   CreateReceiptDTO, 
   CreateReportAnalysisDTO, 
@@ -8,7 +8,6 @@ import {
   TopPerfumeDTO, 
   SalesTrendDTO,
   SimulationRequestDTO,
-  PerformanceResultDTO,
   SimulationComparisonDTO
 } from '../DTOs';
 

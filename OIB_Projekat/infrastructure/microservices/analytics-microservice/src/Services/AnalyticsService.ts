@@ -7,7 +7,6 @@ import {
   CreateReceiptDTO, 
   CreateReportAnalysisDTO, 
   SimulationRequestDTO,
-  PerformanceResultDTO,
   SimulationComparisonDTO 
 } from '../Domain/DTOs';
 
@@ -481,10 +480,7 @@ export class AnalyticsService implements IAnalyticsService {
   // ========================
 
   private simulateAlgorithmExecution(
-    algorithm: LogisticsAlgorithm,
-    numberOfSimulations: number,
-    numberOfParticles: number,
-    numberOfIterations: number
+    algorithm: LogisticsAlgorithm
   ) {
     let executionTime: number;
     let distanceCovered: number;

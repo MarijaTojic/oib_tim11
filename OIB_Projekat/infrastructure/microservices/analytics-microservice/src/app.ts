@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import { Repository } from 'typeorm';
 import { Receipt } from './Domain/models/Receipt';
 import { ReportAnalysis } from './Domain/models/ReportAnalysis';
+import { PerformanceResult } from './Domain/models/PerformanceResult';
 import { Db } from './Database/DbConnectionPool';
 import { IAnalyticsService } from './Domain/services/IAnalyticsService';
 import { AnalyticsService } from './Services/AnalyticsService';
@@ -36,9 +37,10 @@ initialize_database();
 // ORM Repositories
 const receiptRepository: Repository<Receipt> = Db.getRepository(Receipt);
 const reportRepository: Repository<ReportAnalysis> = Db.getRepository(ReportAnalysis);
+const performanceRepository: Repository<PerformanceResult> = Db.getRepository(PerformanceResult);
 
 // Services
-const analyticsService: IAnalyticsService = new AnalyticsService(receiptRepository, reportRepository);
+const analyticsService: IAnalyticsService = new AnalyticsService(receiptRepository, reportRepository, performanceRepository);
 const logerService: ILogerService = new LogerService();
 const validatorService: IValidatorService = new ValidatorService();
 
