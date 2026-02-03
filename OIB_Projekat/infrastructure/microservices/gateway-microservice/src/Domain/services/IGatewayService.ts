@@ -4,6 +4,8 @@ import { AuthResponseType } from "../types/AuthResponse";
 import { UserDTO } from "../DTOs/UserDTO";
 import { PlantDTO } from "../DTOs/PlantDTO";
 import { PerfumeDTO } from "../DTOs/PerfumeDTO";
+import { SimulationRequestDTO } from "../DTOs/SimulationRequestDTO";
+import { PerformanceResultDTO } from "../DTOs/PerformanceResultDTO";
 
 export interface IGatewayService {
   // Auth microservice
@@ -28,5 +30,13 @@ export interface IGatewayService {
   getPerfumeById(id: number): Promise<PerfumeDTO>;
   startProcessing(plantId: number, quantity: number, volume: number, perfumeType: string): Promise<PerfumeDTO[]>;
   getPerfumesByType(type: string, quantity: number): Promise<PerfumeDTO[]>;
+
+  // Analytics microservice - Performance
+  runPerformanceSimulation(data: SimulationRequestDTO): Promise<PerformanceResultDTO[]>;
+  getPerformanceResults(limit?: number): Promise<PerformanceResultDTO[]>;
+  getPerformanceResultById(id: number): Promise<PerformanceResultDTO>;
+  deletePerformanceResult(id: number): Promise<void>;
+  comparePerformanceAlgorithms(id: number): Promise<any>;
+  exportPerformanceResult(id: number): Promise<void>;
 }
 
