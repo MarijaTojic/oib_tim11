@@ -7,6 +7,7 @@ import { DashboardPage } from "./pages/DashboardPage";
 import { ProductionPage } from "./pages/ProductionPage";
 import { PerfumesPage } from "./pages/PerfumesPage";
 import {ProcessingPage} from "./pages/ProcessingPage";
+import { SalesPage } from "./pages/SalesPage";
 
 import { IAuthAPI } from "./api/auth/IAuthAPI";
 import { AuthAPI } from "./api/auth/AuthAPI";
@@ -20,10 +21,14 @@ import { PlantAPI } from "./api/plants/PlantAPI";
 import { IPerfumeAPI } from "./api/perfume/IPerfumeAPI";
 import { PerfumeAPI } from "./api/perfume/PerfumeAPI";
 
+import { SalesAPI } from "./api/sale/SalesAPI";
+import { ISalesAPI } from "./api/sale/ISalesAPI";
+
 const authAPI: IAuthAPI = new AuthAPI();
 const userAPI: IUserAPI = new UserAPI();
 const plantAPI: IPlantAPI = new PlantAPI();
 const perfumeAPI: IPerfumeAPI = new PerfumeAPI();
+const salesAPI: ISalesAPI = new SalesAPI();
 
 function App() {
   return (
@@ -67,6 +72,16 @@ function App() {
           element={
             <ProtectedRoute requiredRole="admin,seller">
               <ProcessingPage perfumeAPI={perfumeAPI} />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Protected SalesPage */}
+        <Route
+          path="/sales"
+          element={
+            <ProtectedRoute requiredRole="admin,seller">
+              <SalesPage salesAPI={salesAPI}/>
             </ProtectedRoute>
           }
         />
