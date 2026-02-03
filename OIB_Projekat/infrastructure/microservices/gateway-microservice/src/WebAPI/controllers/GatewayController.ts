@@ -38,6 +38,14 @@ export class GatewayController {
     this.router.get("/perfumes/:id", authenticate, authorize("seller", "manager"), this.getPerfumeById.bind(this));
     this.router.post("/processing/start", authenticate, authorize("seller", "manager"), this.startProcessing.bind(this));
     this.router.get("/perfumes/by-type", authenticate, authorize("seller", "manager"), this.getPerfumesByType.bind(this));
+
+    // Analytics routes - Performance (admin, manager)
+    this.router.post("/performance/simulate", authenticate, authorize("admin", "manager"), this.runPerformanceSimulation.bind(this));
+    this.router.get("/performance", authenticate, authorize("admin", "manager"), this.getPerformanceResults.bind(this));
+    this.router.get("/performance/:id", authenticate, authorize("admin", "manager"), this.getPerformanceResultById.bind(this));
+    this.router.delete("/performance/:id", authenticate, authorize("admin"), this.deletePerformanceResult.bind(this));
+    this.router.get("/performance/:id/compare", authenticate, authorize("admin", "manager"), this.comparePerformanceAlgorithms.bind(this));
+    this.router.patch("/performance/:id/export", authenticate, authorize("admin", "manager"), this.exportPerformanceResult.bind(this));
   }
 
   // =========================
@@ -218,6 +226,93 @@ export class GatewayController {
       const { type, quantity } = req.query;
       const perfumes = await this.gatewayService.getPerfumesByType(type as string, Number(quantity));
       res.status(200).json(perfumes);
+    } catch (err) {
+      res.status(500).json({ message: (err as Error).message });
+    }
+  }
+
+  // =========================
+  // Analytics - Performance handlers
+  // =========================
+  /**
+   * POST /api/v1/performance/simulate
+   * Runs performance simulation
+   */
+  private async runPerformanceSimulation(req: Request, res: Response): Promise<void> {
+    try {
+      const simulationData = req.body;
+      const results = await this.gatewayService.runPerformanceSimulation(simulationData);
+      res.status(201).json(results);
+    } catch (err) {
+      res.status(500).json({ message: (err as Error).message });
+    }
+  }
+
+  /**
+   * GET /api/v1/performance
+   * Get all performance results
+   */
+  private async getPerformanceResults(req: Request, res: Response): Promise<void> {
+    try {
+      const { limit } = req.query;
+      const results = await this.gatewayService.getPerformanceResults(limit ? Number(limit) : undefined);
+      res.status(200).json(results);
+    } catch (err) {
+      res.status(500).json({ message: (err as Error).message });
+    }
+  }
+
+  /**
+   * GET /api/v1/performance/:id
+   * Get performance result by ID
+   */
+  private async getPerformanceResultById(req: Request, res: Response): Promise<void> {
+    try {
+      const id = parseInt(req.params.id, 10);
+      const result = await this.gatewayService.getPerformanceResultById(id);
+      res.status(200).json(result);
+    } catch (err) {
+      res.status(404).json({ message: (err as Error).message });
+    }
+  }
+
+  /**
+   * DELETE /api/v1/performance/:id
+   * Delete performance result
+   */
+  private async deletePerformanceResult(req: Request, res: Response): Promise<void> {
+    try {
+      const id = parseInt(req.params.id, 10);
+      await this.gatewayService.deletePerformanceResult(id);
+      res.status(204).send();
+    } catch (err) {
+      res.status(500).json({ message: (err as Error).message });
+    }
+  }
+
+  /**
+   * GET /api/v1/performance/:id/compare
+   * Compare algorithms from simulation
+   */
+  private async comparePerformanceAlgorithms(req: Request, res: Response): Promise<void> {
+    try {
+      const id = parseInt(req.params.id, 10);
+      const comparison = await this.gatewayService.comparePerformanceAlgorithms(id);
+      res.status(200).json(comparison);
+    } catch (err) {
+      res.status(500).json({ message: (err as Error).message });
+    }
+  }
+
+  /**
+   * PATCH /api/v1/performance/:id/export
+   * Update performance result export date
+   */
+  private async exportPerformanceResult(req: Request, res: Response): Promise<void> {
+    try {
+      const id = parseInt(req.params.id, 10);
+      await this.gatewayService.exportPerformanceResult(id);
+      res.status(200).json({ message: 'Export date updated' });
     } catch (err) {
       res.status(500).json({ message: (err as Error).message });
     }
