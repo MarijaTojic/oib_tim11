@@ -6,18 +6,22 @@ import { AuthResponseType } from "../Domain/types/AuthResponse";
 import { UserDTO } from "../Domain/DTOs/UserDTO";
 import { PerfumeDTO } from "../Domain/DTOs/PerfumeDTO";
 import { PlantDTO } from "../Domain/DTOs/PlantDTO";
+import { SimulationRequestDTO } from "../Domain/DTOs/SimulationRequestDTO";
+import { PerformanceResultDTO } from "../Domain/DTOs/PerformanceResultDTO";
 
 export class GatewayService implements IGatewayService {
   private readonly authClient: AxiosInstance;
   private readonly userClient: AxiosInstance;
   private readonly productionClient: AxiosInstance;
   private readonly processingClient: AxiosInstance;
+  private readonly analyticsClient: AxiosInstance;
 
   constructor() {
     const authBaseURL = process.env.AUTH_SERVICE_API;
     const userBaseURL = process.env.USER_SERVICE_API;
     const productionBaseURL = process.env.PRODUCTION_SERVICE_API;
     const processingBaseURL = process.env.PROCESSING_SERVICE_API;
+    const analyticsBaseURL = process.env.ANALYTICS_SERVICE_API;
 
     this.authClient = axios.create({
       baseURL: authBaseURL,
@@ -39,6 +43,12 @@ export class GatewayService implements IGatewayService {
 
     this.processingClient = axios.create({
       baseURL: processingBaseURL,
+      headers: { "Content-Type": "application/json" },
+      timeout: 5000,
+    });
+
+    this.analyticsClient = axios.create({
+      baseURL: analyticsBaseURL,
       headers: { "Content-Type": "application/json" },
       timeout: 5000,
     });
@@ -140,5 +150,40 @@ export class GatewayService implements IGatewayService {
       params: { type, quantity },
     });
     return response.data;
+  }
+
+  // Analytics microservice - Performance methods
+  async runPerformanceSimulation(data: SimulationRequestDTO): Promise<PerformanceResultDTO[]> {
+    try {
+      const response = await this.analyticsClient.post<PerformanceResultDTO[]>("/performance/simulate", data);
+      return response.data;
+    } catch {
+      return [];
+    }
+  }
+
+  async getPerformanceResults(limit?: number): Promise<PerformanceResultDTO[]> {
+    const response = await this.analyticsClient.get<PerformanceResultDTO[]>("/performance", {
+      params: limit ? { limit } : {},
+    });
+    return response.data;
+  }
+
+  async getPerformanceResultById(id: number): Promise<PerformanceResultDTO> {
+    const response = await this.analyticsClient.get<PerformanceResultDTO>(`/performance/${id}`);
+    return response.data;
+  }
+
+  async deletePerformanceResult(id: number): Promise<void> {
+    await this.analyticsClient.delete(`/performance/${id}`);
+  }
+
+  async comparePerformanceAlgorithms(id: number): Promise<any> {
+    const response = await this.analyticsClient.get(`/performance/${id}/compare`);
+    return response.data;
+  }
+
+  async exportPerformanceResult(id: number): Promise<void> {
+    await this.analyticsClient.patch(`/performance/${id}/export`);
   }
 }

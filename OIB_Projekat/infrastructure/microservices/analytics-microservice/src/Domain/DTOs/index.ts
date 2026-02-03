@@ -7,3 +7,6 @@ export * from './SalesAnalysisResponseDTO';
 export * from './TopPerfumeDTO';
 export * from './SalesTrendDTO';
 export * from './PerfumeDetailDTO';
+export * from './SimulationRequestDTO';
+export * from './PerformanceResultDTO';
+export * from './SimulationComparisonDTO';
