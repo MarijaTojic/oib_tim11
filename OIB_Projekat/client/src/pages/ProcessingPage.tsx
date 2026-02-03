@@ -1,6 +1,7 @@
 import React, { useEffect, useState} from "react";
 import { IPerfumeAPI } from "../api/perfume/IPerfumeAPI";
 import { PerfumeDTO } from "../models/perfumes/PerfumeDTO";
+import { useNavigate } from "react-router-dom";
 
 type Props = {
     perfumeAPI: IPerfumeAPI;
@@ -11,6 +12,8 @@ export const ProcessingPage: React.FC<Props> = ({perfumeAPI}) => {
     const [selectedPerfume, setSelectedPerfume] = useState<number | null>(null);
     const [bottleCount, setBottleCount] = useState<number>(1);
     const [bottleVolume, setBottleVolume] = useState<number>(150);
+
+    const navigate = useNavigate();
 
       useEffect(() => {
     const loadPerfumes = async () => {
@@ -24,6 +27,10 @@ export const ProcessingPage: React.FC<Props> = ({perfumeAPI}) => {
 
     loadPerfumes();
   }, []);
+
+  const backToDashboard = () => {
+      navigate("/dashboard");
+   }
 
   return (
     <div style={{ padding: "24px" }}>
@@ -93,6 +100,12 @@ export const ProcessingPage: React.FC<Props> = ({perfumeAPI}) => {
         >
           Start processing
         </button>
+
+        <button onClick={backToDashboard}
+          style={{ marginBottom: "16px", padding: "8px 16px", cursor: "pointer" }}>
+            Back to Dashboard
+        </button>
+        
       </div>
     </div>
   );
