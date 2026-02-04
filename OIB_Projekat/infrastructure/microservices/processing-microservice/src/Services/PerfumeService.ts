@@ -1,17 +1,17 @@
 import { Repository } from "typeorm";
 import { IPerfumeService } from "../Domain/services/IPerfumeService";
 import { Perfume } from "../Domain/models/Perfume";
+import { Plant } from "../../../production-microservice/src/Domain/models/Plant";
 import { PerfumeDTO } from "../Domain/DTOs/PerfumeDTO";
 import { PerfumeType } from "../Domain/enums/PerfumeType";
 import { calculateNumberOfPlants } from "../helpers/NumberOfPlants"
 import { LogerService } from "./LogerService";
+import axios from "axios";
 
 export class PerfumeService implements IPerfumeService {
-  constructor(private perfumeRepository: Repository<Perfume>){}//, private plantService: any) {}
+  constructor(private perfumeRepository: Repository<Perfume>, private plantRepository: Repository<Plant>){}
+  //, private plantService: IPlantsService) {}
 
-  /**
-   * Plant processing
-   */
   async plantProcessing(plantId: number, quantity: number, volume: number, perfumeType: string): Promise<PerfumeDTO[]> {
     const logger = new LogerService();
     const numberOfPlants = calculateNumberOfPlants(quantity, volume);
@@ -23,6 +23,15 @@ export class PerfumeService implements IPerfumeService {
     if (!perfumeFromDb) {
       throw new Error(`Perfume with type ${perfumeType} not found`);
     }
+    
+    const plant = await this.plantRepository.findOne({ where: { id: plantId } });
+
+    if (!plant) {
+      throw new Error(`Biljka sa ID ${plantId} ne postoji`);
+    }
+
+    const plantOilStrength = plant.aromaticOilStrength;
+    await logger.log(`Jačina biljke ID ${plantId}: ${plantOilStrength}`);
 
     const perfumes: Perfume[] = [];
     
@@ -38,22 +47,22 @@ export class PerfumeService implements IPerfumeService {
       new Date().setFullYear(new Date().getFullYear() + 2)
       )
     });
-      if (perfume.perfumeAromaticOilStrength > 4.0) {
-        const excess = perfume.perfumeAromaticOilStrength - 4.0;
-        const percentage = excess * 100; // 0.65 → 65%
+   if (perfume.perfumeAromaticOilStrength > 4.0) {
+  const excess = perfume.perfumeAromaticOilStrength - 4.0;
+  const targetFactor = 4.0 / perfume.perfumeAromaticOilStrength;  
 
-        /*const newPlant = await this.plantService.createPlant({
-        commonName: Perfume.name
-          });
+  // Šalji zahtev production servisu
+  const response = await axios.post('http://localhost:3001/api/v1/internal/plant-request', {  
+    commonName: perfumeFromDb.name,          
+    previousOilStrength: perfume.perfumeAromaticOilStrength
+  }, {
+    headers: { 'X-API-Key': process.env.PRODUCTION_API_KEY || 'secret' }
+  });
 
-        //smanji jačinu aromatičnih ulja nove biljke
-       /*  await this.plantService.changeAromaticOilStrength(
-            newPlant.id,
-            newPlant.id,
-            percentage
-         );*/
-      }
+  const newPlant = response.data;
 
+  await logger.log(`Nova biljka zasađena i korigovana na ${newPlant.adjustedOilStrength}`);
+}
 
     perfume = await this.perfumeRepository.save(perfume);
     perfume.serialNumber = `PP-2025-${perfume.id}`;

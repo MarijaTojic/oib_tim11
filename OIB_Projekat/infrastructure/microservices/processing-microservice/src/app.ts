@@ -11,6 +11,7 @@ import { PerfumeService } from './Services/PerfumeService';
 import { PerfumeController } from './WebAPI/controllers/PerfumeController';
 import { ILogerService } from './Domain/services/ILogerService';
 import { LogerService } from './Services/LogerService';
+import { Plant } from '../../production-microservice/src/Domain/models/Plant';
 
 dotenv.config({ quiet: true });
 
@@ -32,9 +33,10 @@ initialize_database();
 
 // ORM Repositories
 const perfumeRepository: Repository<Perfume> = Db.getRepository(Perfume);
+const plantRepository = Db.getRepository(Plant);
 
 // Services
-const perfumeService: IPerfumeService = new PerfumeService(perfumeRepository);
+const perfumeService: IPerfumeService = new PerfumeService(perfumeRepository, plantRepository);
 const logerService: ILogerService = new LogerService();
 
 // WebAPI routes

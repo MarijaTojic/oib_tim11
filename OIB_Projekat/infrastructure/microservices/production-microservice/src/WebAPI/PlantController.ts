@@ -2,6 +2,7 @@ import { Router, Request, Response } from "express";
 import { ILogService } from "../../../log-microservice/src/Domain/services/ILogService";
 import { IPlantsService } from "../Domain/services/IPlantsService";
 import { PlantDTO } from "../Domain/DTOs/PlantDTO";
+import { PlantStatus } from "../Domain/enums/PlantStatus";
 
 export class PlantsController {
   private readonly router: Router;
@@ -18,6 +19,9 @@ export class PlantsController {
     this.router.post("/plants", this.createPlant.bind(this));
     this.router.put("/plants/:id/aroma", this.changeAromaticOilStrength.bind(this));
     this.router.post("/plants/harvest", this.harvestPlants.bind(this));
+    this.router.post("/internal/plant-request", this.handleInternalPlantRequest.bind(this));
+    this.router.get("/plants", this.getAllPlants.bind(this));
+    this.router.get("/plants/:id", this.getPlantById.bind(this));
   }
 
 
@@ -90,6 +94,68 @@ export class PlantsController {
     }
 
 
+ private async handleInternalPlantRequest(req: Request, res: Response): Promise<void> {
+  try {
+    const { commonName, previousOilStrength } = req.body;
+
+    const newPlant = await this.plantsService.createPlant({
+      commonName,
+      latinName: "",
+      aromaticOilStrength: 0,
+      countryOfOrigin: "",
+      status: PlantStatus.PLANTED,
+      id: 0
+    });
+
+    let adjustedStrength = newPlant.aromaticOilStrength;
+    let adjustmentNote = "No adjustment (previous ≤ 4.0)";
+
+    if (previousOilStrength && previousOilStrength > 4.0) {
+    
+      const factor = 4.0 / previousOilStrength;   
+
+      adjustedStrength = Number((newPlant.aromaticOilStrength * factor).toFixed(2));
+      
+      const percentageToApply = factor * 100;     
+      await this.plantsService.changeAromaticOilStrength(newPlant.id, percentageToApply);
+
+      adjustmentNote = `Adjusted proportionally: ${previousOilStrength.toFixed(2)} → ${adjustedStrength.toFixed(2)} (${(factor * 100).toFixed(1)}% of original)`;
+     
+    }
+
+    await this.logger.log(
+      `[production] INTERNAL_PLANT_REQUEST - SUCCESS: ${commonName} | ${adjustmentNote}`
+    );
+
+    res.status(201).json({
+      ...this.plantsService.toDTO(newPlant),
+      adjustedOilStrength: adjustedStrength,
+      adjustmentNote
+    });
+  } catch (err) {
+    await this.logger.log(`[production] INTERNAL_PLANT_REQUEST - FAIL: ${(err as Error).message}`);
+    res.status(500).json({ message: (err as Error).message });
+  }
+}
+
+  private async getAllPlants(req: Request, res: Response): Promise<void> {
+  try {
+    const plants = await this.plantsService.getAllPlants();
+    res.json(plants);
+  } catch (err) {
+    res.status(500).json({ message: (err as Error).message });
+  }
+}
+
+private async getPlantById(req: Request, res: Response): Promise<void> {
+  try {
+    const id = parseInt(req.params.id, 10);
+    const plant = await this.plantsService.getPlantById(id);
+    res.json(plant);
+  } catch (err) {
+    res.status(404).json({ message: (err as Error).message });
+  }
+}
 
   public getRouter(): Router {
     return this.router;
