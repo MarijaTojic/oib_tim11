@@ -1,9 +1,2 @@
-import { LogisticsAlgorithm } from '../models/PerformanceResult';
-
-export interface SimulationRequestDTO {
-  algorithms: LogisticsAlgorithm[];
-  simulationName: string;
-  numberOfSimulations?: number;
-  numberOfParticles?: number;
-  numberOfIterations?: number;
-}
+// This file has been removed as it is used by the performance-microservice instead
+// All performance-related code has been moved to the dedicated performance-microservice

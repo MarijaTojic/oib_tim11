@@ -39,13 +39,13 @@ export class GatewayController {
     this.router.post("/processing", authenticate, authorize("seller", "manager"), this.startProcessing.bind(this));
     this.router.get("/perfumes/by-type", authenticate, authorize("seller", "manager"), this.getPerfumesByType.bind(this));
 
-    // Analytics routes - Performance (admin, manager)
-    this.router.post("/performance/simulate", authenticate, authorize("admin", "manager"), this.runPerformanceSimulation.bind(this));
-    this.router.get("/performance", authenticate, authorize("admin", "manager"), this.getPerformanceResults.bind(this));
-    this.router.get("/performance/:id", authenticate, authorize("admin", "manager"), this.getPerformanceResultById.bind(this));
+    // Performance routes (admin only)
+    this.router.post("/performance/simulate", authenticate, authorize("admin"), this.runPerformanceSimulation.bind(this));
+    this.router.get("/performance", authenticate, authorize("admin"), this.getPerformanceResults.bind(this));
+    this.router.get("/performance/:id", authenticate, authorize("admin"), this.getPerformanceResultById.bind(this));
     this.router.delete("/performance/:id", authenticate, authorize("admin"), this.deletePerformanceResult.bind(this));
-    this.router.get("/performance/:id/compare", authenticate, authorize("admin", "manager"), this.comparePerformanceAlgorithms.bind(this));
-    this.router.patch("/performance/:id/export", authenticate, authorize("admin", "manager"), this.exportPerformanceResult.bind(this));
+    this.router.get("/performance/:id/compare", authenticate, authorize("admin"), this.comparePerformanceAlgorithms.bind(this));
+    this.router.patch("/performance/:id/export", authenticate, authorize("admin"), this.exportPerformanceResult.bind(this));
   }
 
   // =========================
@@ -233,7 +233,7 @@ export class GatewayController {
   }
 
   // =========================
-  // Analytics - Performance handlers
+  // Performance handlers
   // =========================
   /**
    * POST /api/v1/performance/simulate

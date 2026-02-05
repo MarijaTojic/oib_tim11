@@ -15,6 +15,7 @@ export class GatewayService implements IGatewayService {
   private readonly productionClient: AxiosInstance;
   private readonly processingClient: AxiosInstance;
   private readonly analyticsClient: AxiosInstance;
+  private readonly performanceClient: AxiosInstance;
 
   constructor() {
     const authBaseURL = process.env.AUTH_SERVICE_API;
@@ -22,6 +23,7 @@ export class GatewayService implements IGatewayService {
     const productionBaseURL = process.env.PRODUCTION_SERVICE_API;
     const processingBaseURL = process.env.PROCESSING_SERVICE_API;
     const analyticsBaseURL = process.env.ANALYTICS_SERVICE_API;
+    const performanceBaseURL = process.env.PERFORMANCE_SERVICE_API;
 
     this.authClient = axios.create({
       baseURL: authBaseURL,
@@ -49,6 +51,12 @@ export class GatewayService implements IGatewayService {
 
     this.analyticsClient = axios.create({
       baseURL: analyticsBaseURL,
+      headers: { "Content-Type": "application/json" },
+      timeout: 5000,
+    });
+
+    this.performanceClient = axios.create({
+      baseURL: performanceBaseURL,
       headers: { "Content-Type": "application/json" },
       timeout: 5000,
     });
@@ -152,10 +160,10 @@ export class GatewayService implements IGatewayService {
     return response.data;
   }
 
-  // Analytics microservice - Performance methods
+  // Performance microservice methods
   async runPerformanceSimulation(data: SimulationRequestDTO): Promise<PerformanceResultDTO[]> {
     try {
-      const response = await this.analyticsClient.post<PerformanceResultDTO[]>("/performance/simulate", data);
+      const response = await this.performanceClient.post<PerformanceResultDTO[]>("/simulate", data);
       return response.data;
     } catch {
       return [];
@@ -163,27 +171,27 @@ export class GatewayService implements IGatewayService {
   }
 
   async getPerformanceResults(limit?: number): Promise<PerformanceResultDTO[]> {
-    const response = await this.analyticsClient.get<PerformanceResultDTO[]>("/performance", {
+    const response = await this.performanceClient.get<PerformanceResultDTO[]>("/", {
       params: limit ? { limit } : {},
     });
     return response.data;
   }
 
   async getPerformanceResultById(id: number): Promise<PerformanceResultDTO> {
-    const response = await this.analyticsClient.get<PerformanceResultDTO>(`/performance/${id}`);
+    const response = await this.performanceClient.get<PerformanceResultDTO>(`/${id}`);
     return response.data;
   }
 
   async deletePerformanceResult(id: number): Promise<void> {
-    await this.analyticsClient.delete(`/performance/${id}`);
+    await this.performanceClient.delete(`/${id}`);
   }
 
   async comparePerformanceAlgorithms(id: number): Promise<any> {
-    const response = await this.analyticsClient.get(`/performance/${id}/compare`);
+    const response = await this.performanceClient.get(`/${id}/compare`);
     return response.data;
   }
 
   async exportPerformanceResult(id: number): Promise<void> {
-    await this.analyticsClient.patch(`/performance/${id}/export`);
+    await this.performanceClient.patch(`/${id}/export`);
   }
 }

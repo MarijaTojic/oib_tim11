@@ -1,12 +1,12 @@
-import "reflect-metadata";
-import { DataSource } from "typeorm";
-import dotenv from "dotenv";
-import { Receipt, ReportAnalysis } from "../Domain";
+import 'reflect-metadata';
+import { DataSource } from 'typeorm';
+import dotenv from 'dotenv';
+import { PerformanceResult } from '../Domain';
 
 dotenv.config();
 
 export const Db = new DataSource({
-  type: "mysql",
+  type: 'mysql',
   host: process.env.DB_HOST,
   port: Number(process.env.DB_PORT),
   username: process.env.DB_USER,
@@ -15,5 +15,5 @@ export const Db = new DataSource({
   ssl: { rejectUnauthorized: false },
   synchronize: true, // automatsko kreiranje tabela u bazi
   logging: false, // debug sql gresaka
-  entities: [Receipt, ReportAnalysis],
+  entities: [PerformanceResult],
 });
