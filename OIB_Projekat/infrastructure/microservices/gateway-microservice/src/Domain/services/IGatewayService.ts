@@ -38,5 +38,10 @@ export interface IGatewayService {
   deletePerformanceResult(id: number): Promise<void>;
   comparePerformanceAlgorithms(id: number): Promise<any>;
   exportPerformanceResult(id: number): Promise<void>;
+
+  // Sales microservice
+  getCatalogue(): Promise<any>;
+  sell(data: any): Promise<any>;
+
 }
 

@@ -46,6 +46,10 @@ export class GatewayController {
     this.router.delete("/performance/:id", authenticate, authorize("admin"), this.deletePerformanceResult.bind(this));
     this.router.get("/performance/:id/compare", authenticate, authorize("admin"), this.comparePerformanceAlgorithms.bind(this));
     this.router.patch("/performance/:id/export", authenticate, authorize("admin"), this.exportPerformanceResult.bind(this));
+
+    // Sales routes (seller, manager)
+    this.router.get("/sales/catalogue", authenticate, authorize("seller", "manager"),this.getCatalogue.bind(this));
+    this.router.post("/sales/sell", authenticate, authorize("seller", "manager"), this.sell.bind(this));
   }
 
   // =========================
@@ -314,6 +318,27 @@ export class GatewayController {
       const id = parseInt(req.params.id, 10);
       await this.gatewayService.exportPerformanceResult(id);
       res.status(200).json({ message: 'Export date updated' });
+    } catch (err) {
+      res.status(500).json({ message: (err as Error).message });
+    }
+  }
+
+  // =========================
+  // Sales handlers
+  // =========================
+  private async getCatalogue(req: Request, res: Response): Promise<void> {
+    try {
+      const catalogue = await this.gatewayService.getCatalogue();
+      res.status(200).json(catalogue);
+    } catch (err) {
+      res.status(500).json({ message: (err as Error).message });
+    }
+  }
+
+  private async sell(req: Request, res: Response): Promise<void> {
+    try {
+      const result = await this.gatewayService.sell(req.body);
+      res.status(200).json(result);
     } catch (err) {
       res.status(500).json({ message: (err as Error).message });
     }

@@ -16,6 +16,8 @@ export class GatewayService implements IGatewayService {
   private readonly processingClient: AxiosInstance;
   private readonly analyticsClient: AxiosInstance;
   private readonly performanceClient: AxiosInstance;
+  private readonly salesClient: AxiosInstance;
+
 
   constructor() {
     const authBaseURL = process.env.AUTH_SERVICE_API;
@@ -24,6 +26,8 @@ export class GatewayService implements IGatewayService {
     const processingBaseURL = process.env.PROCESSING_SERVICE_API;
     const analyticsBaseURL = process.env.ANALYTICS_SERVICE_API;
     const performanceBaseURL = process.env.PERFORMANCE_SERVICE_API;
+    const salesBaseURL = process.env.SALES_SERVICE_API;
+
 
     this.authClient = axios.create({
       baseURL: authBaseURL,
@@ -60,6 +64,13 @@ export class GatewayService implements IGatewayService {
       headers: { "Content-Type": "application/json" },
       timeout: 5000,
     });
+
+    this.salesClient = axios.create({
+      baseURL: salesBaseURL,
+      headers: { "Content-Type": "application/json" },
+      timeout: 5000,
+    });
+
   }
 
   // Auth microservice
@@ -193,5 +204,16 @@ export class GatewayService implements IGatewayService {
 
   async exportPerformanceResult(id: number): Promise<void> {
     await this.performanceClient.patch(`/${id}/export`);
+  }
+
+  // Sales microservice
+  async getCatalogue(): Promise<any> {
+    const response = await this.salesClient.get("/sales/catalogue");
+    return response.data;
+  }
+
+  async sell(data: any): Promise<any> {
+    const response = await this.salesClient.post("/sales/sell", data);
+    return response.data;
   }
 }

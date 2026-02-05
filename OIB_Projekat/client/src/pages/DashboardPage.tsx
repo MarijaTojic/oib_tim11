@@ -24,7 +24,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ userAPI, plantAPI 
       setErrorPlants("");
 
       const token = localStorage.getItem("authToken") || "";
-      console.log(localStorage.getItem("authToken"));
 
       try{
         const userData = await userAPI.getAllUsers(token);

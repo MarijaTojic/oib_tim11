@@ -3,7 +3,7 @@ import { ISalesService } from "../Domain/services/ISalesService";
 import { CreateSaleDTO } from "../Domain/DTOs/CreateSaleDTO";
 import { PerfumeDTO } from "../Domain/DTOs/perfumes/PerfumeDTO";
 import { CatalogueDTO } from "../Domain/DTOs/catalogues/CatalogueDTO";
-import QRCode from "qrcode"; // npm install qrcode + npm i --save-dev @types/qrcode
+import QRCode from "qrcode"; // npm install qrcode
 
 export class SalesService implements ISalesService {
   private gateway: AxiosInstance;
@@ -28,7 +28,7 @@ export class SalesService implements ISalesService {
         };
       }
 
-      const res = await this.gateway.get<PerfumeDTO[]>("/perfumes");
+      const res = await this.gateway.get<PerfumeDTO[]>("/perfumes"); 
       this.perfumeCache = res.data;
       this.cacheTimestamp = Date.now();
 
@@ -43,12 +43,13 @@ export class SalesService implements ISalesService {
     }
   }
 
+  // Prodaja parfema
   async sell(dto: CreateSaleDTO): Promise<{ success: boolean; message?: string; qrCode?: string }> {
     try {
-      const perfumes = await this.getCatalogue();
+      const catalogue = await this.getCatalogue();
 
       for (const p of dto.perfumes) {
-        if (!perfumes.allPerfumes.find(x => x.id === p.perfumeId)) {
+        if (!catalogue.allPerfumes.find(x => x.id === p.perfumeId)) {
           throw new Error(`Perfume ${p.perfumeId} not found`);
         }
       }
@@ -74,6 +75,7 @@ export class SalesService implements ISalesService {
 
       const receipt = await this.gateway.post("/analytics/sale", perfumesSold);
 
+      // Generiši QR kod
       const qrData = receipt.data.perfumeDetails.map((p: any) => ({
         perfumeId: p.perfumeId,
         perfumeName: p.perfumeName,
