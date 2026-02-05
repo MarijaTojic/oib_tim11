@@ -6,21 +6,19 @@ import { PlantDTO } from "../Domain/DTOs/PlantDTO";
 export class PlantsService implements IPlantsService {
   constructor(private plantRepository: Repository<Plant>) {}
 
-  /* Get all plants */
   async getAllPlants(): Promise<PlantDTO[]> {
     const plants = await this.plantRepository.find();
     return plants.map((plant) => this.toDTO(plant));
   }
 
-  /** Get a single plant by ID */
+  
   async getPlantById(id: number): Promise<PlantDTO> {
     const plant = await this.plantRepository.findOne({ where: { id } });
     if (!plant) throw new Error(`Plant with ID ${id} not found`);
     return this.toDTO(plant);
   }
-  /**
-   * Create / plant new plant
-   */
+
+
   async createPlant(plantDTO: PlantDTO): Promise<PlantDTO> {
     const plant = this.plantRepository.create({
       commonName: plantDTO.commonName,
@@ -36,45 +34,53 @@ export class PlantsService implements IPlantsService {
     return this.toDTO(savedPlant);
   }
 
-  /**
-   * Change aromatic oil strength by percentage
-   */
-  async changeAromaticOilStrength(id: number,percentage: number): Promise<PlantDTO> {
+ 
+ async changeAromaticOilStrength(id: number, percentage: number): Promise<PlantDTO> {
+  const plant = await this.plantRepository.findOne({ where: { id } });
+  if (!plant) throw new Error(`Plant with ID ${id} not found`);
 
-    const plant = await this.plantRepository.findOne({ where: { id } });
-    if (!plant) throw new Error(`Plant with ID ${id} not found`);
 
-    plant.aromaticOilStrength = Number(
-      (plant.aromaticOilStrength * (percentage / 100)).toFixed(2)
-    );
-
-    const savedPlant = await this.plantRepository.save(plant);
-    return this.toDTO(savedPlant);
+  if (percentage <= 0) {
+    throw new Error("Percentage must be greater than 0");
   }
 
-  /**
-   * Harvest plants
-   */
-  async harvestPlants(commonName: string,quantity: number): Promise<PlantDTO[]> {
 
-    const plants = await this.plantRepository.find({
-      where: { commonName },
-      take: quantity
-    });
+  plant.aromaticOilStrength = Number(
+    (plant.aromaticOilStrength * (percentage / 100)).toFixed(2)
+  );
 
-    if (plants.length < quantity) {
-      throw new Error(`Not enough plants with name ${commonName}`);
-    }
+  if (plant.aromaticOilStrength < 0) {
+    plant.aromaticOilStrength = 0;
+  }
 
-    await this.plantRepository.remove(plants);
-    return plants.map(p => this.toDTO(p));
+  const savedPlant = await this.plantRepository.save(plant);
+  return this.toDTO(savedPlant);
+}
+
+async harvestPlants(commonName: string, quantity: number): Promise<PlantDTO[]> {
+ 
+  const plants = await this.plantRepository.find({ where: { commonName } });
+
+  if (plants.length === 0) {
+    throw new Error(`No plants with name ${commonName} found`);
+  }
+
+  const plant = plants[0]; 
+
+  if (plant.quantity < quantity) {
+    throw new Error(`Not enough plants with name ${commonName}. Available: ${plant.quantity}`);
   }
 
   
-  /**
-   * Convert Plant entity to PlantDTO
-   */
-  private toDTO(plant: Plant): PlantDTO {
+  plant.quantity -= quantity;
+  await this.plantRepository.save(plant);
+
+  
+  return [this.toDTO(plant)];
+  
+}
+
+   public toDTO(plant: Plant): PlantDTO {
     return {
       id: plant.id,
       commonName: plant.commonName,
