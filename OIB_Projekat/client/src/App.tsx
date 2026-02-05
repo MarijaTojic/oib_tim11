@@ -98,6 +98,7 @@ function App() {
 
       {/* Catch-all */}
       <Route path="*" element={<Navigate to="/" />} />
+      
     </Routes>
   );
 }

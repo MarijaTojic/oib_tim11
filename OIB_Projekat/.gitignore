@@ -71,3 +71,5 @@ typings/
 
 dist
 .env
+
+node_modules
