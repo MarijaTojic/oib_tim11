@@ -9,7 +9,7 @@ type Props = {
 
 export const CreatePlantForm: React.FC<Props> = ({ plantsAPI, onSuccess }) => {
   const [form, setForm] = useState({
-    id: 0,
+    //id: 0,
     commonName: "",
     latinName: "",
     countryOfOrigin: "",

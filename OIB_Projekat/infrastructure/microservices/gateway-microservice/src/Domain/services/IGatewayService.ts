@@ -6,6 +6,7 @@ import { PlantDTO } from "../DTOs/PlantDTO";
 import { PerfumeDTO } from "../DTOs/PerfumeDTO";
 import { SimulationRequestDTO } from "../DTOs/SimulationRequestDTO";
 import { PerformanceResultDTO } from "../DTOs/PerformanceResultDTO";
+import { PackagingDTO } from "../DTOs/PackagingDTO";
 
 export interface IGatewayService {
   // Auth microservice
@@ -42,6 +43,9 @@ export interface IGatewayService {
   // Sales microservice
   getCatalogue(): Promise<any>;
   sell(data: any): Promise<any>;
+
+  //Packaging microservice
+  packagingPerfumes(perfumeType: string, quantity: number, senderAddress: string, stroageID: number): Promise<PackagingDTO[]>;
 
 }
 

@@ -42,7 +42,11 @@ export class PlantsController {
                 `[production] CREATE_PLANT - FAIL: ${(err as Error).message}`
               );
 
-        res.status(500).json({ message: (err as Error).message });
+        //res.status(500).json({ message: (err as Error).message });
+        const errorMessage =
+      err instanceof Error ? err.message : JSON.stringify(err);
+      console.error("❌ CREATE_PLANT ERROR:", errorMessage);
+
       }
     }
 
@@ -104,7 +108,8 @@ export class PlantsController {
       aromaticOilStrength: 0,
       countryOfOrigin: "",
       status: PlantStatus.PLANTED,
-      id: 0
+      quantity: 1,
+      //id: 0
     });
 
     let adjustedStrength = newPlant.aromaticOilStrength;
@@ -117,12 +122,11 @@ export class PlantsController {
       adjustedStrength = Number((newPlant.aromaticOilStrength * factor).toFixed(2));
       
       const percentageToApply = factor * 100;     
-      await this.plantsService.changeAromaticOilStrength(newPlant.id, percentageToApply);
+      await this.plantsService.changeAromaticOilStrength(newPlant.id!, percentageToApply);
 
       adjustmentNote = `Adjusted proportionally: ${previousOilStrength.toFixed(2)} → ${adjustedStrength.toFixed(2)} (${(factor * 100).toFixed(1)}% of original)`;
      
     }
-
     await this.logger.log(
       `[production] INTERNAL_PLANT_REQUEST - SUCCESS: ${commonName} | ${adjustmentNote}`
     );
@@ -133,6 +137,7 @@ export class PlantsController {
       adjustmentNote
     });
   } catch (err) {
+    console.error(err);
     await this.logger.log(`[production] INTERNAL_PLANT_REQUEST - FAIL: ${(err as Error).message}`);
     res.status(500).json({ message: (err as Error).message });
   }

@@ -1,11 +1,15 @@
 import { IPlantAPI } from "./IPlantAPI";
 import { PlantDTO } from "../../models/plants/PlantDTO";
+import { PlantStatus } from "../../enums/PlantStatus";
 
 export class PlantAPI implements IPlantAPI {
-  private baseUrl = "/api/v1/plants";
+  private baseUrl = `${import.meta.env.VITE_GATEWAY_URL}/plants`;
 
   async getAllPlants(): Promise<PlantDTO[]> {
-    const res = await fetch(this.baseUrl);
+    const token = localStorage.getItem("authToken");
+    const res = await fetch(this.baseUrl, {
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}`}
+    });
     if (!res.ok) throw new Error("Failed to fetch plants");
     return res.json();
   }
@@ -17,10 +21,22 @@ export class PlantAPI implements IPlantAPI {
   }
 
   async createPlant(plant: PlantDTO): Promise<PlantDTO> {
-    const plantToSend = { ...plant, aromaticOilStrength: Number((Math.random() * 4 + 1).toFixed(2)) };
+    const token = localStorage.getItem("authToken");
+    console.log(token);
+    const { id,  ...plantWithoutId } = plant;
+    //const plantToSend = { ...plant, aromaticOilStrength: Number((Math.random() * 4 + 1).toFixed(2)) };
+    const plantToSend: PlantDTO = {
+      commonName: plant.commonName,
+      latinName: plant.latinName || "",
+      countryOfOrigin: plant.countryOfOrigin || "",
+      status: PlantStatus.PLANTED, 
+      aromaticOilStrength: Number((Math.random() * 4 + 1).toFixed(2)),
+      quantity: plant.quantity || 1,
+    };
+
     const res = await fetch(this.baseUrl, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}`},
       body: JSON.stringify(plantToSend),
     });
     if (!res.ok) throw new Error("Failed to create plant");

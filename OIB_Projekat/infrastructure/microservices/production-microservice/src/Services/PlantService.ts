@@ -25,9 +25,11 @@ export class PlantsService implements IPlantsService {
       latinName: plantDTO.latinName,
       countryOfOrigin: plantDTO.countryOfOrigin,
       status: plantDTO.status,
-      aromaticOilStrength: Number(
-        (Math.random() * 4 + 1).toFixed(2) // 1.0 – 5.0
-      )
+      aromaticOilStrength:
+      plantDTO.aromaticOilStrength && plantDTO.aromaticOilStrength > 0
+        ? plantDTO.aromaticOilStrength
+        : Number((Math.random() * 4 + 1).toFixed(2)),
+       quantity: plantDTO.quantity ?? 1, 
     });
 
     const savedPlant = await this.plantRepository.save(plant);
@@ -87,7 +89,8 @@ async harvestPlants(commonName: string, quantity: number): Promise<PlantDTO[]> {
       latinName: plant.latinName,
       aromaticOilStrength: plant.aromaticOilStrength,
       countryOfOrigin: plant.countryOfOrigin,
-      status: plant.status
+      status: plant.status,
+      quantity: plant.quantity
     };
   }
 }

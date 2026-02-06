@@ -50,6 +50,9 @@ export class GatewayController {
     // Sales routes (seller, manager)
     this.router.get("/sales/catalogue", authenticate, authorize("seller", "manager"),this.getCatalogue.bind(this));
     this.router.post("/sales/sell", authenticate, authorize("seller", "manager"), this.sell.bind(this));
+
+    //Packaging rotes
+    this.router.post("/packaging", this.packagePerfumes.bind(this));
   }
 
   // =========================
@@ -165,6 +168,7 @@ export class GatewayController {
 
   private async plantNewPlant(req: Request, res: Response): Promise<void> {
     try {
+      console.log(req.body)
       const plant = await this.gatewayService.plantNewPlant(req.body);
       res.status(201).json(plant);
     } catch (err) {
@@ -342,6 +346,25 @@ export class GatewayController {
     } catch (err) {
       res.status(500).json({ message: (err as Error).message });
     }
+  }
+
+  //Packaging
+  private async packagePerfumes(req: Request, res: Response): Promise<void>{
+    try{
+        const { perfumeTyp, quantity, senderAddress, stroageID } = req.body;
+
+      const result = await this.gatewayService.packagingPerfumes(
+        perfumeTyp,
+        quantity,
+        senderAddress,
+        stroageID
+    );
+
+    res.status(201).json(res);
+    } catch(err){
+      res.status(500).json({message: (err as Error).message});
+    }
+    
   }
 
   public getRouter(): Router {

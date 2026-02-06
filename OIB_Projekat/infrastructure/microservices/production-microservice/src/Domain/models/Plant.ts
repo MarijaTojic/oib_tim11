@@ -1,31 +1,30 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 import { PlantStatus } from "../enums/PlantStatus";
 
-@Entity("plants") 
+@Entity("plants")
 export class Plant {
   @PrimaryGeneratedColumn()
-  id!: number;
+  id!: number; 
 
-  @Column()
-  commonName!: string;
+  @Column({ type: "varchar", length: 100 })
+  commonName!: string; 
 
-  @Column()
-  latinName!: string;
+  @Column({ type: "varchar", length: 100, default: "" })
+  latinName!: string; 
 
-  @Column("float")
-  aromaticOilStrength!: number;
+  @Column({ type: "float", default: 1.0 })
+  aromaticOilStrength!: number; 
 
-  @Column()
-  countryOfOrigin!: string;
+  @Column({ type: "varchar", length: 100, default: "" })
+  countryOfOrigin!: string; 
 
-  @Column()
-  quantity!: number;
+  @Column({ type: "int", default: 1 })
+  quantity!: number; 
 
   @Column({
     type: "enum",
-    enum: PlantStatus
+    enum: PlantStatus,
+    default: PlantStatus.PLANTED
   })
-  status!: PlantStatus;
-
-
+  status!: PlantStatus; 
 }

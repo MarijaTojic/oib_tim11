@@ -1,0 +1,3 @@
+interface PerfumeForPackagingDTO {
+  id: string;
+}

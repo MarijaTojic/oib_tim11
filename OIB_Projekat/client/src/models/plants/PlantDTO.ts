@@ -1,7 +1,7 @@
 import { PlantStatus } from "../../enums/PlantStatus";
 
 export interface PlantDTO {
-  id: number;
+  id?: number;
   commonName: string;
   latinName: string;
   aromaticOilStrength: number; // 1.0 to 5.0

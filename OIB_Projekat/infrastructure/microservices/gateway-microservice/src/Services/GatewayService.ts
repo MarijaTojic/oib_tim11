@@ -8,6 +8,7 @@ import { PerfumeDTO } from "../Domain/DTOs/PerfumeDTO";
 import { PlantDTO } from "../Domain/DTOs/PlantDTO";
 import { SimulationRequestDTO } from "../Domain/DTOs/SimulationRequestDTO";
 import { PerformanceResultDTO } from "../Domain/DTOs/PerformanceResultDTO";
+import { PackagingDTO } from "../Domain/DTOs/PackagingDTO";
 
 export class GatewayService implements IGatewayService {
   private readonly authClient: AxiosInstance;
@@ -17,6 +18,7 @@ export class GatewayService implements IGatewayService {
   private readonly analyticsClient: AxiosInstance;
   private readonly performanceClient: AxiosInstance;
   private readonly salesClient: AxiosInstance;
+  private readonly packagingClient: AxiosInstance;
 
 
   constructor() {
@@ -27,6 +29,7 @@ export class GatewayService implements IGatewayService {
     const analyticsBaseURL = process.env.ANALYTICS_SERVICE_API;
     const performanceBaseURL = process.env.PERFORMANCE_SERVICE_API;
     const salesBaseURL = process.env.SALES_SERVICE_API;
+    const packagingBaseURL = process.env.PACKAGING_SERVICE_API;
 
 
     this.authClient = axios.create({
@@ -67,6 +70,12 @@ export class GatewayService implements IGatewayService {
 
     this.salesClient = axios.create({
       baseURL: salesBaseURL,
+      headers: { "Content-Type": "application/json" },
+      timeout: 5000,
+    });
+
+    this.packagingClient = axios.create({
+      baseURL: packagingBaseURL,
       headers: { "Content-Type": "application/json" },
       timeout: 5000,
     });
@@ -214,6 +223,17 @@ export class GatewayService implements IGatewayService {
 
   async sell(data: any): Promise<any> {
     const response = await this.salesClient.post("/sales/sell", data);
+    return response.data;
+  }
+
+  //Packaging microservice
+  async packagingPerfumes(perfumeType: string, quantity: number, senderAddress: string, storageID: number): Promise<PackagingDTO[]>{
+    const response = await this.packagingClient.post<PackagingDTO[]>("/packaging", {
+      perfumeType,
+      quantity,
+      senderAddress,
+      storageID,
+    });
     return response.data;
   }
 }

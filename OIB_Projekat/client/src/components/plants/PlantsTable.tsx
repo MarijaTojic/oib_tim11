@@ -56,7 +56,7 @@ export const PlantsTable: React.FC<Props> = ({ plants, onChangeAroma, onHarvest 
                 </td>
                 <td className="p-3 flex gap-2">
                   <button
-                    onClick={() => onChangeAroma(p.id)}
+                    onClick={() => onChangeAroma(p.id!)}
                     className="btn-small bg-yellow-500 hover:bg-yellow-600 text-white"
                   >
                     Promeni jačinu
