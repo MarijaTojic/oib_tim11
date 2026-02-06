@@ -37,11 +37,11 @@ initialize_database();
 
 // ORM Repositories
 const catalogueRepository: Repository<Catalogue> = Db.getRepository(Catalogue);
-const auditRepository: Repository<Log> = Db.getRepository(Log);
+const auditRepository: Repository<Log> = Db.getRepository(Log as any);
 
 // Services
 const salesService: ISalesService = new SalesService(); 
-const logerService: ILogService = new LogService(auditRepository);
+const logerService = new LogService(auditRepository as any);
 
 // WebAPI routes
 const salesController = new SalesController(salesService, logerService);

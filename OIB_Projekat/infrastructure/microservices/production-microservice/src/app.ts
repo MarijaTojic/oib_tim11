@@ -37,9 +37,9 @@ app.use(express.json());
 initialize_database();
 
 const plantRepository: Repository<Plant> = Db.getRepository(Plant);
-const auditRepository: Repository<Log> = Db.getRepository(Log);
+const auditRepository: Repository<Log> = Db.getRepository(Log as any);
 
-const loggerService: ILogService = new LogService(auditRepository);
+const loggerService: ILogService = new LogService(auditRepository as any);
 const plantsService: IPlantsService = new PlantsService(plantRepository);
 
 

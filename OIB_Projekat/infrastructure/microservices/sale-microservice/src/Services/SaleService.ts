@@ -3,11 +3,12 @@ import { ISalesService } from "../Domain/services/ISalesService";
 import { CreateSaleDTO } from "../Domain/DTOs/CreateSaleDTO";
 import { PerfumeDTO } from "../Domain/DTOs/perfumes/PerfumeDTO";
 import { CatalogueDTO } from "../Domain/DTOs/catalogues/CatalogueDTO";
-import QRCode from "qrcode"; // npm install qrcode
+import QRCode from "qrcode"; 
 
 export class SalesService implements ISalesService {
   private gateway: AxiosInstance;
-  private perfumeCache: PerfumeDTO[] | null = null;
+
+  private catalogueCache: CatalogueDTO | null = null;
   private cacheTimestamp: number = 0;
   private cacheTTL = 5 * 60 * 1000; // 5 minuta
 
@@ -21,21 +22,20 @@ export class SalesService implements ISalesService {
 
   async getCatalogue(): Promise<CatalogueDTO> {
     try {
-      if (this.perfumeCache && Date.now() - this.cacheTimestamp < this.cacheTTL) {
-        return {
-          allPerfumes: this.perfumeCache,
-          amount: this.perfumeCache.length,
-        };
+      if (this.catalogueCache && Date.now() - this.cacheTimestamp < this.cacheTTL) {
+        return this.catalogueCache;
       }
 
-      const res = await this.gateway.get<PerfumeDTO[]>("/perfumes"); 
-      this.perfumeCache = res.data;
-      this.cacheTimestamp = Date.now();
+      // gateway ruta: GET /perfumes
+      const res = await this.gateway.get<PerfumeDTO[]>("/perfumes");
 
       const catalogue: CatalogueDTO = {
         allPerfumes: res.data,
         amount: res.data.length,
       };
+
+      this.catalogueCache = catalogue;
+      this.cacheTimestamp = Date.now();
 
       return catalogue;
     } catch (err: any) {
@@ -56,6 +56,7 @@ export class SalesService implements ISalesService {
 
       const perfumeIds = dto.perfumes.map(p => p.perfumeId);
 
+      // storage 
       const storageRes = await this.gateway.post("/storage/send", {
         perfumeIds,
         userRole: "manager",
@@ -73,9 +74,10 @@ export class SalesService implements ISalesService {
         userId: dto.userId,
       }));
 
+      // analytics 
       const receipt = await this.gateway.post("/analytics/sale", perfumesSold);
 
-      // Generiši QR kod
+      // QR kod
       const qrData = receipt.data.perfumeDetails.map((p: any) => ({
         perfumeId: p.perfumeId,
         perfumeName: p.perfumeName,

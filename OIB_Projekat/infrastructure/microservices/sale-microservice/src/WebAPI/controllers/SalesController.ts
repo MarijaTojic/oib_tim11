@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 import { ISalesService } from "../../Domain/services/ISalesService";
-import { ILogService } from "../../../../log-microservice/src/Domain/services/ILogService"
+import { ILogService } from "../../../../log-microservice/src/Domain/services/ILogService";
 
 export class SalesController {
   private readonly router: Router;
@@ -37,6 +37,7 @@ export class SalesController {
       if (!result.success) {
         await this.logger.log(`ERROR: Sale failed for user ${saleDto.userId} - ${result.message}`);
         res.status(400).json(result);
+        return;
       }
 
       await this.logger.log(`INFO: Sale successful for user ${saleDto.userId}`);
