@@ -1,16 +1,16 @@
 import { Request, Response, Router } from 'express';
 import { IAnalyticsService } from '../../Domain/services/IAnalyticsService';
-import { ILogerService } from '../../Domain/services/ILogerService';
+import { ILogService } from '../../../../log-microservice/src/Domain/services/ILogService';
 import { IValidatorService } from '../../Domain/services/IValidatorService';
 import { CreateReceiptDTO, CreateReportAnalysisDTO, SalesAnalysisRequestDTO } from '../../Domain/DTOs';
 
 export class AnalyticsController {
   private router: Router;
   private analyticsService: IAnalyticsService;
-  private logerService: ILogerService;
+  private logerService: ILogService;
   private validatorService: IValidatorService;
 
-  constructor(analyticsService: IAnalyticsService, logerService: ILogerService, validatorService: IValidatorService) {
+  constructor(analyticsService: IAnalyticsService, logerService: ILogService, validatorService: IValidatorService) {
     this.router = Router();
     this.analyticsService = analyticsService;
     this.logerService = logerService;

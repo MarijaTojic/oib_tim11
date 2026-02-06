@@ -1,18 +1,18 @@
-import { Request, Response, Router } from 'express';
+import { Request, Response, Router } from "express";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const PDFDocument = require('pdfkit');
-import { IPerformanceService } from '../../Domain/services/IPerformanceService';
-import { ILogerService } from '../../Domain/services/ILogerService';
-import { IValidatorService } from '../../Domain/services/IValidatorService';
-import { SimulationRequestDTO } from '../../Domain/DTOs';
+const PDFDocument = require("pdfkit");
+import { IPerformanceService } from "../../Domain/services/IPerformanceService";
+import { ILogService } from "../../../../log-microservice/src/Domain/services/ILogService";
+import { IValidatorService } from "../../Domain/services/IValidatorService";
+import { SimulationRequestDTO } from "../../Domain/DTOs";
 
 export class PerformanceController {
   private router: Router;
   private performanceService: IPerformanceService;
-  private logerService: ILogerService;
+  private logerService: ILogService;
   private validatorService: IValidatorService;
 
-  constructor(performanceService: IPerformanceService, logerService: ILogerService, validatorService: IValidatorService) {
+  constructor(performanceService: IPerformanceService, logerService: ILogService, validatorService: IValidatorService) {
     this.router = Router();
     this.performanceService = performanceService;
     this.logerService = logerService;

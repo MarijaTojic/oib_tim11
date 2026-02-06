@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { ILogerService } from "../../Domain/services/ILogerService";
+import { ILogService } from "../../../../log-microservice/src/Domain/services/ILogService";
 import { IPerfumeService } from "../../Domain/services/IPerfumeService";
 import { PerfumeType } from "../../Domain/enums/PerfumeType";
 
@@ -8,7 +8,7 @@ export class PerfumeController {
 
   constructor(
     private readonly perfumesService: IPerfumeService,
-    private readonly logger: ILogerService
+    private readonly logger: ILogService
   ) {
     this.router = Router();
     this.initializeRoutes();

@@ -5,17 +5,16 @@ import { Plant } from "../../../production-microservice/src/Domain/models/Plant"
 import { PerfumeDTO } from "../Domain/DTOs/PerfumeDTO";
 import { PerfumeType } from "../Domain/enums/PerfumeType";
 import { calculateNumberOfPlants } from "../helpers/NumberOfPlants"
-import { LogerService } from "./LogerService";
+import { ILogService } from "../../../log-microservice/src/Domain/services/ILogService";
 import axios from "axios";
 
 export class PerfumeService implements IPerfumeService {
-  constructor(private perfumeRepository: Repository<Perfume>, private plantRepository: Repository<Plant>){}
+  constructor(private perfumeRepository: Repository<Perfume>, private plantRepository: Repository<Plant>, private logger: ILogService){}
   //, private plantService: IPlantsService) {}
 
   async plantProcessing(plantId: number, quantity: number, volume: number, perfumeType: string): Promise<PerfumeDTO[]> {
-    const logger = new LogerService();
     const numberOfPlants = calculateNumberOfPlants(quantity, volume);
-    await logger.log(`Number of plants needed: ${numberOfPlants}`);
+    await this.logger.log(`Number of plants needed: ${numberOfPlants}`);
 
     const typeEnum = perfumeType as PerfumeType;
     const perfumeFromDb = await this.perfumeRepository.findOne({where: {type: typeEnum}});
@@ -31,11 +30,11 @@ export class PerfumeService implements IPerfumeService {
     }
 
     const plantOilStrength = plant.aromaticOilStrength;
-    await logger.log(`Jačina biljke ID ${plantId}: ${plantOilStrength}`);
+    await this.logger.log(`Jačina biljke ID ${plantId}: ${plantOilStrength}`);
 
     const perfumes: Perfume[] = [];
     
-    await logger.log(`Starting plant processing for ${Perfume.name} (${quantity} bottles of ${volume} ml)`);
+    await this.logger.log(`Starting plant processing for ${Perfume.name} (${quantity} bottles of ${volume} ml)`);
  
     for (let i = 0; i < quantity; i++) {
     let perfume = this.perfumeRepository.create({
@@ -61,7 +60,7 @@ export class PerfumeService implements IPerfumeService {
 
   const newPlant = response.data;
 
-  await logger.log(`Nova biljka zasađena i korigovana na ${newPlant.adjustedOilStrength}`);
+  await this.logger.log(`Nova biljka zasađena i korigovana na ${newPlant.adjustedOilStrength}`);
 }
 
     perfume = await this.perfumeRepository.save(perfume);

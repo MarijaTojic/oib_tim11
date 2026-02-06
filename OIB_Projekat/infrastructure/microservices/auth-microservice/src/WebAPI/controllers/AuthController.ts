@@ -5,14 +5,14 @@ import { LoginUserDTO } from '../../Domain/DTOs/LoginUserDTO';
 import { RegistrationUserDTO } from '../../Domain/DTOs/RegistrationUserDTO';
 import { validateLoginData } from '../validators/LoginValidator';
 import { validateRegistrationData } from '../validators/RegisterValidator';
-import { ILogerService } from '../../Domain/services/ILogerService';
+import { ILogService } from "../../../../log-microservice/src/Domain/services/ILogService";
 
 export class AuthController {
   private router: Router;
   private authService: IAuthService;
-  private readonly logerService: ILogerService;
+  private readonly logerService: ILogService;
 
-  constructor(authService: IAuthService, logerService: ILogerService) {
+  constructor(authService: IAuthService, logerService: ILogService) {
     this.router = Router();
     this.authService = authService;
     this.logerService = logerService;

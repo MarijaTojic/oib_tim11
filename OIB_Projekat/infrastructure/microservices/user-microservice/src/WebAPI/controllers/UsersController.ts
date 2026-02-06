@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { ILogerService } from "../../Domain/services/ILogerService";
+import { ILogService } from "../../../../log-microservice/src/Domain/services/ILogService";
 import { IUsersService } from "../../Domain/services/IUsersService";
 
 export class UsersController {
@@ -7,7 +7,7 @@ export class UsersController {
 
   constructor(
     private readonly usersService: IUsersService,
-    private readonly logger: ILogerService
+    private readonly logger: ILogService
   ) {
     this.router = Router();
     this.initializeRoutes();

@@ -1,16 +1,19 @@
 import express from 'express';
 import cors from 'cors';
 import "reflect-metadata";
-import { initialize_database } from './Database/InitializeConnection';
 import dotenv from 'dotenv';
-import { Repository } from 'typeorm';
-import { User } from './Domain/models/User';
+import { initialize_database } from './Database/InitializeConnection';
 import { Db } from './Database/DbConnectionPool';
+import { Repository } from 'typeorm';
+
+import { User } from './Domain/models/User';
 import { IAuthService } from './Domain/services/IAuthService';
 import { AuthService } from './Services/AuthService';
 import { AuthController } from './WebAPI/controllers/AuthController';
-import { ILogerService } from './Domain/services/ILogerService';
-import { LogerService } from './Services/LogerService';
+
+import { ILogService } from '../../log-microservice/src/Domain/services/ILogService';
+import { LogService } from '../../log-microservice/src/Services/LogService';
+import { Log } from '../../log-microservice/src/Domain/models/Log';
 
 dotenv.config({ quiet: true });
 
@@ -28,17 +31,19 @@ app.use(cors({
 
 app.use(express.json());
 
+// Initialize DB
 initialize_database();
 
 // ORM Repositories
 const userRepository: Repository<User> = Db.getRepository(User);
+const auditRepository: Repository<Log> = Db.getRepository(Log as any);
 
 // Services
+const logService: ILogService = new LogService(auditRepository as any);
 const authService: IAuthService = new AuthService(userRepository);
-const logerService: ILogerService = new LogerService();
 
 // WebAPI routes
-const authController = new AuthController(authService, logerService);
+const authController = new AuthController(authService, logService);
 
 // Registering routes
 app.use('/api/v1', authController.getRouter());

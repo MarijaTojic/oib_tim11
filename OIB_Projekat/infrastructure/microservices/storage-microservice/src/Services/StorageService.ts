@@ -5,7 +5,7 @@ import { PackageStatus } from '../Domain/Enums/PackageStatus';
 import { CreatePackageDTO } from '../Domain/DTOs/CreatePackageDTO';
 import { CreateWarehouseDTO } from '../Domain/DTOs/CreateWarehouseDTO';
 import { IStorageService } from '../Domain/Services/IStorageService';
-import { ILogService } from '../Domain/Services/ILogService';
+import { ILogService } from "../../../log-microservice/src/Domain/services/ILogService";
 import { IStorageStrategy } from './IStorageStrategy';
 import { DistributionStrategy } from './DistributionStrategy';
 import { WarehouseStrategy } from './WarehouseStrategy';
