@@ -53,6 +53,8 @@ export class GatewayController {
 
     //Packaging rotes
     this.router.post("/packaging", this.packagePerfumes.bind(this));
+    this.router.post("/packaging/send", this.sendAmbalage.bind(this));
+
   }
 
   // =========================
@@ -351,23 +353,47 @@ export class GatewayController {
   //Packaging
   private async packagePerfumes(req: Request, res: Response): Promise<void>{
     try{
-        const { perfumeTyp, quantity, senderAddress, stroageID } = req.body;
+        const { perfumeType, quantity, senderAddress, stroageID } = req.body;
 
       const result = await this.gatewayService.packagingPerfumes(
-        perfumeTyp,
+        perfumeType,
         quantity,
         senderAddress,
         stroageID
     );
 
-    res.status(201).json(res);
+    res.status(201).json(result);
     } catch(err){
       res.status(500).json({message: (err as Error).message});
     }
     
   }
 
+  private async sendAmbalage(req: Request, res: Response): Promise<void> {
+    try {
+      const { storageID, perfumeType, quantity, senderAddress } = req.body;
+
+      if (!storageID) {
+        res.status(400).json({ message: "Missing storageID!" });
+        return;
+      }
+
+      const sent = await this.gatewayService.sendAmbalage(Number(storageID),);
+
+      if (!sent) {
+        res.status(500).json({ message: "Failed to send or create packaging" });
+        return;
+      }
+
+      res.status(200).json(sent);
+    } catch (err) {
+      console.error("GatewayController sendAmbalage error:", err);
+      res.status(500).json({ message: (err as Error).message });
+    }
+  }
+
   public getRouter(): Router {
     return this.router;
   }
+  
 }

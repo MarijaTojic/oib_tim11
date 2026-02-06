@@ -8,6 +8,21 @@ import fetch from 'node-fetch';
 export class PackagingService implements IPackagingService{
     constructor(private packagingRepository: Repository<Packaging>){}
 
+     private packagingStorage: Packaging[] = [];
+
+    async sendAmbalage(storageID: number): Promise<PackagingDTO | null> {
+       const available = await this.packagingRepository.findOne({where: { status: PackagingStatus.PACKED }});
+
+        if (available) {
+            available.status = PackagingStatus.SENT;
+            available.storageID = storageID; 
+            return this.toDTO(available); 
+        } else {
+            console.log("Nema dostupne ambalaže, potrebno je pakovanje.");
+            return null;
+        }
+    }
+
     async perfumePackagin(perfumeType: string, quantity: number, senderAddress: string, storageID: number): Promise<PackagingDTO[]> {
         const perfumesForPackaging: PerfumeForPackagingDTO[] = await this.getPerfumesForPackaging(perfumeType, quantity);
 

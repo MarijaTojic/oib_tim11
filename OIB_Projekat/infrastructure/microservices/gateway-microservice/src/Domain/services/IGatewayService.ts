@@ -46,6 +46,6 @@ export interface IGatewayService {
 
   //Packaging microservice
   packagingPerfumes(perfumeType: string, quantity: number, senderAddress: string, stroageID: number): Promise<PackagingDTO[]>;
-
+  sendAmbalage(storageID: number): Promise<PackagingDTO | null>;
 }
 
