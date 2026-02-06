@@ -4,5 +4,5 @@ import { Packaging } from "../models/Packaging";
 
 export interface IPackagingService {
     perfumePackagin(perfumeType: string, quantity: number, senderAddress: string, storageID: number): Promise<PackagingDTO[]>  
-    //sentAmbalage
+    sendAmbalage(storageID: number): Promise<PackagingDTO | null>;
 }
