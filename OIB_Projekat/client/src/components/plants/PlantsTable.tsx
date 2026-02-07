@@ -66,7 +66,7 @@ export const PlantsTable: React.FC<Props> = ({ plants, onChangeAroma, onHarvest 
                     onClick={() => onHarvest(p.commonName)}
                     className="btn-small bg-purple-600 hover:bg-purple-700 text-white"
                   >
-                    Harves
+                    Harvest
                   </button>
                 </td>
               </tr>

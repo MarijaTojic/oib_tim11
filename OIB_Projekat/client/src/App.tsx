@@ -99,7 +99,11 @@ function App() {
 
       <Route
           path="/production/logs"
-          element={<ProductionLogPage gatewayUrl={import.meta.env.VITE_GATEWAY_URL || ""} />}
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <ProductionLogPage gatewayUrl={import.meta.env.VITE_GATEWAY_URL || ""} />
+          </ProtectedRoute>
+        }
         />
 
       {/* Catch-all */}
