@@ -6,7 +6,7 @@ export class Log {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ type: "varchar", unique: true, length: 100 })
+  @Column({ type: "varchar", length: 100 })
   description!: string;
 
   @Column({type: "enum", enum: LogInfo, default: LogInfo.INFO })

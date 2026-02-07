@@ -51,9 +51,16 @@ export class GatewayController {
     this.router.get("/sales/catalogue", authenticate, authorize("seller", "manager"),this.getCatalogue.bind(this));
     this.router.post("/sales/sell", authenticate, authorize("seller", "manager"), this.sell.bind(this));
 
-    //Packaging rotes
+    //Packaging routes
     this.router.post("/packaging", this.packagePerfumes.bind(this));
     this.router.post("/packaging/send", this.sendAmbalage.bind(this));
+
+    //Log routes
+    this.router.post("/logs", this.createLog.bind(this));
+    this.router.get("/logs/:id", this.getLogById.bind(this));
+    this.router.get("/logs", this.getAllLogs.bind(this));
+    this.router.put("/logs/:id", this.updateLog.bind(this));
+    this.router.delete("/logs/:id", this.deleteLog.bind(this));
 
   }
 
@@ -391,6 +398,57 @@ export class GatewayController {
       res.status(500).json({ message: (err as Error).message });
     }
   }
+
+  //Log
+  private async createLog(req: Request, res: Response): Promise<void> {
+  try {
+    const log = await this.gatewayService.createLog(req.body);
+    res.status(201).json(log);
+  } catch (err) {
+    res.status(500).json({ message: (err as Error).message });
+  }
+}
+
+private async getLogById(req: Request, res: Response): Promise<void> {
+  try {
+    const id = Number(req.params.id);
+    const log = await this.gatewayService.getLogById(id);
+    res.status(200).json(log);
+  } catch (err) {
+    res.status(500).json({ message: (err as Error).message });
+  }
+}
+
+private async getAllLogs(req: Request, res: Response): Promise<void> {
+  try {
+    const logs = await this.gatewayService.getAllLogs();
+    res.status(200).json(logs);
+  } catch (err) {
+    res.status(500).json({ message: (err as Error).message });
+  }
+}
+
+private async updateLog(req: Request, res: Response): Promise<void> {
+  try {
+    const id = Number(req.params.id);
+    const updatedLog = await this.gatewayService.updateLog(id, req.body);
+    res.status(200).json(updatedLog);
+  } catch (err) {
+    res.status(500).json({ message: (err as Error).message });
+  }
+}
+
+private async deleteLog(req: Request, res: Response): Promise<void> {
+  try {
+    const id = Number(req.params.id);
+    const success = await this.gatewayService.deleteLog(id);
+    if (success) res.status(200).json({ message: "Deleted successfully" });
+    else res.status(404).json({ message: "Log not found" });
+  } catch (err) {
+    res.status(500).json({ message: (err as Error).message });
+  }
+}
+
 
   public getRouter(): Router {
     return this.router;

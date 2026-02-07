@@ -1,15 +1,15 @@
 import { Router, Request, Response } from "express";
-//import { ILogService } from "../../../log-microservice/src/Domain/services/ILogService";
+import { LogType } from "../Helpers/LogInfo";
 import { IPlantsService } from "../Domain/services/IPlantsService";
 import { PlantDTO } from "../Domain/DTOs/PlantDTO";
 import { PlantStatus } from "../Domain/enums/PlantStatus";
+import axios from "axios";
 
 export class PlantsController {
   private readonly router: Router;
 
   constructor(
     private readonly plantsService: IPlantsService,
-   // private readonly logger: ILogService
   ) {
     this.router = Router();
     this.initializeRoutes();
@@ -32,15 +32,11 @@ export class PlantsController {
 
         const createdPlant = await this.plantsService.createPlant(plantDTO);
 
-             /* await this.logger.log(
-                    `[production] CREATE_PLANT - SUCCESS: Plant ${createdPlant.commonName} successfully planted`
-              );*/
+        await this.logPlantAction(`Plant ${createdPlant.commonName} planted`, "CREATE_PLANT", createdPlant.id, LogType.INFO);
 
         res.status(201).json(createdPlant);
       } catch (err) {
-              /*await this.logger.log(
-                `[production] CREATE_PLANT - FAIL: ${(err as Error).message}`
-              );*/
+              await this.logPlantAction(`Planted failed`, "CREATE_PLANT", undefined, LogType.INFO);
 
         res.status(500).json({ message: (err as Error).message });
       }
@@ -55,10 +51,8 @@ export class PlantsController {
           const updatedPlant =
             await this.plantsService.changeAromaticOilStrength(id, percentage);
 
-          /*await this.logger.log(
-            `[production] CHANGE_AROMA - SUCCESS: Aromatic oil strength changed by ${percentage}% for plant ${id}`
-          );*/
-
+          await this.logPlantAction(`Plant ${updatedPlant.commonName} updated`, "UPDATE_PLANT", updatedPlant.id, LogType.INFO);
+          
           res.status(200).json(updatedPlant);
         } catch (err) {
          /* await this.logger.log(
@@ -77,15 +71,12 @@ export class PlantsController {
         const harvested =
           await this.plantsService.harvestPlants(commonName, quantity);
 
-       /* await this.logger.log(
-          `[production] HARVEST - SUCCESS: Harvested ${quantity} plants of type ${commonName}`
-        );*/
-
+          await this.logPlantAction(`Plant harvested`, "HARVEST_PLANT", undefined,LogType.INFO);
+      
         res.status(200).json(harvested);
       } catch (err) {
-        /*await this.logger.log(
-          `[production] HARVEST - FAIL: ${(err as Error).message}`
-        );*/
+
+        await this.logPlantAction(`Plant harvested fail`, "HARVEST_PLANT", undefined,LogType.ERROR);
 
         res.status(400).json({ message: (err as Error).message });
       }
@@ -153,6 +144,18 @@ private async getPlantById(req: Request, res: Response): Promise<void> {
     res.json(plant);
   } catch (err) {
     res.status(404).json({ message: (err as Error).message });
+  }
+}
+
+private async logPlantAction(message: string, action: string, entityId?: number, logtype: LogType = LogType.INFO) {
+  try {
+    await axios.post(`${process.env.LOG_MS_URL}/audit`, {
+      logtype: logtype,
+      description: `[plants-ms] ${action} - ${message}`,
+      datetime: new Date().toISOString(),
+    });
+  } catch (err) {
+    console.error("Failed to log to Log MS:", err);
   }
 }
 

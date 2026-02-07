@@ -47,5 +47,12 @@ export interface IGatewayService {
   //Packaging microservice
   packagingPerfumes(perfumeType: string, quantity: number, senderAddress: string, stroageID: number): Promise<PackagingDTO[]>;
   sendAmbalage(storageID: number): Promise<PackagingDTO | null>;
+
+  //Log microservice
+   createLog(log: { logtype: "INFO" | "WARNING" | "ERROR"; description: string; datetime?: string }): Promise<any>
+   getLogById(id: number): Promise<any>
+   getAllLogs(): Promise<any[]>
+   deleteLog(id: number): Promise<boolean>
+   updateLog(id: number, data: Partial<{ logtype: "INFO" | "WARNING" | "ERROR"; description: string; datetime?: string }>): Promise<any>
 }
 

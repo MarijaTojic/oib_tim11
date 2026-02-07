@@ -19,6 +19,7 @@ export class GatewayService implements IGatewayService {
   private readonly performanceClient: AxiosInstance;
   private readonly salesClient: AxiosInstance;
   private readonly packagingClient: AxiosInstance;
+  private readonly logClient: AxiosInstance;
 
 
   constructor() {
@@ -30,6 +31,7 @@ export class GatewayService implements IGatewayService {
     const performanceBaseURL = process.env.PERFORMANCE_SERVICE_API;
     const salesBaseURL = process.env.SALES_SERVICE_API;
     const packagingBaseURL = process.env.PACKAGING_SERVICE_API;
+    const logBaseURL = process.env.LOG_SERVICE_API;
 
 
     this.authClient = axios.create({
@@ -80,6 +82,11 @@ export class GatewayService implements IGatewayService {
       timeout: 5000,
     });
 
+    this.logClient = axios.create({
+      baseURL: logBaseURL,
+      headers: { "Content-Type": "application/json" },
+      timeout: 5000,
+    });
   }
   
   // Auth microservice
@@ -245,6 +252,32 @@ export class GatewayService implements IGatewayService {
           console.error("sendAmbalage error:", err);
           return null;
       }
+  }
+
+  //Log microservice
+  async createLog(log: { logtype: "INFO" | "WARNING" | "ERROR"; description: string; datetime?: string }): Promise<any> {
+    const response = await this.logClient.post("/audit", log);
+    return response.data;
+  }
+
+  async getLogById(id: number): Promise<any> {
+    const response = await this.logClient.get(`/audit/${id}`);
+    return response.data;
+  }
+
+  async getAllLogs(): Promise<any[]> {
+    const response = await this.logClient.get("/audit");
+    return response.data.logs;
+  }
+
+  async deleteLog(id: number): Promise<boolean> {
+    const response = await this.logClient.delete(`/audit/${id}`);
+    return response.status === 200;
+  }
+
+  async updateLog(id: number, data: Partial<{ logtype: "INFO" | "WARNING" | "ERROR"; description: string; datetime?: string }>): Promise<any> {
+    const response = await this.logClient.put(`/audit/${id}`, data);
+    return response.data;
   }
 
 }
