@@ -5,7 +5,7 @@ import { LogDTO } from "../Domain/DTOs/LogDTO";
 import { LogInfo } from "../Domain/enums/Log";
 
 export class LogService implements ILogService {
-  constructor(private auditRepository: Repository<LogDTO>) {
+  constructor(private auditRepository: Repository<Log>) {
     console.log(`\x1b[35m[Logger@1.0.0]\x1b[0m Service started`);
   }
 
@@ -18,7 +18,7 @@ export class LogService implements ILogService {
         logtype: LogInfo.INFO,
         description: "",
         datetime: new Date(),
-      });
+      }) as Log;
       await this.auditRepository.save(log);
       console.log(`\x1b[35m[Logger@1.0.0]\x1b[0m ${type}: ${message}`);
       return true;
@@ -34,15 +34,15 @@ export class LogService implements ILogService {
       logtype: log.logtype,
       description: log.description,
       datetime: log.datetime ? new Date(log.datetime) : new Date(),
-    });
-    const savedLog = await this.auditRepository.save(newLog);
+    }) as Log;
+    const savedLog = await this.auditRepository.save(newLog as Log);
     return this.toDTO(savedLog);
   }
 
  
   async getAllLogs(): Promise<LogDTO[]> {
     const logs = await this.auditRepository.find();
-    return logs.map(log => this.toDTO(log));
+    return logs.map((log: Log) => this.toDTO(log));
   }
 
   
@@ -70,7 +70,7 @@ export class LogService implements ILogService {
   }
 
 
-  private toDTO(log: LogDTO): LogDTO {
+  private toDTO(log: Log): LogDTO {
     return {
       id: log.id,
       logtype: log.logtype,

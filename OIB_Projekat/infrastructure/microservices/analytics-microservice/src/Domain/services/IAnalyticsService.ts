@@ -4,7 +4,7 @@ import {
   CreateReceiptDTO, 
   CreateReportAnalysisDTO, 
   SalesAnalysisResponseDTO, 
-  TopPerfumeDTO, 
+  TopTenSummaryDTO,
   SalesTrendDTO
 } from '../DTOs';
 
@@ -25,7 +25,7 @@ export interface IAnalyticsService {
     period?: string
   ): Promise<SalesAnalysisResponseDTO>;
 
-  calculateTopTenPerfumes(): Promise<TopPerfumeDTO[]>;
+  calculateTopTenPerfumes(): Promise<TopTenSummaryDTO>;
 
   calculateSalesTrend(days?: number): Promise<SalesTrendDTO[]>;
 }

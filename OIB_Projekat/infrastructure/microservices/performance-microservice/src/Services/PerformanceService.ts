@@ -31,11 +31,11 @@ export class PerformanceService implements IPerformanceService {
           numberOfIterations
         );
 
-        // Generate detailed report
         result.analysisConclusions = this.generateAnalysisConclusions(result.metrics, algorithm);
-        result.detailedReport = this.generateDetailedReport(result);
 
-        const savedResult = await this.performanceRepository.save(result);
+        let savedResult = await this.performanceRepository.save(result);
+        savedResult.detailedReport = this.generateDetailedReport(savedResult);
+        savedResult = await this.performanceRepository.save(savedResult);
         results.push(savedResult);
 
         console.log(

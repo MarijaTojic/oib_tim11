@@ -5,11 +5,14 @@ export interface ReceiptDTO {
   id?: number;
   saleType: SaleType;
   paymentType: PaymentType;
-  perfumeItems: {
+  perfumeDetails: {
     perfumeId: number;
+    perfumeName: string;
     quantity: number;
     price: number;
+    totalPrice: number;
   }[];
   totalAmount: number;
+  userId: number;
   createdAt?: Date;
 }

@@ -8,6 +8,6 @@ export interface CreateReportAnalysisDTO {
   salesData: SalesAnalysisResponseDTO;
   topTenPerfumes: TopPerfumeDTO[];
   salesTrend: SalesTrendDTO[];
-  pdfData: string;
+  pdfData?: string;
   generatedBy?: string | null;
 }

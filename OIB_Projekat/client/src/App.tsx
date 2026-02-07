@@ -8,6 +8,8 @@ import { ProductionPage } from "./pages/ProductionPage";
 import { PerfumesPage } from "./pages/PerfumesPage";
 import { ProcessingPage } from "./pages/ProcessingPage";
 import { SalesPage } from "./pages/SalesPage";
+import { AnalyticsPage } from "./pages/AnalyticsPage";
+import { PerformancePage } from "./pages/PerformancePage";
 
 import { IAuthAPI } from "./api/auth/IAuthAPI";
 import { AuthAPI } from "./api/auth/AuthAPI";
@@ -23,6 +25,10 @@ import { PerfumeAPI } from "./api/perfume/PerfumeAPI";
 
 import { SalesAPI } from "./api/sale/SalesAPI";
 import { ISalesAPI } from "./api/sale/ISalesAPI";
+import { AnalyticsAPI } from "./api/analytics/AnalyticsAPI";
+import { IAnalyticsAPI } from "./api/analytics/IAnalyticsAPI";
+import { PerformanceAPI } from "./api/performance/PerformanceAPI";
+import { IPerformanceAPI } from "./api/performance/IPerformanceAPI";
 
 import { useContext } from "react";
 import AuthContext from "./contexts/AuthContext";
@@ -33,6 +39,8 @@ const userAPI: IUserAPI = new UserAPI();
 const plantAPI: IPlantAPI = new PlantAPI();
 const perfumeAPI: IPerfumeAPI = new PerfumeAPI();
 const salesAPI: ISalesAPI = new SalesAPI();
+const analyticsAPI: IAnalyticsAPI = new AnalyticsAPI();
+const performanceAPI: IPerformanceAPI = new PerformanceAPI();
 
 function App() {
   const authContext = useContext(AuthContext);
@@ -97,14 +105,34 @@ function App() {
         }
       />
 
+      {/* Protected AnalyticsPage */}
       <Route
-          path="/production/logs"
-          element={
-            <ProtectedRoute requiredRole="admin">
-              <ProductionLogPage gatewayUrl={import.meta.env.VITE_GATEWAY_URL || ""} />
+        path="/analytics"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <AnalyticsPage userAPI={userAPI} analyticsAPI={analyticsAPI} />
           </ProtectedRoute>
         }
-        />
+      />
+
+      {/* Protected PerformancePage */}
+      <Route
+        path="/performance"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <PerformancePage userAPI={userAPI} performanceAPI={performanceAPI} />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/production/logs"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <ProductionLogPage gatewayUrl={import.meta.env.VITE_GATEWAY_URL || ""} />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Catch-all */}
       <Route path="*" element={<Navigate to="/" />} />

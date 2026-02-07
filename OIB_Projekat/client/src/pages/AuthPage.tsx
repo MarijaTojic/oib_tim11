@@ -20,7 +20,14 @@ export const AuthPage: React.FC<AuthPageProps> = ({ authAPI }) => {
           <span className="titlebar-title">Authentication</span>
         </div>
 
-        <div className="window-content" style={{ padding: 0 }}>
+        <div
+          className="window-content"
+          style={{
+            padding: 0,
+            maxHeight: "calc(90vh - 88px)",
+            overflowY: "auto",
+          }}
+        >
           {/* Tabs */}
           <div className="flex" style={{ borderBottom: "1px solid var(--win11-divider)" }}>
             <button

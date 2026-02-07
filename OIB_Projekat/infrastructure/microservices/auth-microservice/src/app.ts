@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { type RequestHandler } from 'express';
 import cors from 'cors';
 import "reflect-metadata";
 import dotenv from 'dotenv';
@@ -11,10 +11,6 @@ import { IAuthService } from './Domain/services/IAuthService';
 import { AuthService } from './Services/AuthService';
 import { AuthController } from './WebAPI/controllers/AuthController';
 
-/*import { ILogService } from '../../log-microservice/src/Domain/services/ILogService';
-import { LogService } from '../../log-microservice/src/Services/LogService';
-import { Log } from '../../log-microservice/src/Domain/models/Log';*/
-
 dotenv.config({ quiet: true });
 
 const app = express();
@@ -22,24 +18,41 @@ const app = express();
 // Read CORS settings from environment
 const corsOrigin = process.env.CORS_ORIGIN ?? "*";
 const corsMethods = process.env.CORS_METHODS?.split(",").map(m => m.trim()) ?? ["POST"];
+const allowedOrigins = corsOrigin === "*"
+  ? "*"
+  : corsOrigin.split(",").map(origin => origin.trim()).filter(Boolean);
 
 // Protected microservice from unauthorized access
-app.use(cors({
-  origin: corsOrigin,
+const corsMiddleware = cors({
+  origin: allowedOrigins,
   methods: corsMethods,
-}));
+}) as unknown as RequestHandler;
+
+app.use(corsMiddleware);
 
 app.use(express.json());
+
+const internalKey = process.env.AUTH_INTERNAL_KEY;
+app.use((req, res, next) => {
+  if (!internalKey) {
+    res.status(500).json({ success: false, message: "Internal key missing" });
+    return;
+  }
+
+  const providedKey = req.header("x-internal-key");
+  if (providedKey !== internalKey) {
+    res.status(403).json({ success: false, message: "Forbidden" });
+    return;
+  }
+
+  next();
+});
 
 // Initialize DB
 initialize_database();
 
 // ORM Repositories
 const userRepository: Repository<User> = Db.getRepository(User);
-//const auditRepository: Repository<Log> = Db.getRepository(Log as any);
-
-// Services
-//const logService: ILogService = new LogService(auditRepository as any);
 const authService: IAuthService = new AuthService(userRepository);
 
 // WebAPI routes

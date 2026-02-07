@@ -1,6 +1,8 @@
 import { AuthTokenClaimsType } from "./AuthTokenClaims";
 
 export type AuthResponseType = {
-    authenificated: boolean;
+    success: boolean;
+    message?: string;
+    token?: string;
     userData?: AuthTokenClaimsType;
 }

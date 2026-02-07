@@ -70,6 +70,7 @@ export class PerformanceController {
 
       const results = await this.performanceService.getPerformanceResults(resultLimit);
 
+      await this.logerService.log('Performance results fetched');
       res.status(200).json({ success: true, data: results });
     } catch (error) {
       await this.logerService.log(`Error fetching performance results: ${error}`);
@@ -86,6 +87,7 @@ export class PerformanceController {
       const { id } = req.params;
 
       if (!id) {
+        await this.logerService.log('Performance result request missing id', 'WARNING');
         res.status(400).json({ success: false, message: 'Performance result ID is required' });
         return;
       }
@@ -93,10 +95,12 @@ export class PerformanceController {
       const result = await this.performanceService.getPerformanceResultById(parseInt(id as string));
 
       if (!result) {
+        await this.logerService.log(`Performance result ${id} not found`, 'WARNING');
         res.status(404).json({ success: false, message: 'Performance result not found' });
         return;
       }
 
+      await this.logerService.log(`Performance result ${id} fetched successfully`);
       res.status(200).json({ success: true, data: result });
     } catch (error) {
       await this.logerService.log(`Error fetching performance result: ${error}`);
@@ -113,6 +117,7 @@ export class PerformanceController {
       const { id } = req.params;
 
       if (!id) {
+        await this.logerService.log('Performance delete request missing id', 'WARNING');
         res.status(400).json({ success: false, message: 'Performance result ID is required' });
         return;
       }
@@ -120,6 +125,7 @@ export class PerformanceController {
       const isDeleted = await this.performanceService.deletePerformanceResult(parseInt(id as string));
 
       if (!isDeleted) {
+        await this.logerService.log(`Performance result ${id} not found`, 'WARNING');
         res.status(404).json({ success: false, message: 'Performance result not found' });
         return;
       }
@@ -141,6 +147,7 @@ export class PerformanceController {
       const { id } = req.params;
 
       if (!id) {
+        await this.logerService.log('Performance comparison request missing id', 'WARNING');
         res.status(400).json({ success: false, message: 'Performance result ID is required' });
         return;
       }
@@ -148,10 +155,12 @@ export class PerformanceController {
       const comparison = await this.performanceService.compareAlgorithms(parseInt(id as string));
 
       if (!comparison) {
+        await this.logerService.log(`No comparison data for performance result ${id}`, 'WARNING');
         res.status(404).json({ success: false, message: 'No comparison data found' });
         return;
       }
 
+      await this.logerService.log(`Performance result ${id} compared successfully`);
       res.status(200).json({ success: true, data: comparison });
     } catch (error) {
       await this.logerService.log(`Error comparing algorithms: ${error}`);
@@ -168,6 +177,7 @@ export class PerformanceController {
       const { id } = req.params;
 
       if (!id) {
+        await this.logerService.log('Performance export request missing id', 'WARNING');
         res.status(400).json({ success: false, message: 'Performance result ID is required' });
         return;
       }
@@ -196,6 +206,7 @@ export class PerformanceController {
       const { id } = req.params;
 
       if (!id) {
+        await this.logerService.log('Performance PDF request missing id', 'WARNING');
         res.status(400).json({ success: false, message: 'Performance result ID is required' });
         return;
       }

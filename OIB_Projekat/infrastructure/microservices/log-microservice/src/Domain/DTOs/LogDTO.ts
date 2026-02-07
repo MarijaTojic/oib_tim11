@@ -1,7 +1,7 @@
 import { LogInfo } from "../enums/Log";
 
 export interface LogDTO {
-    id: Number;
+    id: number;
     logtype: LogInfo;
     datetime: Date;
     description: string;

@@ -41,7 +41,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ authAPI }) => {
         setError(response.message || "Login failed. Please try again.");
       }
     } catch (err: any) {
-      setError(err || "An error occurred. Please try again.");
+      const message = err?.response?.data?.message ?? err?.message ?? "An error occurred. Please try again.";
+      setError(message);
     } finally {
       setIsLoading(false);
     }

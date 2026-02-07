@@ -7,6 +7,16 @@ import { PerfumeDTO } from "../DTOs/PerfumeDTO";
 import { SimulationRequestDTO } from "../DTOs/SimulationRequestDTO";
 import { PerformanceResultDTO } from "../DTOs/PerformanceResultDTO";
 import { PackagingDTO } from "../DTOs/PackagingDTO";
+import { CreateReportAnalysisDTO } from "../DTOs/CreateReportAnalysisDTO";
+import { ReportAnalysisDTO } from "../DTOs/ReportAnalysisDTO";
+import { SalesAnalysisRequestDTO } from "../DTOs/SalesAnalysisRequestDTO";
+import { SalesAnalysisResponseDTO } from "../DTOs/SalesAnalysisResponseDTO";
+import { SalesTrendDTO } from "../DTOs/SalesTrendDTO";
+import { TopTenSummaryDTO } from "../DTOs/TopTenSummaryDTO";
+import { RouteHealthDTO, RouteInfoDTO } from "../DTOs/RouteInfoDTO";
+import { CreateReceiptDTO } from "../DTOs/CreateReceiptDTO";
+import { ReceiptDTO } from "../DTOs/ReceiptDTO";
+import { LogDTO } from "../DTOs/LogDTO";
 
 export interface IGatewayService {
   // Auth microservice
@@ -39,6 +49,35 @@ export interface IGatewayService {
   deletePerformanceResult(id: number): Promise<void>;
   comparePerformanceAlgorithms(id: number): Promise<any>;
   exportPerformanceResult(id: number): Promise<void>;
+  getPerformancePdf(id: number): Promise<{ data: ArrayBuffer; contentType: string }>;
+
+  // Analytics microservice - Sales analytics
+  createReportAnalysis(data: CreateReportAnalysisDTO): Promise<ReportAnalysisDTO>;
+  getReportAnalysisList(limit?: number): Promise<ReportAnalysisDTO[]>;
+  getReportAnalysisById(id: number): Promise<ReportAnalysisDTO>;
+  getReportAnalysisPdf(id: number): Promise<{ data: ArrayBuffer; contentType: string }>;
+  deleteReportAnalysis(id: number): Promise<void>;
+  exportReportAnalysis(id: number): Promise<void>;
+  calculateSalesAnalysis(data: SalesAnalysisRequestDTO): Promise<SalesAnalysisResponseDTO>;
+  getTopTenPerfumes(): Promise<TopTenSummaryDTO>;
+  getSalesTrend(days?: number): Promise<SalesTrendDTO[]>;
+
+  // Analytics microservice - Receipts
+  createReceipt(data: CreateReceiptDTO): Promise<ReceiptDTO>;
+  getReceipts(userId: number, startDate?: string, endDate?: string): Promise<ReceiptDTO[]>;
+  getReceiptById(id: number): Promise<ReceiptDTO>;
+  deleteReceipt(id: number): Promise<void>;
+
+  // Routing microservice (gateway) info
+  getRouteMap(): RouteInfoDTO[];
+  getRouteHealth(): Promise<RouteHealthDTO[]>;
+
+  // Log microservice
+  createLog(data: LogDTO): Promise<LogDTO>;
+  getAllLogs(): Promise<LogDTO[]>;
+  getLogById(id: number): Promise<LogDTO>;
+  updateLog(id: number, data: Partial<LogDTO>): Promise<LogDTO>;
+  deleteLog(id: number): Promise<void>;
 
   // Sales microservice
   getCatalogue(): Promise<any>;
@@ -47,12 +86,5 @@ export interface IGatewayService {
   //Packaging microservice
   packagingPerfumes(perfumeType: string, quantity: number, senderAddress: string, stroageID: number): Promise<PackagingDTO[]>;
   sendAmbalage(storageID: number): Promise<PackagingDTO | null>;
-
-  //Log microservice
-   createLog(log: { logtype: "INFO" | "WARNING" | "ERROR"; description: string; datetime?: string }): Promise<any>
-   getLogById(id: number): Promise<any>
-   getAllLogs(): Promise<any[]>
-   deleteLog(id: number): Promise<boolean>
-   updateLog(id: number, data: Partial<{ logtype: "INFO" | "WARNING" | "ERROR"; description: string; datetime?: string }>): Promise<any>
 }
 

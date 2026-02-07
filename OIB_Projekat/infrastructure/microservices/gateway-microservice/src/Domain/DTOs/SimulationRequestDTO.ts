@@ -1,4 +1,4 @@
-import { LogisticsAlgorithm } from '../../types/LogisticsAlgorithmType';
+import { LogisticsAlgorithm } from '../types/LogisticsAlgorithmType';
 
 export interface SimulationRequestDTO {
   algorithms: LogisticsAlgorithm[];

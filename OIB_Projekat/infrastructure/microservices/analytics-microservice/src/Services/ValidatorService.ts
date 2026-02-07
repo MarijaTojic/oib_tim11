@@ -113,6 +113,10 @@ export class ValidatorService implements IValidatorService {
       });
     }
 
+    if (report.pdfData !== undefined && typeof report.pdfData !== 'string') {
+      errors.push('PDF data must be a string when provided');
+    }
+
     return {
       isValid: errors.length === 0,
       errors,

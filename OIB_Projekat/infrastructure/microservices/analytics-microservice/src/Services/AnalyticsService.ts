@@ -2,9 +2,10 @@ import { Repository } from 'typeorm';
 import { IAnalyticsService } from '../Domain/services/IAnalyticsService';
 import { Receipt } from '../Domain/models/Receipt';
 import { ReportAnalysis } from '../Domain/models/ReportAnalysis';
-import { 
-  CreateReceiptDTO, 
-  CreateReportAnalysisDTO
+import {
+  CreateReceiptDTO,
+  CreateReportAnalysisDTO,
+  TopTenSummaryDTO
 } from '../Domain/DTOs';
 
 export class AnalyticsService implements IAnalyticsService {
@@ -75,7 +76,10 @@ export class AnalyticsService implements IAnalyticsService {
 
   async createReportAnalysis(reportData: CreateReportAnalysisDTO): Promise<ReportAnalysis> {
     try {
-      const newReport = this.reportRepository.create(reportData);
+      const newReport = this.reportRepository.create({
+        ...reportData,
+        pdfData: reportData.pdfData ?? '',
+      });
       const savedReport = await this.reportRepository.save(newReport);
       console.log(`\x1b[36m[Analytics@1.0.0]\x1b[0m Report created with ID: ${savedReport.id}`);
       return savedReport;
@@ -172,7 +176,12 @@ export class AnalyticsService implements IAnalyticsService {
 
       const receipts = await query.getMany();
 
-      const totalSales = receipts.length;
+      const totalSales = receipts.reduce((sum, receipt) => {
+        const receiptQty = receipt.perfumeDetails?.reduce((qtySum, detail) => {
+          return qtySum + (typeof detail.quantity === 'number' ? detail.quantity : Number(detail.quantity) || 0);
+        }, 0) ?? 0;
+        return sum + receiptQty;
+      }, 0);
       const totalRevenue = receipts.reduce((sum, receipt) => {
         return sum + parseFloat(receipt.totalAmount.toString());
       }, 0);
@@ -188,14 +197,7 @@ export class AnalyticsService implements IAnalyticsService {
     }
   }
 
-  async calculateTopTenPerfumes(): Promise<
-    Array<{
-      perfumeId: number;
-      perfumeName: string;
-      quantity: number;
-      revenue: number;
-    }>
-  > {
+  async calculateTopTenPerfumes(): Promise<TopTenSummaryDTO> {
     try {
       const receipts = await this.receiptRepository.find();
 
@@ -229,8 +231,12 @@ export class AnalyticsService implements IAnalyticsService {
       const topTen = Array.from(perfumeMap.values())
         .sort((a, b) => b.quantity - a.quantity)
         .slice(0, 10);
+      const totalRevenue = topTen.reduce((sum, item) => sum + item.revenue, 0);
 
-      return topTen;
+      return {
+        items: topTen,
+        totalRevenue,
+      };
     } catch (error) {
       console.error('\x1b[31m[Analytics@1.0.0]\x1b[0m Error calculating top ten perfumes:', error);
       throw error;
@@ -260,12 +266,18 @@ export class AnalyticsService implements IAnalyticsService {
         const dateStr = receipt.createdAt.toISOString().split('T')[0];
         if (trendMap.has(dateStr)) {
           const existing = trendMap.get(dateStr)!;
-          existing.sales += 1;
+          const receiptQty = receipt.perfumeDetails?.reduce((qtySum, detail) => {
+            return qtySum + (typeof detail.quantity === 'number' ? detail.quantity : Number(detail.quantity) || 0);
+          }, 0) ?? 0;
+          existing.sales += receiptQty;
           existing.revenue += parseFloat(receipt.totalAmount.toString());
         } else {
+          const receiptQty = receipt.perfumeDetails?.reduce((qtySum, detail) => {
+            return qtySum + (typeof detail.quantity === 'number' ? detail.quantity : Number(detail.quantity) || 0);
+          }, 0) ?? 0;
           trendMap.set(dateStr, {
             date: dateStr,
-            sales: 1,
+            sales: receiptQty,
             revenue: parseFloat(receipt.totalAmount.toString()),
           });
         }
