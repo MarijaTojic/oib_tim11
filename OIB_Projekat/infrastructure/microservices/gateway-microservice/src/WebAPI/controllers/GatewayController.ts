@@ -21,10 +21,10 @@ export class GatewayController {
     this.router.post("/auth/register", this.register.bind(this));
 
     // User routes (admin only)
-    this.router.get("/users", authenticate, authorize("admin"), this.getAllUsers.bind(this));
+    this.router.get("/users", authenticate, authorize("admin", "seller", "manager"), this.getAllUsers.bind(this));
     this.router.get("/users/:id", authenticate, authorize("admin", "seller", "manager"), this.getUserById.bind(this));
-    this.router.put("/users/:id", authenticate, authorize("admin"), this.updateUser.bind(this));
-    this.router.delete("/users/:id", authenticate, authorize("admin"), this.deleteUser.bind(this));
+    this.router.put("/users/:id", authenticate, authorize("admin", "seller", "manager"), this.updateUser.bind(this));
+    this.router.delete("/users/:id", authenticate, authorize("admin", "seller", "manager"), this.deleteUser.bind(this));
 
     // Production routes (seller, manager)
     this.router.get("/plants", authenticate, authorize("seller", "manager"), this.getAllPlants.bind(this));

@@ -26,6 +26,7 @@ import { ISalesAPI } from "./api/sale/ISalesAPI";
 
 import { useContext } from "react";
 import AuthContext from "./contexts/AuthContext";
+import { ProductionLogPage } from "./pages/ProductionLogPage";
 
 const authAPI: IAuthAPI = new AuthAPI();
 const userAPI: IUserAPI = new UserAPI();
@@ -95,6 +96,11 @@ function App() {
           </ProtectedRoute>
         }
       />
+
+      <Route
+          path="/production/logs"
+          element={<ProductionLogPage gatewayUrl={import.meta.env.VITE_GATEWAY_URL || ""} />}
+        />
 
       {/* Catch-all */}
       <Route path="*" element={<Navigate to="/" />} />

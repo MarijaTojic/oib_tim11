@@ -48,43 +48,20 @@ export const ProductionPage: React.FC<Props> = ({ plantsAPI }) => {
   };
 
   const loadLogs = async () => {
-    try {
-      setLoading(true);
-      const mockLogs: LogEntry[] = [
-        {
-          timestamp: "2026-02-04 21:35",
-          userOrSystem: "Sistem (Processing)",
-          action: "Zasađena nova biljka – Lavanda",
-          status: "success",
-          message: "Jačina nasumično postavljena na 3.87",
-        },
-        {
-          timestamp: "2026-02-04 21:28",
-          userOrSystem: "Marija",
-          action: "Smanjena jačina za 20% na Menti",
-          status: "success",
-          message: "Nova jačina: 2.45",
-        },
-        {
-          timestamp: "2026-02-04 21:15",
-          userOrSystem: "Sistem",
-          action: "Berba 10 biljaka Lavande",
-          status: "error",
-          message: "Nema dovoljno biljaka na lageru",
-        },
-      ];
-      setLogs(mockLogs);
-      setError(null);
-    } catch (err: any) {
-      setError("Greška pri učitavanju dnevnika: " + err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    setLoading(true);
+    const response = await fetch(`${import.meta.env.VITE_GATEWAY_URL}/logs`);
+    const data = await response.json();
+    setLogs(data);
+  } catch (err: any) {
+    setError("Greška pri učitavanju dnevnika: " + err.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     if (activeTab === "list") loadPlants();
-    if (activeTab === "logs") loadLogs();
   }, [activeTab]);
 
   const handleCreateSuccess = () => {
@@ -111,7 +88,7 @@ export const ProductionPage: React.FC<Props> = ({ plantsAPI }) => {
     <div className="overlay-blur-none" style={{ position: "fixed", inset: 0 }}>
       <div className="window" style={{ width: "960px", maxWidth: "95vw", margin: "20px auto" }}>
         <div className="titlebar">
-          <span className="titlebar-title">Proizvodnja biljaka</span>
+          <span className="titlebar-title">Plant production</span>
         </div>
 
         <div className="window-content" style={{ padding: 0 }}>
@@ -120,30 +97,30 @@ export const ProductionPage: React.FC<Props> = ({ plantsAPI }) => {
               className={`px-6 py-2 ${activeTab === "list" ? "bg-white font-bold" : "bg-gray-200"}`}
               onClick={() => setActiveTab("list")}
             >
-              Trenutno stanje
+              Current state
             </button>
             <button
               className={`px-6 py-2 ${activeTab === "create" ? "bg-white font-bold" : "bg-gray-200"}`}
               onClick={() => setActiveTab("create")}
             >
-              Zasadi novu
+              Plant a new plant
             </button>
             <button
               className={`px-6 py-2 ${activeTab === "logs" ? "bg-white font-bold" : "bg-gray-200"}`}
-              onClick={() => setActiveTab("logs")}
+              onClick={() => navigate("/production/logs")}
             >
-              Dnevnik proizvodnje
+              Production log
             </button>
             <button
               className="btn bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded"
               onClick={() => navigate("/dashboard")} 
             >
-              Nazad na dashboard
+              Back to dashboard
             </button>
           </div>
 
           <div style={{ padding: "24px" }}>
-            {loading && <p className="text-center">Učitavanje...</p>}
+            {loading && <p className="text-center">Loading...</p>}
             {error && <p className="text-red-600 text-center">{error}</p>}
 
             {activeTab === "list" && (
@@ -154,7 +131,7 @@ export const ProductionPage: React.FC<Props> = ({ plantsAPI }) => {
                   onHarvest={openHarvestModal}
                 />
                 <button className="btn mt-4" onClick={loadPlants}>
-                  Osveži listu
+                  Refresh list
                 </button>
               </div>
             )}
@@ -165,9 +142,9 @@ export const ProductionPage: React.FC<Props> = ({ plantsAPI }) => {
 
             {activeTab === "logs" && (
               <div className="border rounded p-4 bg-white">
-                <h3 className="text-lg font-bold mb-3">Dnevnik proizvodnje</h3>
+                <h3 className="text-lg font-bold mb-3">Production log</h3>
                 {logs.length === 0 ? (
-                  <p className="text-gray-500">Nema zabeleženih događaja</p>
+                  <p className="text-gray-500">No events recorded</p>
                 ) : (
                   <ul className="space-y-3">
                     {logs.map((log, idx) => (
@@ -187,7 +164,7 @@ export const ProductionPage: React.FC<Props> = ({ plantsAPI }) => {
                   </ul>
                 )}
                 <button className="btn mt-4" onClick={loadLogs}>
-                  Osveži dnevnik
+                  Refresh log
                 </button>
               </div>
             )}
@@ -199,13 +176,13 @@ export const ProductionPage: React.FC<Props> = ({ plantsAPI }) => {
         <div className="modal-backdrop fixed inset-0 bg-black/50 flex items-center justify-center">
           <div className="bg-white p-6 rounded shadow w-80">
             <h3 className="text-lg font-bold mb-2">
-              {modalType === "aroma" ? "Promeni jačinu arome" : "Berba biljaka"}
+              {modalType === "aroma" ? "Change the aroma strength" : "Harvesting plants"}
             </h3>
 
             <input
               type="number"
               className="border p-2 w-full mb-4"
-              placeholder={modalType === "aroma" ? "Procenat promene" : "Količina za berbu"}
+              placeholder={modalType === "aroma" ? "Percent change" : "Harvest quantity"}
               value={modalValue}
               onChange={(e) => setModalValue(e.target.value)}
             />
@@ -215,7 +192,7 @@ export const ProductionPage: React.FC<Props> = ({ plantsAPI }) => {
                 className="btn bg-gray-300"
                 onClick={() => setModalOpen(false)}
               >
-                Otkaži
+                Cancle
               </button>
               <button
                 className="btn bg-blue-500 text-white"
@@ -228,24 +205,24 @@ export const ProductionPage: React.FC<Props> = ({ plantsAPI }) => {
                         selectedPlantId,
                         Number(modalValue)
                       );
-                      alert("Jačina uspešno promenjena!");
+                      alert("Aroma strength successfully changed!");
                       loadPlants();
                     } else if (modalType === "harvest") {
                       await plantsAPI.harvestPlants(
                         selectedPlantName,
                         Number(modalValue)
                       );
-                      alert("Berba uspešna!");
+                      alert("Harvest successful!!");
                       loadPlants();
                     }
                   } catch (err: any) {
-                    alert("Greška: " + err.message);
+                    alert("Error: " + err.message);
                   } finally {
                     setModalOpen(false);
                   }
                 }}
               >
-                Potvrdi
+                Confirm
               </button>
             </div>
           </div>

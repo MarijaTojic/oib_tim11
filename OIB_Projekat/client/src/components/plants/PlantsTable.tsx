@@ -20,14 +20,14 @@ export const PlantsTable: React.FC<Props> = ({ plants, onChangeAroma, onHarvest 
             <th className="p-3 text-left">Aromatic Oil Strength</th>
             <th className="p-3 text-left">Country of Origin</th>
             <th className="p-3 text-left">Status</th>
-            <th className="p-3 text-left">Akcije</th>
+            <th className="p-3 text-left">Action</th>
           </tr>
         </thead>
         <tbody>
           {plants.length === 0 ? (
             <tr>
               <td colSpan={7} className="text-center p-6 text-gray-500">
-                Nema biljaka u proizvodnji
+                No plants in production!
               </td>
             </tr>
           ) : (
@@ -60,13 +60,13 @@ export const PlantsTable: React.FC<Props> = ({ plants, onChangeAroma, onHarvest 
                     onClick={() => onChangeAroma(p.id!)}
                     className="btn-small bg-yellow-500 hover:bg-yellow-600 text-white"
                   >
-                    Promeni jačinu
+                    Change aroma
                   </button>
                   <button
                     onClick={() => onHarvest(p.commonName)}
                     className="btn-small bg-purple-600 hover:bg-purple-700 text-white"
                   >
-                    Beri
+                    Harves
                   </button>
                 </td>
               </tr>
