@@ -81,7 +81,7 @@ export class GatewayService implements IGatewayService {
     });
 
   }
-
+  
   // Auth microservice
   async login(data: LoginUserDTO): Promise<AuthResponseType> {
     try {
@@ -96,7 +96,7 @@ export class GatewayService implements IGatewayService {
     try {
       const response = await this.authClient.post<AuthResponseType>("/auth/register", data);
       return response.data;
-    } catch {
+    } catch (e) {
       return { authenificated: false };
     }
   }
@@ -236,4 +236,15 @@ export class GatewayService implements IGatewayService {
     });
     return response.data;
   }
+
+  async sendAmbalage(storageID: number): Promise<PackagingDTO | null> {
+      try {
+          const response = await this.packagingClient.post<PackagingDTO>("/packaging/send", { storageID });
+          return response.data;
+      } catch (err) {
+          console.error("sendAmbalage error:", err);
+          return null;
+      }
+  }
+
 }
