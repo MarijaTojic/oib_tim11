@@ -5,20 +5,20 @@ import { Plant } from "../../../production-microservice/src/Domain/models/Plant"
 import { PerfumeDTO } from "../Domain/DTOs/PerfumeDTO";
 import { PerfumeType } from "../Domain/enums/PerfumeType";
 import { calculateNumberOfPlants } from "../helpers/NumberOfPlants"
-import { ILogService } from "../../../log-microservice/src/Domain/services/ILogService";
+//import { ILogService } from "../../../log-microservice/src/Domain/services/ILogService";
 import axios from "axios";
 
 export class PerfumeService implements IPerfumeService {
-  constructor(private perfumeRepository: Repository<Perfume>, private plantRepository: Repository<Plant>, private logger: ILogService){}
+  constructor(private perfumeRepository: Repository<Perfume>, private plantRepository: Repository<Plant>/*, private logger: ILogService*/){}
   //, private plantService: IPlantsService) {}
 
   async plantProcessing(plantId: number, quantity: number, volume: number, perfumeType: string): Promise<PerfumeDTO[]> {
     const numberOfPlants = calculateNumberOfPlants(quantity, volume);
-    await this.logger.log(`Number of plants needed: ${numberOfPlants}`);
+    //await this.logger.log(`Number of plants needed: ${numberOfPlants}`);
 
     const typeEnum = perfumeType as PerfumeType;
     const perfumeFromDb = await this.perfumeRepository.findOne({where: {type: typeEnum}});
-
+    console.log("Perfume found:", perfumeFromDb);
     if (!perfumeFromDb) {
       throw new Error(`Perfume with type ${perfumeType} not found`);
     }
@@ -29,12 +29,12 @@ export class PerfumeService implements IPerfumeService {
       throw new Error(`Biljka sa ID ${plantId} ne postoji`);
     }
 
-    const plantOilStrength = plant.aromaticOilStrength;
-    await this.logger.log(`Jačina biljke ID ${plantId}: ${plantOilStrength}`);
+    const plantOilStrength = plant?.aromaticOilStrength;
+    //await this.logger.log(`Jačina biljke ID ${plantId}: ${plantOilStrength}`);
 
     const perfumes: Perfume[] = [];
     
-    await this.logger.log(`Starting plant processing for ${Perfume.name} (${quantity} bottles of ${volume} ml)`);
+    //await this.logger.log(`Starting plant processing for ${Perfume.name} (${quantity} bottles of ${volume} ml)`);
  
     for (let i = 0; i < quantity; i++) {
     let perfume = this.perfumeRepository.create({
@@ -46,12 +46,12 @@ export class PerfumeService implements IPerfumeService {
       new Date().setFullYear(new Date().getFullYear() + 2)
       )
     });
-   if (perfume.perfumeAromaticOilStrength > 4.0) {
+  /*if (perfume.perfumeAromaticOilStrength > 4.0) {
   const excess = perfume.perfumeAromaticOilStrength - 4.0;
   const targetFactor = 4.0 / perfume.perfumeAromaticOilStrength;  
 
   // Šalji zahtev production servisu
-  const response = await axios.post('http://localhost:3001/api/v1/internal/plant-request', {  
+  const response = await axios.post('http://localhost:6854/api/v1/internal/plant-request', {  
     commonName: perfumeFromDb.name,          
     previousOilStrength: perfume.perfumeAromaticOilStrength
   }, {
@@ -60,8 +60,8 @@ export class PerfumeService implements IPerfumeService {
 
   const newPlant = response.data;
 
-  await this.logger.log(`Nova biljka zasađena i korigovana na ${newPlant.adjustedOilStrength}`);
-}
+  //await this.logger.log(`Nova biljka zasađena i korigovana na ${newPlant.adjustedOilStrength}`);
+}*/
 
     perfume = await this.perfumeRepository.save(perfume);
     perfume.serialNumber = `PP-2025-${perfume.id}`;

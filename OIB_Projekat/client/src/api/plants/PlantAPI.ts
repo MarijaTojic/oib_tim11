@@ -63,6 +63,7 @@ export class PlantAPI implements IPlantAPI {
       headers: { "Content-Type": "application/json",  "Authorization": `Bearer ${token}`},
       body: JSON.stringify({ commonName, quantity }),
     });
+    console.log(res)
     if (!res.ok) throw new Error("Failed to harvest plants");
     return res.json();
   }

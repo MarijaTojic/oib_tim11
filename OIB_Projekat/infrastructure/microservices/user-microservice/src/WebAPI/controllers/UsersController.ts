@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { ILogService } from "../../../../log-microservice/src/Domain/services/ILogService";
+//import { ILogService } from "../../../../log-microservice/src/Domain/services/ILogService";
 import { IUsersService } from "../../Domain/services/IUsersService";
 
 export class UsersController {
@@ -7,7 +7,7 @@ export class UsersController {
 
   constructor(
     private readonly usersService: IUsersService,
-    private readonly logger: ILogService
+    //private readonly logger: ILogService
   ) {
     this.router = Router();
     this.initializeRoutes();
@@ -20,11 +20,11 @@ export class UsersController {
 
   private async getAllUsers(req: Request, res: Response): Promise<void> {
     try {
-      this.logger.log("Fetching all users");
+      //this.logger.log("Fetching all users");
       const users = await this.usersService.getAllUsers();
       res.status(200).json(users);
     } catch (err) {
-      this.logger.log((err as Error).message);
+      //this.logger.log((err as Error).message);
       res.status(500).json({ message: (err as Error).message });
     }
   }
@@ -32,11 +32,11 @@ export class UsersController {
   private async getUserById(req: Request, res: Response): Promise<void> {
     try {
       const id = parseInt(req.params.id, 10);
-      this.logger.log(`Fetching user with ID ${id}`);
+      //this.logger.log(`Fetching user with ID ${id}`);
       const user = await this.usersService.getUserById(id);
       res.status(200).json(user);
     } catch (err) {
-      this.logger.log((err as Error).message);
+      //this.logger.log((err as Error).message);
       res.status(404).json({ message: (err as Error).message });
     }
   }

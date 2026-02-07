@@ -5,17 +5,17 @@ import { LoginUserDTO } from '../../Domain/DTOs/LoginUserDTO';
 import { RegistrationUserDTO } from '../../Domain/DTOs/RegistrationUserDTO';
 import { validateLoginData } from '../validators/LoginValidator';
 import { validateRegistrationData } from '../validators/RegisterValidator';
-import { ILogService } from "../../../../log-microservice/src/Domain/services/ILogService";
+//import { ILogService } from "../../../../log-microservice/src/Domain/services/ILogService";
 
 export class AuthController {
   private router: Router;
   private authService: IAuthService;
-  private readonly logerService: ILogService;
+  //private readonly logerService: ILogService;
 
-  constructor(authService: IAuthService, logerService: ILogService) {
+  constructor(authService: IAuthService/*, logerService: ILogService*/) {
     this.router = Router();
     this.authService = authService;
-    this.logerService = logerService;
+    //this.logerService = logerService;
     this.initializeRoutes();
   }
 
@@ -30,7 +30,7 @@ export class AuthController {
    */
   private async login(req: Request, res: Response): Promise<void> {
     try {
-      this.logerService.log("Login request received");
+      //this.logerService.log("Login request received");
 
       const data: LoginUserDTO = req.body as LoginUserDTO;
 
@@ -55,7 +55,7 @@ export class AuthController {
         res.status(401).json({ success: false, message: "Invalid credentials!" });
       }
     } catch (error) {
-      this.logerService.log(error as string)
+      //this.logerService.log(error as string)
       res.status(500).json({ success: false, message: "Server error" });
     }
   }
@@ -66,7 +66,7 @@ export class AuthController {
    */
   private async register(req: Request, res: Response): Promise<void> {
     try {
-      this.logerService.log("Registration request received");
+      //this.logerService.log("Registration request received");
 
       const data: RegistrationUserDTO = req.body as RegistrationUserDTO;
 
@@ -91,7 +91,7 @@ export class AuthController {
         res.status(400).json({ success: false, message: "Registration failed. Username or email may already exist." });
       }
     } catch (error) {
-      this.logerService.log(error as string)
+      //this.logerService.log(error as string)
       res.status(500).json({ success: false, message: "Server error" });
     }
   }

@@ -180,8 +180,8 @@ export class GatewayController {
 
   private async harvestPlants(req: Request, res: Response): Promise<void> {
     try {
-      const { plantId, quantity } = req.body;
-      const plants = await this.gatewayService.harvestPlants(plantId, quantity);
+      const { commonName, quantity } = req.body;
+      const plants = await this.gatewayService.harvestPlants(commonName, quantity);
       res.status(200).json(plants);
     } catch (err) {
       res.status(500).json({ message: (err as Error).message });

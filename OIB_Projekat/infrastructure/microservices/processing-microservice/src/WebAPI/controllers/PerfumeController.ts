@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { ILogService } from "../../../../log-microservice/src/Domain/services/ILogService";
+//import { ILogService } from "../../../../log-microservice/src/Domain/services/ILogService";
 import { IPerfumeService } from "../../Domain/services/IPerfumeService";
 import { PerfumeType } from "../../Domain/enums/PerfumeType";
 
@@ -8,7 +8,7 @@ export class PerfumeController {
 
   constructor(
     private readonly perfumesService: IPerfumeService,
-    private readonly logger: ILogService
+    //private readonly logger: ILogService
   ) {
     this.router = Router();
     this.initializeRoutes();
@@ -25,22 +25,22 @@ export class PerfumeController {
       const typeParam = req.params.type;
       const quantity = parseFloat(req.params.quantity);
       const type = PerfumeType[typeParam as  keyof typeof PerfumeType];
-      this.logger.log('Fetching perfume with type');
+      //this.logger.log('Fetching perfume with type');
       const perfume = await this.perfumesService.getPerfumeByTypeAndQuantity(type, quantity);
       res.status(200).json(perfume);
     } catch (err){
-      this.logger.log((err as Error).message);
+      //this.logger.log((err as Error).message);
       res.status(400).json({message: (err as Error).message});
     }
   }
 
   private async getAllPerfumes(req: Request, res: Response): Promise<void>{
     try{
-      this.logger.log("Fetching all perfumes");
+      //this.logger.log("Fetching all perfumes");
       const perfumes = await this.perfumesService.getAllPerfumes();
       res.status(200).json(perfumes);
     } catch (err){
-      this.logger.log((err as Error).message);
+      //this.logger.log((err as Error).message);
       res.status(400).json({message: (err as Error).message});
     }
   }
@@ -57,7 +57,7 @@ export class PerfumeController {
         const processedPerfumes = await this.perfumesService.plantProcessing(plantId, Number(quantity), Number(volume), perfumeType);
         res.status(200).json(processedPerfumes);
     } catch (err){
-      this.logger.log((err as Error).message);
+      //this.logger.log((err as Error).message);
       res.status(400).json({message: (err as Error).message});
     }
   }

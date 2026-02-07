@@ -11,9 +11,9 @@ import { IUsersService } from './Domain/services/IUsersService';
 import { UsersService } from './Services/UsersService';
 import { UsersController } from './WebAPI/controllers/UsersController';
 
-import { ILogService } from '../../log-microservice/src/Domain/services/ILogService';
+/*import { ILogService } from '../../log-microservice/src/Domain/services/ILogService';
 import { LogService } from '../../log-microservice/src/Services/LogService';
-import { Log } from '../../log-microservice/src/Domain/models/Log';
+import { Log } from '../../log-microservice/src/Domain/models/Log';*/
 
 dotenv.config({ quiet: true });
 
@@ -38,14 +38,14 @@ initialize_database();
 const userRepository: Repository<User> = Db.getRepository(User);
 
 // Log repository 
-const auditRepository: Repository<Log> = Db.getRepository(Log as any);
+//const auditRepository: Repository<Log> = Db.getRepository(Log as any);
 
 // Services
 const userService: IUsersService = new UsersService(userRepository);
-const loggerService: ILogService = new LogService(auditRepository as any);
+//const loggerService: ILogService = new LogService(auditRepository as any);
 
 // WebAPI routes
-const userController = new UsersController(userService, loggerService);
+const userController = new UsersController(userService/*, loggerService*/);
 
 // Register routes
 app.use('/api/v1', userController.getRouter());

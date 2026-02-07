@@ -2,6 +2,7 @@ import { Repository } from "typeorm";
 import { IPlantsService } from "../Domain/services/IPlantsService";
 import { Plant } from "../Domain/models/Plant";
 import { PlantDTO } from "../Domain/DTOs/PlantDTO";
+import { PlantStatus } from "../Domain/enums/PlantStatus";
 
 export class PlantsService implements IPlantsService {
   constructor(private plantRepository: Repository<Plant>) {}
@@ -75,11 +76,12 @@ async harvestPlants(commonName: string, quantity: number): Promise<PlantDTO[]> {
 
   
   plant.quantity -= quantity;
+  if(plant.quantity == 0){
+    plant.status = PlantStatus.HARVESTED;
+  }
   await this.plantRepository.save(plant);
 
-  
   return [this.toDTO(plant)];
-  
 }
 
    public toDTO(plant: Plant): PlantDTO {

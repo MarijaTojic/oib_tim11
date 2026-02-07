@@ -9,12 +9,12 @@ import { Db } from "./Database/DbConnectionPool";
 
 import { Plant } from "./Domain/models/Plant";
 import { IPlantsService } from "./Domain/services/IPlantsService";
-import { ILogService } from "../../log-microservice/src/Domain/services/ILogService";
+//import { ILogService } from "../../log-microservice/src/Domain/services/ILogService";
 
 import { PlantsService } from "./Services/PlantService";
-import { LogService } from "../../log-microservice/src/Services/LogService";
+//import { LogService } from "../../log-microservice/src/Services/LogService";
 import { PlantsController } from "./WebAPI/PlantController";
-import { Log } from "../../log-microservice/src/Domain/models/Log";
+//import { Log } from "../../log-microservice/src/Domain/models/Log";
 
 dotenv.config({ quiet: true });
 
@@ -37,15 +37,15 @@ app.use(express.json());
 initialize_database();
 
 const plantRepository: Repository<Plant> = Db.getRepository(Plant);
-const auditRepository: Repository<Log> = Db.getRepository(Log as any);
+//const auditRepository: Repository<Log> = Db.getRepository(Log as any);
 
-const loggerService: ILogService = new LogService(auditRepository as any);
+//const loggerService: ILogService = new LogService(auditRepository as any);
 const plantsService: IPlantsService = new PlantsService(plantRepository);
 
 
 const plantsController = new PlantsController(
   plantsService,
-  loggerService
+  //loggerService
 );
 
 app.use("/api/v1", plantsController.getRouter());

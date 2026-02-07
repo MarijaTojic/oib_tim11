@@ -137,9 +137,9 @@ export class GatewayService implements IGatewayService {
     return response.data;
   }
 
-  async harvestPlants(plantId: number, quantity: number): Promise<PlantDTO[]> {
+  async harvestPlants(commonName: number, quantity: number): Promise<PlantDTO[]> {
     const response = await this.productionClient.post<PlantDTO[]>("/plants/harvest", {
-      plantId,
+      commonName,
       quantity,
     });
     return response.data;
