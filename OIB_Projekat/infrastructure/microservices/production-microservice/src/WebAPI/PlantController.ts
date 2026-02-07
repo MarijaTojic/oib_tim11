@@ -17,7 +17,7 @@ export class PlantsController {
 
   private initializeRoutes(): void {
     this.router.post("/plants", this.createPlant.bind(this));
-    this.router.put("/plants/:id/aroma", this.changeAromaticOilStrength.bind(this));
+    this.router.patch("/plants/:id/aromatic", this.changeAromaticOilStrength.bind(this));
     this.router.post("/plants/harvest", this.harvestPlants.bind(this));
     this.router.post("/internal/plant-request", this.handleInternalPlantRequest.bind(this));
     this.router.get("/plants", this.getAllPlants.bind(this));
@@ -42,17 +42,11 @@ export class PlantsController {
                 `[production] CREATE_PLANT - FAIL: ${(err as Error).message}`
               );
 
-        //res.status(500).json({ message: (err as Error).message });
-        const errorMessage =
-      err instanceof Error ? err.message : JSON.stringify(err);
-      console.error("❌ CREATE_PLANT ERROR:", errorMessage);
-
+        res.status(500).json({ message: (err as Error).message });
       }
     }
 
-
-
-  /** PUT change aromatic oil strength by percentage */
+  /** PATCH change aromatic oil strength by percentage */
       private async changeAromaticOilStrength(req: Request, res: Response): Promise<void> {
         try {
           const id = parseInt(req.params.id, 10);

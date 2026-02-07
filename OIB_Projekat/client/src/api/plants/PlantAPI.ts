@@ -44,9 +44,12 @@ export class PlantAPI implements IPlantAPI {
   }
 
   async changeAromaticOilStrength(id: number, percentage: number): Promise<PlantDTO> {
+    const token = localStorage.getItem("authToken");
+    console.log("Token being sent:", token);
+
     const res = await fetch(`${this.baseUrl}/${id}/aromatic`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}`},
       body: JSON.stringify({ percentage }),
     });
     if (!res.ok) throw new Error("Failed to change aromatic oil strength");
@@ -54,9 +57,10 @@ export class PlantAPI implements IPlantAPI {
   }
 
   async harvestPlants(commonName: string, quantity: number): Promise<PlantDTO[]> {
+    const token = localStorage.getItem("authToken");
     const res = await fetch(`${this.baseUrl}/harvest`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json",  "Authorization": `Bearer ${token}`},
       body: JSON.stringify({ commonName, quantity }),
     });
     if (!res.ok) throw new Error("Failed to harvest plants");

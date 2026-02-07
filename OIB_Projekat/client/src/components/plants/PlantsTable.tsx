@@ -1,5 +1,6 @@
 import { PlantStatus } from "../../enums/PlantStatus";
 import { PlantDTO } from "../../models/plants/PlantDTO";
+import React from "react";
 
 type Props = {
   plants: PlantDTO[];
@@ -7,7 +8,7 @@ type Props = {
   onHarvest: (commonName: string) => void;
 };
 
-export const PlantsTable: React.FC<Props> = ({ plants, onChangeAroma, onHarvest }) => {
+export const PlantsTable: React.FC<Props> = ({ plants, onChangeAroma, onHarvest }) => {  
   return (
     <div className="overflow-x-auto">
       <table className="table w-full border-collapse">

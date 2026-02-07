@@ -146,7 +146,7 @@ export class GatewayService implements IGatewayService {
   }
 
   async adjustAromaticOilStrength(plantId: number, percentage: number): Promise<PlantDTO> {
-    const response = await this.productionClient.patch<PlantDTO>(`/plants/${plantId}/oil-strength`, {
+    const response = await this.productionClient.patch<PlantDTO>(`/plants/${plantId}/aromatic`, {
       percentage,
     });
     return response.data;

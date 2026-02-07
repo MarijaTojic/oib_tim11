@@ -3,6 +3,7 @@ import { IPlantAPI } from "../api/plants/IPlantAPI";
 import { PlantDTO } from "../models/plants/PlantDTO";
 import { PlantsTable } from "../components/plants/PlantsTable";
 import { CreatePlantForm } from "../components/plants/CreatePlantForm";
+import { useNavigate } from "react-router-dom";
 
 type LogEntry = {
   timestamp: string;
@@ -23,6 +24,16 @@ export const ProductionPage: React.FC<Props> = ({ plantsAPI }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // --- Modal state ---
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<"aroma" | "harvest" | null>(null);
+  const [modalValue, setModalValue] = useState("");
+  const [selectedPlantId, setSelectedPlantId] = useState<number | null>(null);
+  const [selectedPlantName, setSelectedPlantName] = useState<string>("");
+
+  const navigate = useNavigate();
+
+  // --- Data loading ---
   const loadPlants = async () => {
     try {
       setLoading(true);
@@ -62,7 +73,7 @@ export const ProductionPage: React.FC<Props> = ({ plantsAPI }) => {
           message: "Nema dovoljno biljaka na lageru",
         },
       ];
-      setLogs(mockLogs); 
+      setLogs(mockLogs);
       setError(null);
     } catch (err: any) {
       setError("Greška pri učitavanju dnevnika: " + err.message);
@@ -81,31 +92,19 @@ export const ProductionPage: React.FC<Props> = ({ plantsAPI }) => {
     setActiveTab("list");
   };
 
-  const handleChangeAroma = async (id: number) => {
-    const percentage = prompt("Unesite procenat promene (npr. 80 za 80%):");
-    if (!percentage || isNaN(Number(percentage))) return;
-
-    try {
-      await plantsAPI.changeAromaticOilStrength(id, Number(percentage));
-      alert("Jačina uspešno promenjena!");
-      loadPlants();
-    } catch (err: any) {
-      alert("Greška: " + err.message);
-    }
+  // --- Modal open functions ---
+  const openAromaModal = (id: number) => {
+    setSelectedPlantId(id);
+    setModalValue("");
+    setModalType("aroma");
+    setModalOpen(true);
   };
 
-  const handleHarvest = async (commonName: string) => {
-    const qtyStr = prompt(`Koliko biljaka ${commonName} želite da uberete?`);
-    const qty = Number(qtyStr);
-    if (!qty || isNaN(qty) || qty <= 0) return;
-
-    try {
-      await plantsAPI.harvestPlants(commonName, qty);
-      alert("Berba uspešna!");
-      loadPlants();
-    } catch (err: any) {
-      alert("Greška pri berbi: " + err.message);
-    }
+  const openHarvestModal = (name: string) => {
+    setSelectedPlantName(name);
+    setModalValue("");
+    setModalType("harvest");
+    setModalOpen(true);
   };
 
   return (
@@ -135,6 +134,12 @@ export const ProductionPage: React.FC<Props> = ({ plantsAPI }) => {
             >
               Dnevnik proizvodnje
             </button>
+            <button
+              className="btn bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded"
+              onClick={() => navigate("/dashboard")} 
+            >
+              Nazad na dashboard
+            </button>
           </div>
 
           <div style={{ padding: "24px" }}>
@@ -145,8 +150,8 @@ export const ProductionPage: React.FC<Props> = ({ plantsAPI }) => {
               <div>
                 <PlantsTable
                   plants={plants}
-                  onChangeAroma={handleChangeAroma}
-                  onHarvest={handleHarvest}
+                  onChangeAroma={openAromaModal}
+                  onHarvest={openHarvestModal}
                 />
                 <button className="btn mt-4" onClick={loadPlants}>
                   Osveži listu
@@ -189,6 +194,63 @@ export const ProductionPage: React.FC<Props> = ({ plantsAPI }) => {
           </div>
         </div>
       </div>
+
+      {modalOpen && (
+        <div className="modal-backdrop fixed inset-0 bg-black/50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded shadow w-80">
+            <h3 className="text-lg font-bold mb-2">
+              {modalType === "aroma" ? "Promeni jačinu arome" : "Berba biljaka"}
+            </h3>
+
+            <input
+              type="number"
+              className="border p-2 w-full mb-4"
+              placeholder={modalType === "aroma" ? "Procenat promene" : "Količina za berbu"}
+              value={modalValue}
+              onChange={(e) => setModalValue(e.target.value)}
+            />
+
+            <div className="flex justify-end gap-2">
+              <button
+                className="btn bg-gray-300"
+                onClick={() => setModalOpen(false)}
+              >
+                Otkaži
+              </button>
+              <button
+                className="btn bg-blue-500 text-white"
+                onClick={async () => {
+                  if (!modalValue || isNaN(Number(modalValue))) return;
+
+                  try {
+                    if (modalType === "aroma" && selectedPlantId !== null) {
+                      await plantsAPI.changeAromaticOilStrength(
+                        selectedPlantId,
+                        Number(modalValue)
+                      );
+                      alert("Jačina uspešno promenjena!");
+                      loadPlants();
+                    } else if (modalType === "harvest") {
+                      await plantsAPI.harvestPlants(
+                        selectedPlantName,
+                        Number(modalValue)
+                      );
+                      alert("Berba uspešna!");
+                      loadPlants();
+                    }
+                  } catch (err: any) {
+                    alert("Greška: " + err.message);
+                  } finally {
+                    setModalOpen(false);
+                  }
+                }}
+              >
+                Potvrdi
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
