@@ -82,6 +82,7 @@ export interface IGatewayService {
   // Sales microservice
   getCatalogue(): Promise<any>;
   sell(data: any): Promise<any>;
+  syncCatalogue(): Promise<any>;
 
   //Packaging microservice
   packagingPerfumes(perfumeType: string, quantity: number, senderAddress: string, stroageID: number): Promise<PackagingDTO[]>;

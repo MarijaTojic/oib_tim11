@@ -50,6 +50,11 @@ export const SalesPage: React.FC<SalesPageProps> = ({ userId, salesAPI }) => {
     loadCatalogue();
   }, []);
 
+  useEffect(() => {
+    console.log("CATALOGUE FROM API:", catalogue);
+  }, [catalogue]);
+
+
   const handleQuantityChange = (perfumeId: number, value: number) => {
     setQuantities(prev => ({ ...prev, [perfumeId]: value }));
   };

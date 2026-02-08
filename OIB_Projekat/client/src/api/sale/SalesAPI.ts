@@ -6,15 +6,17 @@ export class SalesAPI implements ISalesAPI {
   private readonly axiosInstance: AxiosInstance;
 
   constructor() {
-    const token = localStorage.getItem("authToken");
-    console.log("Auth token:", token);
     this.axiosInstance = axios.create({
       baseURL: import.meta.env.VITE_GATEWAY_URL,
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: token ? `Bearer ${token}` : "",
-      },
       timeout: 5000,
+    });
+
+    this.axiosInstance.interceptors.request.use(config => {
+      const token = localStorage.getItem("authToken");
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      return config;
     });
   }
 

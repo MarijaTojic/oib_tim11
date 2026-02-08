@@ -453,6 +453,12 @@ export class GatewayService implements IGatewayService {
     return response.data;
   }
 
+  async syncCatalogue(): Promise<any> {
+    const response = await this.salesClient.post("/sales/catalogue/sync");
+    return response.data;
+  }
+
+
   //Packaging microservice
   async packagingPerfumes(perfumeType: string, quantity: number, senderAddress: string, storageID: number): Promise<PackagingDTO[]>{
     const response = await this.packagingClient.post<PackagingDTO[]>("/packaging", {

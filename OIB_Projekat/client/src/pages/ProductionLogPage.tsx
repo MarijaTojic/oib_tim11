@@ -114,7 +114,16 @@ export const ProductionLogPage: React.FC<Props> = ({ gatewayUrl }) => {
     if (!res.ok) throw new Error("Neuspešno učitavanje logova");
 
     const json = await res.json();
-    setLogs(json.logs); 
+
+    const filteredLogs = json.logs.filter(
+      (log: LogEntry) =>
+        log.description.includes("[plants-ms] ") ||
+        log.description.includes("[processing-ms]"
+    ));
+
+    setLogs(filteredLogs); 
+    setError(null);
+
     setError(null);
   } catch (err: any) {
     setError(err.message);
