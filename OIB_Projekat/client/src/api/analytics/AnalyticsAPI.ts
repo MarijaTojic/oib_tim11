@@ -26,7 +26,8 @@ export class AnalyticsAPI implements IAnalyticsAPI {
     });
   }
 
-  async getReports(token: string, limit?: number): Promise<ReportAnalysisDTO[]> {
+  async getReports(limit?: number): Promise<ReportAnalysisDTO[]> {
+    const token = localStorage.getItem("authToken");
     const response = await this.axiosInstance.get<ApiResponse<ReportAnalysisDTO[]>>("/analytics/reports", {
       params: limit ? { limit } : undefined,
       headers: { Authorization: `Bearer ${token}` },
@@ -34,36 +35,40 @@ export class AnalyticsAPI implements IAnalyticsAPI {
     return unwrap(response.data);
   }
 
-  async getReportById(token: string, id: number): Promise<ReportAnalysisDTO> {
+  async getReportById(id: number): Promise<ReportAnalysisDTO> {
+    const token = localStorage.getItem("authToken");
     const response = await this.axiosInstance.get<ApiResponse<ReportAnalysisDTO>>(`/analytics/reports/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return unwrap(response.data);
   }
 
-  async createReport(token: string, data: CreateReportAnalysisDTO): Promise<ReportAnalysisDTO> {
+  async createReport( data: CreateReportAnalysisDTO): Promise<ReportAnalysisDTO> {
+    const token = localStorage.getItem("authToken");
     const response = await this.axiosInstance.post<ApiResponse<ReportAnalysisDTO>>("/analytics/reports", data, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return unwrap(response.data);
   }
 
-  async deleteReport(token: string, id: number): Promise<void> {
+  async deleteReport(id: number): Promise<void> {
+    const token = localStorage.getItem("authToken");
     await this.axiosInstance.delete(`/analytics/reports/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
   }
 
-  async exportReport(token: string, id: number): Promise<void> {
+  async exportReport(id: number): Promise<void> {
+    const token = localStorage.getItem("authToken");
     await this.axiosInstance.patch(`/analytics/reports/${id}/export`, null, {
       headers: { Authorization: `Bearer ${token}` },
     });
   }
 
   async calculateSalesAnalysis(
-    token: string,
     data: SalesAnalysisRequestDTO
   ): Promise<SalesAnalysisResponseDTO> {
+    const token = localStorage.getItem("authToken");
     const response = await this.axiosInstance.post<ApiResponse<SalesAnalysisResponseDTO>>(
       "/analytics/analysis/sales",
       data,
@@ -74,14 +79,16 @@ export class AnalyticsAPI implements IAnalyticsAPI {
     return unwrap(response.data);
   }
 
-  async getTopTen(token: string): Promise<TopTenSummaryDTO> {
+  async getTopTen(): Promise<TopTenSummaryDTO> {
+    const token = localStorage.getItem("authToken");
     const response = await this.axiosInstance.get<ApiResponse<TopTenSummaryDTO>>("/analytics/analysis/top-ten", {
       headers: { Authorization: `Bearer ${token}` },
     });
     return unwrap(response.data);
   }
 
-  async getSalesTrend(token: string, days?: number): Promise<SalesTrendDTO[]> {
+  async getSalesTrend(days?: number): Promise<SalesTrendDTO[]> {
+    const token = localStorage.getItem("authToken");
     const response = await this.axiosInstance.get<ApiResponse<SalesTrendDTO[]>>("/analytics/analysis/trend", {
       params: days ? { days } : undefined,
       headers: { Authorization: `Bearer ${token}` },

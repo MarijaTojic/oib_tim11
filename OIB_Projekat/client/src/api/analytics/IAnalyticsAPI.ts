@@ -6,12 +6,12 @@ import { SalesTrendDTO } from "../../models/analytics/SalesTrendDTO";
 import { TopTenSummaryDTO } from "../../models/analytics/TopTenSummaryDTO";
 
 export interface IAnalyticsAPI {
-  getReports(token: string, limit?: number): Promise<ReportAnalysisDTO[]>;
-  getReportById(token: string, id: number): Promise<ReportAnalysisDTO>;
-  createReport(token: string, data: CreateReportAnalysisDTO): Promise<ReportAnalysisDTO>;
-  deleteReport(token: string, id: number): Promise<void>;
-  exportReport(token: string, id: number): Promise<void>;
-  calculateSalesAnalysis(token: string, data: SalesAnalysisRequestDTO): Promise<SalesAnalysisResponseDTO>;
-  getTopTen(token: string): Promise<TopTenSummaryDTO>;
-  getSalesTrend(token: string, days?: number): Promise<SalesTrendDTO[]>;
+  getReports(limit?: number): Promise<ReportAnalysisDTO[]>;
+  getReportById(id: number): Promise<ReportAnalysisDTO>;
+  createReport(data: CreateReportAnalysisDTO): Promise<ReportAnalysisDTO>;
+  deleteReport(id: number): Promise<void>;
+  exportReport(id: number): Promise<void>;
+  calculateSalesAnalysis(data: SalesAnalysisRequestDTO): Promise<SalesAnalysisResponseDTO>;
+  getTopTen(): Promise<TopTenSummaryDTO>;
+  getSalesTrend(days?: number): Promise<SalesTrendDTO[]>;
 }
