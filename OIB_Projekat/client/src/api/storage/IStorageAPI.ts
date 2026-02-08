@@ -1,8 +1,9 @@
 // src/api/storage/IStorageAPI.ts
-import { CreatePackageDTO } from "../../models/packaging/CreatePackageDTO";
-import { CreateWarehouseDTO } from "../../models/packaging/CreateWarehouseDTO";
+
 import { PackagingDTO } from "../../models/packaging/PackagingDTO";
-import { WarehouseDTO } from "../../models/packaging/WarehouseDTO";
+import { CreatePackageDTO } from "../../models/storages/CreatePackageDTO";
+import { CreateWarehouseDTO } from "../../models/storages/CreateWarehouseDTO";
+import { WarehouseDTO } from "../../models/storages/WarehouseDTO";
 
 
 export interface IStorageAPI { 

@@ -3,9 +3,10 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuthHook";
 import "./StoragePage.css";
 import { PackagingDTO } from "../models/packaging/PackagingDTO";
-import { WarehouseDTO } from "../models/packaging/WarehouseDTO";
+import { WarehouseDTO } from "../models/storages/WarehouseDTO";
 import { IStorageAPI } from "../api/storage/IStorageAPI";
 import { StorageAPI } from "../api/storage/StorageApi";
+import { WarehouseDTO } from "../models/storages/WarehouseDTO";
 
 const StoragePage: React.FC = () => {
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ const StoragePage: React.FC = () => {
 
   const storageAPI: IStorageAPI = new StorageAPI();
 
-  /
+  // Load warehouses and packages
   const loadWarehouses = async () => {
     if (!token) return;
     try {
@@ -223,6 +224,7 @@ const StoragePage: React.FC = () => {
                   <td>{p.id}</td>
                   <td>{p.name}</td>
                   <td>{p.senderAddress}</td>
+                  <td>{p.warehouse?.name}</td>
                 </tr>
               ))}
               {packedPackages.length === 0 && (

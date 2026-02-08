@@ -1,4 +1,4 @@
-import { PackagingDTO } from "./PackagingDTO";
+import { PackagingDTO } from "../packaging/PackagingDTO";
 
 export interface WarehouseDTO {
   id: number;
