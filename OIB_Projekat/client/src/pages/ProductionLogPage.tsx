@@ -100,20 +100,30 @@ export const ProductionLogPage: React.FC<Props> = ({ gatewayUrl }) => {
   const navigate = useNavigate();
 
   const loadLogs = async () => {
-    try {
-      setLoading(true);
-      const res = await fetch(`${gatewayUrl}/logs`);
-      if (!res.ok) throw new Error("Neuspešno učitavanje logova");
-      const data: LogEntry[] = await res.json();
-      setLogs(data);
-      setError(null);
-    } catch (err: any) {
-      setError(err.message);
-      setLogs([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    setLoading(true);
+
+    const token = localStorage.getItem("authToken"); 
+
+    const res = await fetch(`${gatewayUrl}/logs`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) throw new Error("Neuspešno učitavanje logova");
+
+    const json = await res.json();
+    setLogs(json.logs); 
+    setError(null);
+  } catch (err: any) {
+    setError(err.message);
+    setLogs([]);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   useEffect(() => {
     loadLogs();
