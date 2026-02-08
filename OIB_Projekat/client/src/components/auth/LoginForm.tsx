@@ -41,7 +41,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({ authAPI }) => {
         setError(response.message || "Login failed. Please try again.");
       }
     } catch (err: any) {
-      const message = err?.response?.data?.message ?? err?.message ?? "An error occurred. Please try again.";
+      const message =
+        err?.response?.data?.message ??
+        err?.message ??
+        "An error occurred. Please try again.";
       setError(message);
     } finally {
       setIsLoading(false);
@@ -49,14 +52,31 @@ export const LoginForm: React.FC<LoginFormProps> = ({ authAPI }) => {
   };
 
   useEffect(() => {
-    if(isAuthenticated)
-        navigate("/dashboard");
-  })
+    if (isAuthenticated) navigate("/dashboard");
+  }, [isAuthenticated, navigate]);
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <form
+      onSubmit={handleSubmit}
+      className="flex flex-col gap-4"
+      style={{
+        backgroundColor: "#ffffff",
+        padding: "24px",
+        borderRadius: "8px",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+      }}
+    >
       <div>
-        <label htmlFor="username" style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600 }}>
+        <label
+          htmlFor="username"
+          style={{
+            display: "block",
+            marginBottom: "8px",
+            fontSize: "14px",
+            fontWeight: 600,
+            color: "#003366",
+          }}
+        >
           Username
         </label>
         <input
@@ -68,11 +88,32 @@ export const LoginForm: React.FC<LoginFormProps> = ({ authAPI }) => {
           placeholder="Enter your username"
           required
           disabled={isLoading}
+          style={{
+            width: "100%",
+            padding: "10px 12px",
+            border: "1px solid #cce0ff",
+            borderRadius: "6px",
+            outline: "none",
+            transition: "all 0.2s",
+            backgroundColor: "#ffffff",
+            color: "#0d47a1",
+          }}
+          onFocus={(e) => (e.currentTarget.style.borderColor = "#0078d4")}
+          onBlur={(e) => (e.currentTarget.style.borderColor = "#cce0ff")}
         />
       </div>
 
       <div>
-        <label htmlFor="password" style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 600 }}>
+        <label
+          htmlFor="password"
+          style={{
+            display: "block",
+            marginBottom: "8px",
+            fontSize: "14px",
+            fontWeight: 600,
+            color: "#003366",
+          }}
+        >
           Password
         </label>
         <input
@@ -84,42 +125,96 @@ export const LoginForm: React.FC<LoginFormProps> = ({ authAPI }) => {
           placeholder="Enter your password"
           required
           disabled={isLoading}
+          style={{
+            width: "100%",
+            padding: "10px 12px",
+            border: "1px solid #cce0ff",
+            borderRadius: "6px",
+            outline: "none",
+            transition: "all 0.2s",
+            backgroundColor: "#ffffff",
+            color: "#0d47a1",
+          }}
+          onFocus={(e) => (e.currentTarget.style.borderColor = "#0078d4")}
+          onBlur={(e) => (e.currentTarget.style.borderColor = "#cce0ff")}
         />
       </div>
 
       {error && (
         <div
-          className="card"
           style={{
             padding: "12px 16px",
-            backgroundColor: "rgba(196, 43, 28, 0.15)",
-            borderColor: "var(--win11-close-hover)",
+            backgroundColor: "rgba(0, 120, 212, 0.1)",
+            border: "1px solid #0078d4",
+            borderRadius: "6px",
           }}
         >
           <div className="flex items-center gap-2">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="var(--win11-close-hover)">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="#0078d4"
+            >
               <path d="M8 2a6 6 0 100 12A6 6 0 008 2zm0 1a5 5 0 110 10A5 5 0 018 3zm0 2a.5.5 0 01.5.5v3a.5.5 0 01-1 0v-3A.5.5 0 018 5zm0 6a.75.75 0 110 1.5.75.75 0 010-1.5z"/>
             </svg>
-            <span style={{ fontSize: "13px", color: "var(--win11-text-primary)" }}>{error}</span>
+            <span style={{ fontSize: "13px", color: "#003366" }}>{error}</span>
           </div>
         </div>
       )}
 
       <button
         type="submit"
-        className="btn btn-accent"
         disabled={isLoading}
-        style={{ marginTop: "8px" }}
+        style={{
+          marginTop: "8px",
+          backgroundColor: "#0078d4",
+          color: "#ffffff",
+          fontWeight: 600,
+          padding: "10px 16px",
+          borderRadius: "6px",
+          border: "none",
+          cursor: "pointer",
+          transition: "all 0.2s",
+        }}
+        onMouseEnter={(e) =>
+          (e.currentTarget.style.backgroundColor = "#005a9e")
+        }
+        onMouseLeave={(e) =>
+          (e.currentTarget.style.backgroundColor = "#0078d4")
+        }
       >
         {isLoading ? (
           <div className="flex items-center gap-2">
-            <div className="spinner" style={{ width: "16px", height: "16px", borderWidth: "2px" }}></div>
+            <div
+              className="spinner"
+              style={{
+                width: "16px",
+                height: "16px",
+                borderWidth: "2px",
+                borderColor: "#ffffff",
+                borderTopColor: "transparent",
+                borderStyle: "solid",
+                borderRadius: "50%",
+                animation: "spin 1s linear infinite",
+              }}
+            ></div>
             <span>Logging in...</span>
           </div>
         ) : (
           "Login"
         )}
       </button>
+
+      {/* Spinner animation */}
+      <style>
+        {`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}
+      </style>
     </form>
   );
 };

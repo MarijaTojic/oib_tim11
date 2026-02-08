@@ -7,14 +7,80 @@ type Props = {
   onSuccess: () => void;
 };
 
+/* ====== STYLES (PLAVO–BELO) ====== */
+const styles = {
+  card: {
+    maxWidth: "520px",
+    margin: "0 auto",
+    backgroundColor: "#ffffff",
+    border: "1px solid #bbdefb",
+    borderRadius: "8px",
+    padding: "24px",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+  },
+  title: {
+    color: "#0d47a1",
+    fontSize: "20px",
+    fontWeight: 600,
+    marginBottom: "24px",
+  },
+  field: {
+    marginBottom: "16px",
+    display: "flex",
+    flexDirection: "column" as const,
+  },
+  label: {
+    marginBottom: "6px",
+    color: "#0d47a1",
+    fontWeight: 500,
+  },
+  input: {
+    padding: "8px 10px",
+    borderRadius: "4px",
+    border: "1px solid #bbdefb",
+    outline: "none",
+    fontSize: "14px",
+    backgroundColor: "#ffffff",
+    color: "#0d47a1",
+  },
+  errorBox: {
+    marginBottom: "16px",
+    padding: "12px",
+    backgroundColor: "#e3f2fd",
+    color: "#0d47a1",
+    border: "1px solid #90caf9",
+    borderRadius: "4px",
+  },
+  submitBtn: {
+    width: "100%",
+    backgroundColor: "#1976d2",
+    color: "#ffffff",
+    padding: "10px",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+    fontSize: "15px",
+    fontWeight: 500,
+  },
+  submitBtnDisabled: {
+    opacity: 0.6,
+    cursor: "not-allowed",
+  },
+  hint: {
+    marginTop: "16px",
+    fontSize: "13px",
+    color: "#546e7a",
+    textAlign: "center" as const,
+  },
+};
+
 export const CreatePlantForm: React.FC<Props> = ({ plantsAPI, onSuccess }) => {
   const [form, setForm] = useState({
-    //id: 0,
     commonName: "",
     latinName: "",
     countryOfOrigin: "",
-    status: PlantStatus.PLANTED, 
-    aromaticOilStrength: 0,  
+    status: PlantStatus.PLANTED,
+    aromaticOilStrength: 0,
     quantity: 1,
   });
 
@@ -41,57 +107,59 @@ export const CreatePlantForm: React.FC<Props> = ({ plantsAPI, onSuccess }) => {
   };
 
   return (
-    <div className="card max-w-lg mx-auto">
-      <h3 className="text-xl font-bold mb-6">Zasadi novu biljku</h3>
+    <div style={styles.card}>
+      <h3 style={styles.title}>Zasadi novu biljku</h3>
 
-      {error && <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">{error}</div>}
+      {error && <div style={styles.errorBox}>{error}</div>}
 
-      <div className="space-y-4">
-        <div>
-          <label className="block mb-1 font-medium">Common name *</label>
+      <div>
+        <div style={styles.field}>
+          <label style={styles.label}>Common name *</label>
           <input
+            style={styles.input}
             type="text"
             placeholder="npr. Lavanda"
             value={form.commonName}
             onChange={(e) => setForm({ ...form, commonName: e.target.value })}
-            className="w-full p-2 border rounded"
-            required
           />
         </div>
 
-        <div>
-          <label className="block mb-1 font-medium">Latin name</label>
+        <div style={styles.field}>
+          <label style={styles.label}>Latin name</label>
           <input
+            style={styles.input}
             type="text"
             placeholder="npr. Lavandula angustifolia"
             value={form.latinName}
             onChange={(e) => setForm({ ...form, latinName: e.target.value })}
-            className="w-full p-2 border rounded"
           />
         </div>
 
-        <div>
-          <label className="block mb-1 font-medium">Zemlja porekla</label>
+        <div style={styles.field}>
+          <label style={styles.label}>Zemlja porekla</label>
           <input
+            style={styles.input}
             type="text"
             placeholder="npr. Srbija"
             value={form.countryOfOrigin}
-            onChange={(e) => setForm({ ...form, countryOfOrigin: e.target.value })}
-            className="w-full p-2 border rounded"
+            onChange={(e) =>
+              setForm({ ...form, countryOfOrigin: e.target.value })
+            }
           />
         </div>
 
-        <div className="pt-4">
-          <button
-            onClick={handleSubmit}
-            disabled={loading}
-            className={`btn-accent w-full ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
-          >
-            {loading ? "Kreiranje..." : "Zasadi biljku"}
-          </button>
-        </div>
+        <button
+          onClick={handleSubmit}
+          disabled={loading}
+          style={{
+            ...styles.submitBtn,
+            ...(loading ? styles.submitBtnDisabled : {}),
+          }}
+        >
+          {loading ? "Kreiranje..." : "Zasadi biljku"}
+        </button>
 
-        <p className="text-sm text-gray-500 mt-4">
+        <p style={styles.hint}>
           Jačina aromatičnih ulja biće nasumično generisana (1.0 – 5.0)
         </p>
       </div>

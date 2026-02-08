@@ -49,64 +49,120 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ userAPI, plantAPI 
 
   if(loading) return <div>Loading dashboard...</div>
 
-  return (
-    <div style={{ padding: 20 }}>
-      <DashboardNavbar userAPI={userAPI} />
-      <h1>Dashboard</h1>
-      <section style={{ marginBottom: 40 }}>
-        <h2>Users</h2>
-        <table border={1} cellPadding={5}>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Username</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Name</th>
-              <th>Surname</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((u) => (
-              <tr key={u.id}>
-                <td>{u.id}</td>
-                <td>{u.username}</td>
-                <td>{u.email}</td>
-                <td>{u.role}</td>
-                <td>{u.name}</td>
-                <td>{u.surname}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </section>
+  const styles = {
+  page: {
+    padding: 20,
+    backgroundColor: "#f5f9ff",
+    minHeight: "100vh",
+  },
+  title: {
+    color: "#0d47a1",
+  },
+  table: {
+    width: "100%",
+    borderCollapse: "collapse" as const,
+    backgroundColor: "#ffffff",
+  },
+  th: {
+    backgroundColor: "#1976d2",
+    color: "white",
+    padding: "8px",
+    border: "1px solid #bbdefb",
+  },
+  td: {
+    padding: "8px",
+    border: "1px solid #bbdefb",
+    color: "#0d47a1",
+  },
+  section: {
+    marginBottom: 40,
+  },
+};
 
-      <section>
-        <h2>Plants / Production</h2>
-        <table border={1} cellPadding={5}>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Common Name</th>
-              <th>Latin Name</th>
-              <th>Country</th>
-              <th>Aromatic Oil Strength</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {plants.map((p) => (
-              <tr key={p.id}>
-                <td>{p.id}</td>
-                <td>{p.commonName}</td>
-                <td>{p.latinName}</td>
-                <td>{p.countryOfOrigin}</td>
-                <td>{p.aromaticOilStrength.toFixed(2)}</td>
-                <td>{p.status}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+<table style={styles.table}>
+  <thead>
+    <tr>
+      <th style={styles.th}>ID</th>
+      <th style={styles.th}>Username</th>
+      <th style={styles.th}>Email</th>
+      <th style={styles.th}>Role</th>
+      <th style={styles.th}>Name</th>
+      <th style={styles.th}>Surname</th>
+    </tr>
+  </thead>
+  <tbody>
+    {users.map((u) => (
+      <tr key={u.id}>
+        <td style={styles.td}>{u.id}</td>
+        <td style={styles.td}>{u.username}</td>
+        <td style={styles.td}>{u.email}</td>
+        <td style={styles.td}>{u.role}</td>
+        <td style={styles.td}>{u.name}</td>
+        <td style={styles.td}>{u.surname}</td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
+  return (
+    <div style = { styles.page } >
+      <DashboardNavbar userAPI={userAPI} />
+      <h1 style = { styles.title }>Dashboard</h1>
+      <section style={{ marginBottom: 40 }}>
+        <h2 style = { styles.title }>Users</h2>
+        <table style={styles.table}>
+  <thead>
+    <tr>
+      <th style={styles.th}>ID</th>
+      <th style={styles.th}>Username</th>
+      <th style={styles.th}>Email</th>
+      <th style={styles.th}>Role</th>
+      <th style={styles.th}>Name</th>
+      <th style={styles.th}>Surname</th>
+    </tr>
+  </thead>
+  <tbody>
+    {users.map((u) => (
+      <tr key={u.id}>
+        <td style={styles.td}>{u.id}</td>
+        <td style={styles.td}>{u.username}</td>
+        <td style={styles.td}>{u.email}</td>
+        <td style={styles.td}>{u.role}</td>
+        <td style={styles.td}>{u.name}</td>
+        <td style={styles.td}>{u.surname}</td>
+      </tr>
+    ))}
+  </tbody>
+  </table>
+        </section>
+
+        <section>
+          <h2 style = { styles.title }>Plants / Production</h2>
+          <table style={styles.table}>
+    <thead>
+      <tr>
+        <th style={styles.th}>ID</th>
+        <th style={styles.th}>Common name</th>
+        <th style={styles.th}>Latin name</th>
+        <th style={styles.th}>Aromatic Oil Strength</th>
+        <th style={styles.th}>Status</th>
+        <th style={styles.th}>Quantity</th>
+      </tr>
+    </thead>
+    <tbody>
+      {plants.map((u) => (
+        <tr key={u.id}>
+          <td style={styles.td}>{u.id}</td>
+          <td style={styles.td}>{u.commonName}</td>
+          <td style={styles.td}>{u.latinName}</td>
+          <td style={styles.td}>{u.aromaticOilStrength}</td>
+          <td style={styles.td}>{u.countryOfOrigin}</td>
+          <td style={styles.td}>{u.status}</td>
+          <td style={styles.td}>{u.quantity}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
       </section>
     </div>
   );

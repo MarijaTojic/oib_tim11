@@ -10,7 +10,86 @@ type LogEntry = {
 };
 
 type Props = {
-  gatewayUrl: string; 
+  gatewayUrl: string;
+};
+
+const styles = {
+  page: {
+    padding: "24px",
+    backgroundColor: "#f5f9ff",
+    minHeight: "100vh",
+  },
+  card: {
+    maxWidth: "900px",
+    margin: "0 auto",
+    backgroundColor: "#ffffff",
+    border: "1px solid #bbdefb",
+    borderRadius: "8px",
+    padding: "24px",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+  },
+  title: {
+    color: "#0d47a1",
+    fontSize: "22px",
+    fontWeight: 600,
+    marginBottom: "20px",
+  },
+  infoText: {
+    color: "#546e7a",
+  },
+  errorText: {
+    color: "#d32f2f",
+    marginBottom: "12px",
+  },
+  logList: {
+    listStyle: "none",
+    padding: 0,
+    margin: 0,
+  },
+  logItem: {
+    borderBottom: "1px solid #bbdefb",
+    padding: "12px 0",
+  },
+  logHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    fontSize: "13px",
+    color: "#546e7a",
+    marginBottom: "4px",
+  },
+  logDesc: {
+    color: "#0d47a1",
+    fontWeight: 500,
+  },
+  success: {
+    color: "#2e7d32",
+    fontWeight: 700,
+  },
+  error: {
+    color: "#d32f2f",
+    fontWeight: 700,
+  },
+  actions: {
+    display: "flex",
+    gap: "12px",
+    marginTop: "20px",
+  },
+  primaryBtn: {
+    backgroundColor: "#1976d2",
+    color: "#ffffff",
+    padding: "8px 16px",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+  },
+  secondaryBtn: {
+    backgroundColor: "#ffffff",
+    color: "#1976d2",
+    padding: "8px 16px",
+    border: "1px solid #1976d2",
+    borderRadius: "4px",
+    cursor: "pointer",
+  },
 };
 
 export const ProductionLogPage: React.FC<Props> = ({ gatewayUrl }) => {
@@ -41,51 +120,54 @@ export const ProductionLogPage: React.FC<Props> = ({ gatewayUrl }) => {
   }, []);
 
   return (
-    <div className="p-6">
-    <h2 className="text-2xl font-bold mb-4">Production log</h2>
+    <div style={styles.page}>
+      <div style={styles.card}>
+        <h2 style={styles.title}>Production log</h2>
 
-    {loading && <p>Loading...</p>}
-    {error && <p className="text-red-600">{error}</p>}
+        {loading && <p style={styles.infoText}>Loading...</p>}
+        {error && <p style={styles.errorText}>{error}</p>}
 
-    {logs.length === 0 && !loading ? (
-        <p className="text-gray-500">No events recorded</p>
-    ) : (
-        <ul className="space-y-3">
-        {logs.map((log) => (
-            <li key={log.id} className="border-b pb-2">
-            <div className="flex justify-between text-sm text-gray-600">
-                <span>{new Date(log.datetime).toLocaleString()}</span>
-                <span
-                className={
-                    log.logtype === LogInfo.INFO ? "text-green-600" : "text-red-600"
-                }
-                >
-                {log.logtype === LogInfo.INFO ? "✓" : "✗"}
-                </span>
-            </div>
-            <div className="font-medium">{log.description}</div>
-            </li>
-        ))}
-        </ul>
-    )}
+        {logs.length === 0 && !loading ? (
+          <p style={styles.infoText}>No events recorded</p>
+        ) : (
+          <ul style={styles.logList}>
+            {logs.map((log) => (
+              <li key={log.id} style={styles.logItem}>
+                <div style={styles.logHeader}>
+                  <span>{new Date(log.datetime).toLocaleString()}</span>
+                  <span
+                    style={
+                      log.logtype === LogInfo.INFO
+                        ? styles.success
+                        : styles.error
+                    }
+                  >
+                    {log.logtype === LogInfo.INFO ? "✓" : "✗"}
+                  </span>
+                </div>
+                <div style={styles.logDesc}>{log.description}</div>
+              </li>
+            ))}
+          </ul>
+        )}
 
-    <div className="flex gap-2 mt-4">
-        <button
-        className="btn bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-        onClick={loadLogs}
-        disabled={loading}
-        >
-        
-        Refresh log
-        </button>
+        <div style={styles.actions}>
+          <button
+            style={styles.primaryBtn}
+            onClick={loadLogs}
+            disabled={loading}
+          >
+            Refresh log
+          </button>
 
-        <button
-        className="btn bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
-        onClick={() => navigate("/dashboard")}
-        >
-        Back to dashboard
-        </button>
-    </div>
+          <button
+            style={styles.secondaryBtn}
+            onClick={() => navigate("/dashboard")}
+          >
+            Back to dashboard
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

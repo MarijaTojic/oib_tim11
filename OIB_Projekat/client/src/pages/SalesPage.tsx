@@ -9,6 +9,77 @@ type Props = {
   userId: number;
 };
 
+/* ====== STYLES ====== */
+const styles = {
+  page: {
+    padding: "24px",
+    backgroundColor: "#f5f9ff",
+    minHeight: "100vh",
+  },
+  window: {
+    maxWidth: "900px",
+    margin: "0 auto",
+    backgroundColor: "#ffffff",
+    borderRadius: "8px",
+    border: "1px solid #bbdefb",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+  },
+  titleBar: {
+    backgroundColor: "#1976d2",
+    color: "#ffffff",
+    padding: "12px 20px",
+    fontSize: "18px",
+    fontWeight: 600,
+    borderTopLeftRadius: "8px",
+    borderTopRightRadius: "8px",
+  },
+  content: {
+    padding: "24px",
+  },
+  table: {
+    width: "100%",
+    borderCollapse: "collapse" as const,
+    marginTop: "12px",
+  },
+  th: {
+    padding: "10px",
+    textAlign: "left" as const,
+    backgroundColor: "#e3f2fd",
+    color: "#0d47a1",
+    borderBottom: "2px solid #bbdefb",
+  },
+  td: {
+    padding: "8px",
+    borderBottom: "1px solid #e0e0e0",
+  },
+  input: {
+    width: "70px",
+    padding: "4px 6px",
+    border: "1px solid #bbdefb",
+    borderRadius: "4px",
+    backgroundColor: "#ffffff",
+    color: "#000",
+  },
+  btn: {
+    marginTop: "16px",
+    padding: "8px 16px",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+    backgroundColor: "#1976d2",
+    color: "#ffffff",
+  },
+  backBtn: {
+    margin: "16px 24px",
+    padding: "8px 16px",
+    border: "1px solid #1976d2",
+    borderRadius: "4px",
+    cursor: "pointer",
+    backgroundColor: "#ffffff",
+    color: "#1976d2",
+  },
+};
+
 export const SalesPage: React.FC<Props> = ({ salesAPI, userId }) => {
   const [catalogue, setCatalogue] = useState<CatalogueDTO | null>(null);
   const [quantities, setQuantities] = useState<Record<number, number>>({});
@@ -23,7 +94,7 @@ export const SalesPage: React.FC<Props> = ({ salesAPI, userId }) => {
         setCatalogue(data);
 
         const q: Record<number, number> = {};
-        data.allPerfumes.forEach(p => {
+        data.allPerfumes.forEach((p) => {
           if (p.id !== undefined) q[p.id] = 0;
         });
         setQuantities(q);
@@ -37,9 +108,9 @@ export const SalesPage: React.FC<Props> = ({ salesAPI, userId }) => {
   }, [salesAPI]);
 
   const handleQuantityChange = (perfumeId: number, value: number) => {
-    setQuantities(prev => ({
+    setQuantities((prev) => ({
       ...prev,
-      [perfumeId]: value
+      [perfumeId]: value,
     }));
   };
 
@@ -68,7 +139,7 @@ export const SalesPage: React.FC<Props> = ({ salesAPI, userId }) => {
         setCatalogue(updatedCatalogue);
 
         const resetQty: Record<number, number> = {};
-        updatedCatalogue.allPerfumes.forEach(p => {
+        updatedCatalogue.allPerfumes.forEach((p) => {
           if (p.id !== undefined) resetQty[p.id] = 0;
         });
         setQuantities(resetQty);
@@ -88,61 +159,56 @@ export const SalesPage: React.FC<Props> = ({ salesAPI, userId }) => {
   };
 
   return (
-    <div className="overlay-blur-none" style={{ position: "fixed" }}>
-      <div className="window" style={{ width: "900px" }}>
-        <div className="titlebar">
-          <span className="titlebar-title">Sales</span>
-        </div>
+    <div style={styles.page}>
+      <div style={styles.window}>
+        <div style={styles.titleBar}>Sales</div>
 
-        <div className="window-content" style={{ padding: "24px" }}>
+        <div style={styles.content}>
           {catalogue ? (
             <>
               <CatalogueTable catalogue={catalogue} />
 
-              <div style={{ marginTop: "24px" }}>
-                <table className="table" style={{ width: "100%", borderCollapse: "collapse" }}>
-                  <thead>
-                    <tr>
-                      <th>Perfume</th>
-                      <th>Buy quantity</th>
+              <table style={styles.table}>
+                <thead>
+                  <tr>
+                    <th style={styles.th}>Perfume</th>
+                    <th style={styles.th}>Buy quantity</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {catalogue.allPerfumes.map((p) => (
+                    <tr key={p.id}>
+                      <td style={styles.td}>{p.name}</td>
+                      <td style={styles.td}>
+                        <input
+                          type="number"
+                          min={0}
+                          value={quantities[p.id!] || 0}
+                          onChange={(e) =>
+                            handleQuantityChange(p.id!, Number(e.target.value))
+                          }
+                          style={styles.input}
+                        />
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {catalogue.allPerfumes.map(p => (
-                      <tr key={p.id}>
-                        <td>{p.name}</td>
-                        <td>
-                          <input
-                            type="number"
-                            min={0}
-                            value={quantities[p.id!] || 0}
-                            onChange={(e) => handleQuantityChange(p.id!, Number(e.target.value))}
-                            style={{ width: "70px" }}
-                          />
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                  ))}
+                </tbody>
+              </table>
 
-                <button
-                  onClick={handleBuy}
-                  disabled={loading}
-                  style={{ marginTop: "16px", padding: "8px 16px", cursor: "pointer" }}
-                >
-                  {loading ? "Processing..." : "Buy"}
-                </button>
-              </div>
+              <button
+                style={styles.btn}
+                onClick={handleBuy}
+                disabled={loading}
+              >
+                {loading ? "Processing..." : "Buy"}
+              </button>
             </>
           ) : (
             <p>Loading catalogue...</p>
           )}
         </div>
 
-        <button
-          onClick={backToDashboard}
-          style={{ marginBottom: "16px", padding: "8px 16px", cursor: "pointer" }}
-        >
+        <button style={styles.backBtn} onClick={backToDashboard}>
           ← Back to Dashboard
         </button>
       </div>

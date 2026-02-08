@@ -18,7 +18,7 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ userAPI }) => 
     const fetchUser = async () => {
       if (authUser?.id) {
         try {
-          const userData = await userAPI.getUserById(token ?? "", authUser.id, );
+          const userData = await userAPI.getUserById(token ?? "", authUser.id);
           setUser(userData);
         } catch (error) {
           console.error("Failed to fetch user:", error);
@@ -27,9 +27,8 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ userAPI }) => 
         }
       }
     };
-
     fetchUser();
-  }, [authUser, userAPI]);
+  }, [authUser, userAPI, token]);
 
   const handleLogout = () => {
     logout();
@@ -37,10 +36,121 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ userAPI }) => 
   };
 
   return (
-    <nav className="titlebar" style={{ height: "60px", borderRadius: 0 }}>
-      <div className="flex items-center gap-3" style={{ marginLeft: "auto" }}>
+    <nav
+      className="titlebar"
+      style={{
+        height: "60px",
+        borderRadius: 0,
+        backgroundColor: "white",
+        borderBottom: "1px solid #cce6ff",
+        padding: "0 16px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+      }}
+    >
+      {/* Navigation Buttons */}
+      <div className="flex gap-3">
+        <button
+          onClick={() => navigate("/dashboard")}
+          style={{
+            background: "none",
+            border: "none",
+            fontSize: "14px",
+            fontWeight: 600,
+            color: "#0078d4",
+            cursor: "pointer",
+          }}
+        >
+          Dashboard
+        </button>
+        <button
+          onClick={() => navigate("/perfumes")}
+          style={{
+            background: "none",
+            border: "none",
+            fontSize: "14px",
+            fontWeight: 600,
+            color: "#0078d4",
+            cursor: "pointer",
+          }}
+        >
+          Perfumes
+        </button>
+        <button
+          onClick={() => navigate("/processing")}
+          style={{
+            background: "none",
+            border: "none",
+            fontSize: "14px",
+            fontWeight: 600,
+            color: "#0078d4",
+            cursor: "pointer",
+          }}
+        >
+          Plant processing
+        </button>
+        <button
+          onClick={() => navigate("/production")}
+          style={{
+            background: "none",
+            border: "none",
+            fontSize: "14px",
+            fontWeight: 600,
+            color: "#0078d4",
+            cursor: "pointer",
+          }}
+        >
+          Plant production
+        </button>
+        <button
+          onClick={() => navigate("/sales")}
+          style={{
+            background: "none",
+            border: "none",
+            fontSize: "14px",
+            fontWeight: 600,
+            color: "#0078d4",
+            cursor: "pointer",
+          }}
+        >
+          Sales
+        </button>
+        <button
+          onClick={() => navigate("/analytics")}
+          style={{
+            background: "none",
+            border: "none",
+            fontSize: "14px",
+            fontWeight: 600,
+            color: "#0078d4",
+            cursor: "pointer",
+          }}
+        >
+          Analytics
+        </button>
+        <button
+          onClick={() => navigate("/performance")}
+          style={{
+            background: "none",
+            border: "none",
+            fontSize: "14px",
+            fontWeight: 600,
+            color: "#0078d4",
+            cursor: "pointer",
+          }}
+        >
+          Performance
+        </button>
+      </div>
+
+      {/* User Info & Logout */}
+      <div className="flex items-center gap-3">
         {isLoading ? (
-          <div className="spinner" style={{ width: "20px", height: "20px", borderWidth: "2px" }}></div>
+          <div
+            className="spinner"
+            style={{ width: "20px", height: "20px", borderWidth: "2px" }}
+          ></div>
         ) : user ? (
           <>
             {/* Profile Image */}
@@ -53,7 +163,7 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ userAPI }) => 
                   height: "32px",
                   borderRadius: "50%",
                   objectFit: "cover",
-                  border: "2px solid var(--win11-divider)",
+                  border: "2px solid #cce6ff",
                 }}
               />
             ) : (
@@ -62,13 +172,13 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ userAPI }) => 
                   width: "32px",
                   height: "32px",
                   borderRadius: "50%",
-                  background: "var(--win11-accent)",
+                  backgroundColor: "#0078d4",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   fontWeight: 600,
                   fontSize: "14px",
-                  color: "#000",
+                  color: "white",
                 }}
               >
                 {user.username.charAt(0).toUpperCase()}
@@ -77,32 +187,36 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ userAPI }) => 
 
             {/* User Info */}
             <div className="flex flex-col" style={{ gap: 0 }}>
-              <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--win11-text-primary)" }}>
+              <span style={{ fontSize: "13px", fontWeight: 600, color: "#0078d4" }}>
                 {user.email}
               </span>
-              <span style={{ fontSize: "11px", color: "var(--win11-text-tertiary)" }}>
-                {user.role}
-              </span>
+              <span style={{ fontSize: "11px", color: "#3399ff" }}>{user.role}</span>
             </div>
 
             {/* Logout Button */}
-            <button className="btn btn-ghost" onClick={handleLogout} style={{ padding: "8px 16px" }}>
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M6 2v2H3v8h3v2H2V2h4zm4 3l4 3-4 3V9H6V7h4V5z"/>
+            <button
+              onClick={handleLogout}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "6px 12px",
+                fontSize: "13px",
+                fontWeight: 600,
+                color: "white",
+                backgroundColor: "#0078d4",
+                borderRadius: "6px",
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="white">
+                <path d="M6 2v2H3v8h3v2H2V2h4zm4 3l4 3-4 3V9H6V7h4V5z" />
               </svg>
               Logout
             </button>
           </>
         ) : null}
-      </div>
-      <div className="flex gap-3">
-        <button onClick={() => navigate("/dashboard")}>Dashboard</button>
-        <button onClick={() => navigate("/perfumes")}>Perfumes</button>
-        <button onClick={() => navigate("/processing")}>Plant processing</button>
-        <button onClick={() => navigate("/production")}>Plant production</button>
-        <button onClick={() => navigate("/sales")}>Sales</button>
-        <button onClick={() => navigate("/analytics")}>Analytics</button>
-        <button onClick={() => navigate("/performance")}>Performance</button>
       </div>
     </nav>
   );

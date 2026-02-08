@@ -32,13 +32,77 @@ export const ProcessingPage: React.FC<Props> = ({perfumeAPI}) => {
       navigate("/dashboard");
    }
 
-  return (
-    <div style={{ padding: "24px" }}>
-      <h2>Plant Processing</h2>
+  const styles = {
+    page: {
+      padding: "24px",
+      backgroundColor: "#f5f9ff",
+      minHeight: "100vh",
+    },
+    title: {
+      color: "#0d47a1",
+      marginBottom: "24px",
+    },
+    card: {
+      backgroundColor: "#ffffff",
+      padding: "24px",
+      borderRadius: "8px",
+      maxWidth: "500px",
+      boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+    },
+    field: {
+      marginBottom: "16px",
+      display: "flex",
+      flexDirection: "column" as const,
+    },
+    label: {
+      marginBottom: "6px",
+      color: "#0d47a1",
+      fontWeight: 500,
+    },
+    input: {
+      padding: "8px",
+      borderRadius: "4px",
+      border: "1px solid #bbdefb",
+      outline: "none",
+      backgroundColor: "#ffffff",
+      color: "#0d47a1",
+    },
+    select: {
+      padding: "8px",
+      borderRadius: "4px",
+      border: "1px solid #bbdefb",
+      outline: "none",
+      backgroundColor: "#ffffff",
+      color: "#0d47a1",
+    },
+    primaryButton: {
+      backgroundColor: "#1976d2",
+      color: "#ffffff",
+      padding: "10px 16px",
+      border: "none",
+      borderRadius: "4px",
+      cursor: "pointer",
+      marginRight: "12px",
+    },
+    secondaryButton: {
+      backgroundColor: "#ffffff",
+      color: "#1976d2",
+      padding: "10px 16px",
+      border: "1px solid #1976d2",
+      borderRadius: "4px",
+      cursor: "pointer",
+    },
+  };
 
-      <div style={{ marginBottom: "16px" }}>
-        <label>Select perfume:</label>
+  return (
+  <div style={styles.page}>
+    <h2 style={styles.title}>Plant Processing</h2>
+
+    <div style={styles.card}>
+      <div style={styles.field}>
+        <label style={styles.label}>Select perfume</label>
         <select
+          style={styles.select}
           value={selectedPerfume ?? ""}
           onChange={(e) => setSelectedPerfume(Number(e.target.value))}
         >
@@ -51,9 +115,10 @@ export const ProcessingPage: React.FC<Props> = ({perfumeAPI}) => {
         </select>
       </div>
 
-      <div style={{ marginBottom: "16px" }}>
-        <label>Quantity of bottles:</label>
+      <div style={styles.field}>
+        <label style={styles.label}>Quantity of bottles</label>
         <input
+          style={styles.input}
           type="number"
           min={1}
           value={bottleCount}
@@ -61,9 +126,10 @@ export const ProcessingPage: React.FC<Props> = ({perfumeAPI}) => {
         />
       </div>
 
-      <div style={{ marginBottom: "16px" }}>
-        <label>Volume of bottles</label>
+      <div style={styles.field}>
+        <label style={styles.label}>Volume of bottles</label>
         <select
+          style={styles.select}
           value={bottleVolume}
           onChange={(e) => setBottleVolume(Number(e.target.value))}
         >
@@ -74,6 +140,7 @@ export const ProcessingPage: React.FC<Props> = ({perfumeAPI}) => {
 
       <div>
         <button
+          style={styles.primaryButton}
           onClick={async () => {
             if (selectedPerfume === null) {
               alert("Please select a perfume");
@@ -84,16 +151,14 @@ export const ProcessingPage: React.FC<Props> = ({perfumeAPI}) => {
             if (!perfumeObj) return;
 
             try {
-              const result = await perfumeAPI.plantProcessing(
+              await perfumeAPI.plantProcessing(
                 perfumeObj.plantId,
                 bottleCount,
                 bottleVolume,
                 perfumeObj.type
-              );  
-              console.log("Processing result:", result);
+              );
               alert("Processing completed!");
             } catch (err: any) {
-              console.error(err);
               alert(err.message || "Something went wrong");
             }
           }}
@@ -101,12 +166,14 @@ export const ProcessingPage: React.FC<Props> = ({perfumeAPI}) => {
           Start processing
         </button>
 
-        <button onClick={backToDashboard}
-          style={{ marginBottom: "16px", padding: "8px 16px", cursor: "pointer" }}>
-            Back to Dashboard
+        <button
+          style={styles.secondaryButton}
+          onClick={backToDashboard}
+        >
+          Back to Dashboard
         </button>
-        
       </div>
     </div>
-  );
+  </div>
+);
 }
