@@ -1,0 +1,29 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "run-analytics-microservice",
+			"type": "shell",
+			"command": "npm --prefix infrastructure/microservices/analytics-microservice run dev",
+			"isBackground": true,
+			"problemMatcher": [],
+			"group": "none"
+		},
+		{
+			"label": "run-performance-microservice",
+			"type": "shell",
+			"command": "npm --prefix infrastructure/microservices/performance-microservice run dev",
+			"isBackground": true,
+			"problemMatcher": [],
+			"group": "none"
+		},
+		{
+			"label": "run-gateway-microservice",
+			"type": "shell",
+			"command": "npm --prefix infrastructure/microservices/gateway-microservice run dev",
+			"isBackground": true,
+			"problemMatcher": [],
+			"group": "none"
+		}
+	]
+}

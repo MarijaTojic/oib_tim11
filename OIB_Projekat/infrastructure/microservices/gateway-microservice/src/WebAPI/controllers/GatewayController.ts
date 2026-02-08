@@ -49,7 +49,11 @@ export class GatewayController {
     this.router.get("/performance/:id/pdf", authenticate, authorize("admin"), this.downloadPerformancePdf.bind(this));
 
     // Analytics routes (admin only)
-    this.router.post("/analytics/receipts", authenticate, authorize("admin"), this.createReceipt.bind(this));
+    this.router.post(
+      "/analytics/receipts",
+      this.allowInternalOrRoles("ANALYTICS_INTERNAL_KEY", "admin"),
+      this.createReceipt.bind(this)
+    );
     this.router.get("/analytics/receipts/:userId", authenticate, authorize("admin"), this.getReceipts.bind(this));
     this.router.get("/analytics/receipts/detail/:id", authenticate, authorize("admin"), this.getReceiptById.bind(this));
     this.router.delete("/analytics/receipts/:id", authenticate, authorize("admin"), this.deleteReceipt.bind(this));
@@ -653,15 +657,21 @@ export class GatewayController {
     return parseInt(value, 10);
   }
 
+  private allowInternalOrRoles(internalKeyEnv: string, ...roles: string[]) {
+    return (req: Request, res: Response, next: () => void): void => {
+      const internalKey = process.env[internalKeyEnv];
+      const providedKey = req.header("x-internal-key");
+
+      if (internalKey && providedKey === internalKey) {
+        next();
+        return;
+      }
+
+      authenticate(req, res, () => authorize(...roles)(req, res, next));
+    };
+  }
+
   private allowInternalOrAdmin(req: Request, res: Response, next: () => void): void {
-    const internalKey = process.env.LOG_INTERNAL_KEY;
-    const providedKey = req.header("x-internal-key");
-
-    if (internalKey && providedKey === internalKey) {
-      next();
-      return;
-    }
-
-    authenticate(req, res, () => authorize("admin")(req, res, next));
+    this.allowInternalOrRoles("LOG_INTERNAL_KEY", "admin")(req, res, next);
   }
 }
