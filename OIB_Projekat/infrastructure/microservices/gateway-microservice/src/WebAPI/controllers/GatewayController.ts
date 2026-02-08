@@ -1,4 +1,5 @@
 import { Request, Response, Router } from "express";
+import axios from "axios";
 import { IGatewayService } from "../../Domain/services/IGatewayService";
 import { LoginUserDTO } from "../../Domain/DTOs/LoginUserDTO";
 import { RegistrationUserDTO } from "../../Domain/DTOs/RegistrationUserDTO";
@@ -286,7 +287,7 @@ export class GatewayController {
       const results = await this.gatewayService.runPerformanceSimulation(simulationData);
       res.status(201).json(results);
     } catch (err) {
-      res.status(500).json({ message: (err as Error).message });
+      this.handleServiceError(res, err, "Performance");
     }
   }
 
@@ -300,7 +301,7 @@ export class GatewayController {
       const results = await this.gatewayService.getPerformanceResults(limit ? Number(limit) : undefined);
       res.status(200).json(results);
     } catch (err) {
-      res.status(500).json({ message: (err as Error).message });
+      this.handleServiceError(res, err, "Performance");
     }
   }
 
@@ -314,7 +315,7 @@ export class GatewayController {
       const result = await this.gatewayService.getPerformanceResultById(id);
       res.status(200).json(result);
     } catch (err) {
-      res.status(404).json({ message: (err as Error).message });
+      this.handleServiceError(res, err, "Performance", 404);
     }
   }
 
@@ -328,7 +329,7 @@ export class GatewayController {
       await this.gatewayService.deletePerformanceResult(id);
       res.status(204).send();
     } catch (err) {
-      res.status(500).json({ message: (err as Error).message });
+      this.handleServiceError(res, err, "Performance");
     }
   }
 
@@ -342,7 +343,7 @@ export class GatewayController {
       const comparison = await this.gatewayService.comparePerformanceAlgorithms(id);
       res.status(200).json(comparison);
     } catch (err) {
-      res.status(500).json({ message: (err as Error).message });
+      this.handleServiceError(res, err, "Performance");
     }
   }
 
@@ -356,7 +357,7 @@ export class GatewayController {
       await this.gatewayService.exportPerformanceResult(id);
       res.status(200).json({ message: 'Export date updated' });
     } catch (err) {
-      res.status(500).json({ message: (err as Error).message });
+      this.handleServiceError(res, err, "Performance");
     }
   }
 
@@ -371,7 +372,7 @@ export class GatewayController {
       res.setHeader("Content-Type", result.contentType);
       res.status(200).send(Buffer.from(result.data));
     } catch (err) {
-      res.status(500).json({ message: (err as Error).message });
+      this.handleServiceError(res, err, "Performance");
     }
   }
 
@@ -673,5 +674,30 @@ export class GatewayController {
 
   private allowInternalOrAdmin(req: Request, res: Response, next: () => void): void {
     this.allowInternalOrRoles("LOG_INTERNAL_KEY", "admin")(req, res, next);
+  }
+
+  private handleServiceError(
+    res: Response,
+    err: unknown,
+    serviceName: string,
+    fallbackStatus = 500
+  ): void {
+    if (axios.isAxiosError(err)) {
+      if (!err.response) {
+        res.status(503).json({ message: `${serviceName} service unavailable` });
+        return;
+      }
+
+      const message =
+        (err.response.data as { message?: string } | undefined)?.message ??
+        err.message ??
+        `${serviceName} service error`;
+
+      res.status(err.response.status).json({ message });
+      return;
+    }
+
+    const message = err instanceof Error ? err.message : `${serviceName} service error`;
+    res.status(fallbackStatus).json({ message });
   }
 }
