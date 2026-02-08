@@ -1,6 +1,6 @@
 import { PackagingStatus } from "../../enums/PackagingStatus";
 
-export interface PlantDTO {
+export interface PackagingDTO {
   id?: number;
   name: string;
   senderAddress: string;
