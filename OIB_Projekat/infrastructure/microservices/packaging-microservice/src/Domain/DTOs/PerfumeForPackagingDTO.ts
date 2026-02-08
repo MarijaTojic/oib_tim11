@@ -1,3 +1,3 @@
-interface PerfumeForPackagingDTO {
+export interface PerfumeForPackagingDTO {
   id: string;
 }

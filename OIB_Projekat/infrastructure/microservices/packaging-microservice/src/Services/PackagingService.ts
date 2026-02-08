@@ -3,6 +3,7 @@ import { PackagingDTO } from "../Domain/DTOs/PackagingDTO"
 import { PackagingStatus } from "../Domain/enums/PackagingStatus"
 import { Packaging } from "../Domain/models/Packaging"
 import { IPackagingService } from "../Domain/services/IPackagingService"
+import { PerfumeForPackagingDTO } from "../Domain/DTOs/PerfumeForPackagingDTO";
 import fetch from 'node-fetch';
 
 export class PackagingService implements IPackagingService{
@@ -41,6 +42,10 @@ export class PackagingService implements IPackagingService{
             p.storageID = dto.storageID;
             p.perfumeList = dto.perfumeList;
             p.status = dto.status;
+            const expiration = new Date();
+            expiration.setFullYear(expiration.getFullYear() + 1);
+            p.expirationDate = expiration;
+
             return p;
         });
 

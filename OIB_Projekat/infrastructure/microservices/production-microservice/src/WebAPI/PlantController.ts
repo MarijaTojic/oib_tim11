@@ -55,9 +55,6 @@ export class PlantsController {
           
           res.status(200).json(updatedPlant);
         } catch (err) {
-         /* await this.logger.log(
-            `[production] CHANGE_AROMA - FAIL: ${(err as Error).message}`
-          );*/
 
           res.status(404).json({ message: (err as Error).message });
         }
@@ -112,9 +109,6 @@ export class PlantsController {
       adjustmentNote = `Adjusted proportionally: ${previousOilStrength.toFixed(2)} → ${adjustedStrength.toFixed(2)} (${(factor * 100).toFixed(1)}% of original)`;
      
     }
-    /*await this.logger.log(
-      `[production] INTERNAL_PLANT_REQUEST - SUCCESS: ${commonName} | ${adjustmentNote}`
-    );*/
 
     res.status(201).json({
       ...this.plantsService.toDTO(newPlant),
@@ -123,7 +117,6 @@ export class PlantsController {
     });
   } catch (err) {
     console.error(err);
-    //await this.logger.log(`[production] INTERNAL_PLANT_REQUEST - FAIL: ${(err as Error).message}`);
     res.status(500).json({ message: (err as Error).message });
   }
 }
