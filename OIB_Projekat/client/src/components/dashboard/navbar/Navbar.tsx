@@ -142,6 +142,19 @@ export const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ userAPI }) => 
         >
           Performance
         </button>
+        <button
+          onClick={() => navigate("/storage")}
+          style={{
+            background: "none",
+            border: "none",
+            fontSize: "14px",
+            fontWeight: 600,
+            color: "#0078d4",
+            cursor: "pointer",
+          }}
+        > 
+          Storage
+        </button>
       </div>
 
       {/* User Info & Logout */}

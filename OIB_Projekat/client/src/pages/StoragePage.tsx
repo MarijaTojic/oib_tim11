@@ -6,7 +6,6 @@ import { PackagingDTO } from "../models/packaging/PackagingDTO";
 import { WarehouseDTO } from "../models/storages/WarehouseDTO";
 import { IStorageAPI } from "../api/storage/IStorageAPI";
 import { StorageAPI } from "../api/storage/StorageApi";
-import { WarehouseDTO } from "../models/storages/WarehouseDTO";
 
 const StoragePage: React.FC = () => {
   const navigate = useNavigate();
