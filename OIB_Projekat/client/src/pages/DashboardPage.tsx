@@ -145,6 +145,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ userAPI, plantAPI 
         <th style={styles.th}>Common name</th>
         <th style={styles.th}>Latin name</th>
         <th style={styles.th}>Aromatic Oil Strength</th>
+        <th style={styles.th}>Country Of Origin</th>
         <th style={styles.th}>Status</th>
         <th style={styles.th}>Quantity</th>
       </tr>
