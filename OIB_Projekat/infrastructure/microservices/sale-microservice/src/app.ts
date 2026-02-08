@@ -36,11 +36,11 @@ app.use(express.json());
 initialize_database();
 
 // ORM Repositories
-const catalogueRepository: Repository<Catalogue> = Db.getRepository(Catalogue);
+const catalogueRepository = Db.getRepository(Catalogue);
 const auditRepository: Repository<Log> = Db.getRepository(Log as any);
 
 // Services
-const salesService: ISalesService = new SalesService(); 
+const salesService: ISalesService = new SalesService(catalogueRepository);
 const logerService = new LogService(auditRepository as any);
 
 // WebAPI routes

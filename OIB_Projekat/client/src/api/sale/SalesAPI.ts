@@ -7,7 +7,7 @@ export class SalesAPI implements ISalesAPI {
 
   constructor() {
     const token = localStorage.getItem("authToken");
-    //console.log("Auth token:", token);
+    console.log("Auth token:", token);
     this.axiosInstance = axios.create({
       baseURL: import.meta.env.VITE_GATEWAY_URL,
       headers: {

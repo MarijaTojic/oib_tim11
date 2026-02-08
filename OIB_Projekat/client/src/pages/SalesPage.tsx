@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { SalesAPI } from "../api/sale/SalesAPI";
+//import { SalesAPI } from "../api/sale/SalesAPI";
 import { CatalogueDTO } from "../models/catalogues/CatalogueDTO";
 import { CatalogueTable } from "../components/catalogues/Sales";
 import { useNavigate } from "react-router-dom";
+import { ISalesAPI } from "../api/sale/ISalesAPI";
 
 const styles = {
   page: { padding: "24px", backgroundColor: "#f5f9ff", minHeight: "100vh" },
@@ -15,15 +16,22 @@ const styles = {
   input: { width: "70px", padding: "4px 6px" },
   btn: { marginTop: "16px", padding: "8px 16px", cursor: "pointer" },
   backBtn: { margin: "16px 24px", padding: "8px 16px", cursor: "pointer" },
+  qrCode: { marginTop: "16px", maxWidth: "250px" },
 };
 
-export const SalesPage: React.FC<{ userId: number }> = ({ userId }) => {
+type SalesPageProps = {
+  userId: number;
+  salesAPI: ISalesAPI;
+};
+
+export const SalesPage: React.FC<SalesPageProps> = ({ userId, salesAPI }) => {
   const [catalogue, setCatalogue] = useState<CatalogueDTO[]>([]);
   const [quantities, setQuantities] = useState<Record<number, number>>({});
   const [loading, setLoading] = useState(false);
+  const [qrCode, setQrCode] = useState<string | null>(null);
 
   const navigate = useNavigate();
-  const salesAPI = new SalesAPI();
+  //const salesAPI = new SalesAPI();
 
   useEffect(() => {
     const loadCatalogue = async () => {
@@ -49,23 +57,20 @@ export const SalesPage: React.FC<{ userId: number }> = ({ userId }) => {
   const handleBuy = async () => {
     if (catalogue.length === 0) return;
 
-    const selectedIds: number[] = [];
-    Object.entries(quantities).forEach(([id, qty]) => {
-      for (let i = 0; i < qty; i++) selectedIds.push(Number(id));
-    });
-
-    if (selectedIds.length === 0) {
+    // Provera da li je bar jedan parfem izabran
+    const totalSelected = Object.values(quantities).reduce((sum, qty) => sum + qty, 0);
+    if (totalSelected === 0) {
       alert("Select at least one perfume");
       return;
     }
 
     setLoading(true);
     try {
-      const result = await salesAPI.sell(userId, selectedIds);
+      const result = await salesAPI.sell(userId, quantities);
 
       if (result.success) {
         alert("Purchase successful!");
-        console.log("QR Code:", result.qrCode);
+        if (result.qrCode) setQrCode(result.qrCode);
 
         const updatedCatalogue = await salesAPI.getCatalogue();
         setCatalogue(updatedCatalogue);
@@ -121,6 +126,13 @@ export const SalesPage: React.FC<{ userId: number }> = ({ userId }) => {
               <button style={styles.btn} onClick={handleBuy} disabled={loading}>
                 {loading ? "Processing..." : "Buy"}
               </button>
+
+              {qrCode && (
+                <div>
+                  <p>QR Code for your purchase:</p>
+                  <img src={qrCode} alt="QR Code" style={styles.qrCode} />
+                </div>
+              )}
             </>
           ) : (
             <p>Loading catalogue...</p>

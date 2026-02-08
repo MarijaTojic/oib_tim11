@@ -28,11 +28,11 @@ export class GatewayController {
     this.router.delete("/users/:id", authenticate, authorize("admin", "seller", "manager"), this.deleteUser.bind(this));
 
     // Production routes (seller, manager)
-    this.router.get("/plants", authenticate, authorize("seller", "manager"), this.getAllPlants.bind(this));
-    this.router.get("/plants/:id", authenticate, authorize("seller", "manager"), this.getPlantById.bind(this));
-    this.router.post("/plants", authenticate, authorize("seller", "manager"), this.plantNewPlant.bind(this));
-    this.router.post("/plants/harvest", authenticate, authorize("seller", "manager"), this.harvestPlants.bind(this));
-    this.router.patch("/plants/:id/aromatic", authenticate, authorize("seller", "manager"), this.adjustOilStrength.bind(this));
+    this.router.get("/plants", authenticate, authorize("admin", "seller", "manager"), this.getAllPlants.bind(this));
+    this.router.get("/plants/:id", authenticate, authorize("admin", "seller", "manager"), this.getPlantById.bind(this));
+    this.router.post("/plants", authenticate, authorize("admin", "seller", "manager"), this.plantNewPlant.bind(this));
+    this.router.post("/plants/harvest", authenticate, authorize("admin", "seller", "manager"), this.harvestPlants.bind(this));
+    this.router.patch("/plants/:id/aromatic", authenticate, authorize("admin", "seller", "manager"), this.adjustOilStrength.bind(this));
 
     // Processing routes (seller, manager)
     this.router.get("/perfumes", this.allowInternalOrRoles("SALES_INTERNAL_KEY", "seller", "manager"), this.getAllPerfumes.bind(this));
