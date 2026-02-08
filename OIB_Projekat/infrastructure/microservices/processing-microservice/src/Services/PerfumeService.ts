@@ -23,13 +23,13 @@ export class PerfumeService implements IPerfumeService {
       throw new Error(`Perfume with type ${perfumeType} not found`);
     }
     
-    const plant = await this.plantRepository.findOne({ where: { id: plantId } });
+    //const plant = await this.plantRepository.findOne({ where: { id: plantId } });
 
-    if (!plant) {
+    /*if (!plant) {
       throw new Error(`Biljka sa ID ${plantId} ne postoji`);
-    }
+    }*/
 
-    const plantOilStrength = plant?.aromaticOilStrength;
+    //const plantOilStrength = plant?.aromaticOilStrength;
     //await this.logger.log(`Jačina biljke ID ${plantId}: ${plantOilStrength}`);
 
     const perfumes: Perfume[] = [];
@@ -44,7 +44,8 @@ export class PerfumeService implements IPerfumeService {
       plantId: plantId,
       expirationDate: new Date(
       new Date().setFullYear(new Date().getFullYear() + 2)
-      )
+      ),
+      quantity: quantity
     });
   /*if (perfume.perfumeAromaticOilStrength > 4.0) {
   const excess = perfume.perfumeAromaticOilStrength - 4.0;
@@ -112,7 +113,8 @@ export class PerfumeService implements IPerfumeService {
       serialNumber: perfume.serialNumber,
       plantId: perfume.plantId,
       expirationDate: perfume.expirationDate,
-      perfumeAromaticOilStrength: perfume.perfumeAromaticOilStrength
+      perfumeAromaticOilStrength: perfume.perfumeAromaticOilStrength,
+      quantity: perfume.quantity
     };
   }
 }

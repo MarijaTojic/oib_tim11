@@ -1,9 +1,8 @@
 import React from "react";
 import { CatalogueDTO } from "../../models/catalogues/CatalogueDTO";
-import { PerfumeType } from "../../enums/PerfumeType";
 
 type Props = {
-  catalogue: CatalogueDTO;
+  catalogue: CatalogueDTO[];
 };
 
 export const CatalogueTable: React.FC<Props> = ({ catalogue }) => (
@@ -12,24 +11,15 @@ export const CatalogueTable: React.FC<Props> = ({ catalogue }) => (
       <tr>
         <th>ID</th>
         <th>Name</th>
-        <th>Type</th>
-        <th>Net Quantity (ml)</th>
-        <th>Serial Number</th>
-        <th>Plant ID</th>
-        <th>Expiration Date</th>
+        <th>Quantity</th>
       </tr>
     </thead>
-
     <tbody>
-      {catalogue.allPerfumes.map(p => (
+      {catalogue.map((p) => (
         <tr key={p.id}>
           <td>{p.id}</td>
-          <td>{p.name}</td>
-          <td>{PerfumeType[p.type]}</td>
-          <td>{p.netQuantity}</td>
-          <td>{p.serialNumber}</td>
-          <td>{p.plantId}</td>
-          <td>{new Date(p.expirationDate).toLocaleDateString()}</td>
+          <td>{p.perfume_name}</td>
+          <td>{p.perfume_quantity}</td>
         </tr>
       ))}
     </tbody>

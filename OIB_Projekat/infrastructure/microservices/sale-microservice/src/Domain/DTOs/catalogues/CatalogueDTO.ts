@@ -1,7 +1,5 @@
-import { PerfumeDTO } from "../perfumes/PerfumeDTO";
-
 export interface CatalogueDTO {
-  id?: number;
-  allPerfumes: PerfumeDTO[]; 
-  amount: number;
+  id: number;
+  perfume_name: string;
+  perfume_quantity: number;
 }

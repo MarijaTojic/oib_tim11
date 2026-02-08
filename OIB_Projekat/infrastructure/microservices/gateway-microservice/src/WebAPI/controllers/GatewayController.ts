@@ -34,7 +34,7 @@ export class GatewayController {
     this.router.patch("/plants/:id/aromatic", authenticate, authorize("seller", "manager"), this.adjustOilStrength.bind(this));
 
     // Processing routes (seller, manager)
-    this.router.get("/perfumes", authenticate, authorize("seller", "manager"), this.getAllPerfumes.bind(this));
+    this.router.get("/perfumes", this.allowInternalOrRoles("SALES_INTERNAL_KEY", "seller", "manager"), this.getAllPerfumes.bind(this));
     this.router.get("/perfumes/:id", authenticate, authorize("seller", "manager"), this.getPerfumeById.bind(this));
     this.router.post("/processing", authenticate, authorize("seller", "manager"), this.startProcessing.bind(this));
     this.router.get("/perfumes/by-type", authenticate, authorize("seller", "manager"), this.getPerfumesByType.bind(this));
@@ -609,13 +609,13 @@ export class GatewayController {
   //Packaging
   private async packagePerfumes(req: Request, res: Response): Promise<void>{
     try{
-        const { perfumeType, quantity, senderAddress, stroageID } = req.body;
+        const { perfumeType, quantity, senderAddress, storageID } = req.body;
 
       const result = await this.gatewayService.packagingPerfumes(
         perfumeType,
         quantity,
         senderAddress,
-        stroageID
+        storageID
     );
 
     res.status(201).json(result);

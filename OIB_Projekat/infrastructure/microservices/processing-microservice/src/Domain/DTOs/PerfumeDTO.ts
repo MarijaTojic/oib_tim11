@@ -9,5 +9,6 @@ export interface PerfumeDTO {
   plantId: number;
   expirationDate: Date;
   perfumeAromaticOilStrength: number; //in percentage
+  quantity: number;
 
 }

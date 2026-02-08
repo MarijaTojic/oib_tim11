@@ -1,13 +1,13 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
-@Entity("catalogues")
+@Entity("catalogues") 
 export class Catalogue {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column("simple-json", { nullable: true })
-  perfumeIds!: number[]; 
+  @Column({ type: "varchar", length: 255 })
+  perfume_name!: string;
 
   @Column({ type: "int", default: 0 })
-  amount!: number; 
+  perfume_quantity!: number;
 }

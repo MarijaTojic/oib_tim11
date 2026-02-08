@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import { ISalesService } from "../../Domain/services/ISalesService";
 import { ILogService } from "../../../../log-microservice/src/Domain/services/ILogService";
+import { CreateSaleDTO } from "../../Domain/DTOs/CreateSaleDTO";
 
 export class SalesController {
   private readonly router: Router;
@@ -30,7 +31,13 @@ export class SalesController {
 
   private async sell(req: Request, res: Response): Promise<void> {
     try {
-      const saleDto = req.body;
+      const saleDto: CreateSaleDTO = req.body;
+
+      // BASIC VALIDATION
+      if (!saleDto.userId || !Array.isArray(saleDto.perfumes) || saleDto.perfumes.length === 0) {
+        res.status(400).json({ message: "Invalid sale data" });
+        return;
+      }
 
       const result = await this.salesService.sell(saleDto);
 

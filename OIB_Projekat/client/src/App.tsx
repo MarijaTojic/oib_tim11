@@ -97,7 +97,7 @@ function App() {
         element={
           <ProtectedRoute requiredRole="admin,seller">
             {currentUserId ? (
-              <SalesPage salesAPI={salesAPI} userId={currentUserId} />
+              <SalesPage userId={currentUserId} />
             ) : (
               <Navigate to="/" />
             )}

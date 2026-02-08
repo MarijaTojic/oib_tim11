@@ -26,4 +26,7 @@ export class Perfume {
 
   @Column({ type: "int", nullable: true})
   perfumeAromaticOilStrength!: number;
+
+  @Column({ type:"int", nullable: true})
+  quantity!: number;
 }
