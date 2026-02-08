@@ -82,7 +82,7 @@ export class GatewayController {
     // Sales routes (seller, manager)
     this.router.get("/sales/catalogue", authenticate, authorize("seller", "manager"),this.getCatalogue.bind(this));
     this.router.post("/sales/sell", authenticate, authorize("seller", "manager"), this.sell.bind(this));
-    this.router.post("/sales/catalogue/sync", this.allowInternalOrRoles("SALES_INTERNAL_KEY", "admin"), this.syncCatalogue.bind(this));
+    this.router.post("/sales/catalogue/sync", this.allowInternalOrRoles("SALES_INTERNAL_KEY", "seller", "manager", "admin"), this.syncCatalogue.bind(this));
 
     // Packaging routes (seller, manager)
     this.router.post("/packaging", authenticate, authorize("seller", "manager"), this.packagePerfumes.bind(this));

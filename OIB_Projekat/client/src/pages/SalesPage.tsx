@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-//import { SalesAPI } from "../api/sale/SalesAPI";
 import { CatalogueDTO } from "../models/catalogues/CatalogueDTO";
 import { CatalogueTable } from "../components/catalogues/Sales";
 import { useNavigate } from "react-router-dom";
@@ -26,44 +25,37 @@ type SalesPageProps = {
 
 export const SalesPage: React.FC<SalesPageProps> = ({ userId, salesAPI }) => {
   const [catalogue, setCatalogue] = useState<CatalogueDTO[]>([]);
-  const [quantities, setQuantities] = useState<Record<number, number>>({});
   const [loading, setLoading] = useState(false);
   const [qrCode, setQrCode] = useState<string | null>(null);
 
   const navigate = useNavigate();
-  //const salesAPI = new SalesAPI();
 
   useEffect(() => {
     const loadCatalogue = async () => {
       try {
         const data = await salesAPI.getCatalogue();
         setCatalogue(data);
-
-        const q: Record<number, number> = {};
-        data.forEach(p => { q[p.id] = 0; });
-        setQuantities(q);
       } catch (err) {
         console.error(err);
         alert("Failed to load catalogue");
       }
     };
     loadCatalogue();
-  }, []);
+  }, [salesAPI]);
 
-  useEffect(() => {
-    console.log("CATALOGUE FROM API:", catalogue);
-  }, [catalogue]);
-
+  useEffect(() => { console.log("CATALOGUE FROM API:", catalogue); }, [catalogue]);
 
   const handleQuantityChange = (perfumeId: number, value: number) => {
-    setQuantities(prev => ({ ...prev, [perfumeId]: value }));
+    setCatalogue(prev =>
+      prev.map(c => (c.id === perfumeId ? { ...c, perfume_quantity: value } : c))
+    );
   };
 
   const handleBuy = async () => {
     if (catalogue.length === 0) return;
 
-    // Provera da li je bar jedan parfem izabran
-    const totalSelected = Object.values(quantities).reduce((sum, qty) => sum + qty, 0);
+    // Provera da li je bar jedan parfem izabran (količina > 0)
+    const totalSelected = catalogue.reduce((sum, c) => sum + c.perfume_quantity, 0);
     if (totalSelected === 0) {
       alert("Select at least one perfume");
       return;
@@ -71,18 +63,18 @@ export const SalesPage: React.FC<SalesPageProps> = ({ userId, salesAPI }) => {
 
     setLoading(true);
     try {
+      const quantities: Record<number, number> = {};
+      catalogue.forEach(c => { if (c.perfume_quantity > 0) quantities[c.id] = c.perfume_quantity; });
+
       const result = await salesAPI.sell(userId, quantities);
 
       if (result.success) {
         alert("Purchase successful!");
         if (result.qrCode) setQrCode(result.qrCode);
 
+        // Osveži katalog
         const updatedCatalogue = await salesAPI.getCatalogue();
         setCatalogue(updatedCatalogue);
-
-        const resetQty: Record<number, number> = {};
-        updatedCatalogue.forEach(p => { resetQty[p.id] = 0; });
-        setQuantities(resetQty);
       } else {
         alert(result.message || "Purchase failed");
       }
@@ -104,6 +96,7 @@ export const SalesPage: React.FC<SalesPageProps> = ({ userId, salesAPI }) => {
           {catalogue.length > 0 ? (
             <>
               <CatalogueTable catalogue={catalogue} />
+
               <table style={styles.table}>
                 <thead>
                   <tr>
@@ -119,8 +112,10 @@ export const SalesPage: React.FC<SalesPageProps> = ({ userId, salesAPI }) => {
                         <input
                           type="number"
                           min={0}
-                          value={quantities[p.id] || 0}
-                          onChange={(e) => handleQuantityChange(p.id, Number(e.target.value))}
+                          value={p.perfume_quantity}
+                          onChange={(e) =>
+                            handleQuantityChange(p.id, Number(e.target.value))
+                          }
                           style={styles.input}
                         />
                       </td>
@@ -128,6 +123,7 @@ export const SalesPage: React.FC<SalesPageProps> = ({ userId, salesAPI }) => {
                   ))}
                 </tbody>
               </table>
+
               <button style={styles.btn} onClick={handleBuy} disabled={loading}>
                 {loading ? "Processing..." : "Buy"}
               </button>
@@ -143,6 +139,7 @@ export const SalesPage: React.FC<SalesPageProps> = ({ userId, salesAPI }) => {
             <p>Loading catalogue...</p>
           )}
         </div>
+
         <button style={styles.backBtn} onClick={backToDashboard}>
           ← Back to Dashboard
         </button>

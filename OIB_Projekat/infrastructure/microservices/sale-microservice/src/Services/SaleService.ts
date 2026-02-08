@@ -11,6 +11,7 @@ export class SalesService implements ISalesService {
   private gateway: AxiosInstance;
 
   constructor(private catalogueRepo: Repository<Catalogue>) {
+
     this.gateway = axios.create({
       baseURL: process.env.GATEWAY_API,
       timeout: 5000,
