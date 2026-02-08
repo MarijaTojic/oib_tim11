@@ -32,7 +32,6 @@ export const ProductionPage: React.FC<Props> = ({ plantsAPI }) => {
 
   const navigate = useNavigate();
 
-  // --- Data loading ---
   const loadPlants = async () => {
     try {
       setLoading(true);

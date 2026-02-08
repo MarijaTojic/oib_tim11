@@ -7,7 +7,6 @@ type Props = {
   onSuccess: () => void;
 };
 
-/* ====== STYLES (PLAVO–BELO) ====== */
 const styles = {
   card: {
     maxWidth: "520px",

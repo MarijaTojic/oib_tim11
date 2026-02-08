@@ -9,7 +9,6 @@ type Props = {
   userId: number;
 };
 
-/* ====== STYLES ====== */
 const styles = {
   page: {
     padding: "24px",

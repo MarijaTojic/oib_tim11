@@ -206,7 +206,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({ authAPI }) => {
         )}
       </button>
 
-      {/* Spinner animation */}
       <style>
         {`
           @keyframes spin {

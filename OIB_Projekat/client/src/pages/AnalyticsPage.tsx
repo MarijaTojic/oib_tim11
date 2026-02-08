@@ -248,10 +248,10 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({ userAPI, analytics
       }
 
       const [reportsData, summaryData, topTenData, trendData] = await Promise.all([
-        analyticsAPI.getReports(token),
-        analyticsAPI.calculateSalesAnalysis(token, { analysisType, period: trimmedPeriod || undefined }),
-        analyticsAPI.getTopTen(token),
-        analyticsAPI.getSalesTrend(token, 30),
+        analyticsAPI.getReports(),
+        analyticsAPI.calculateSalesAnalysis({ analysisType, period: trimmedPeriod || undefined }),
+        analyticsAPI.getTopTen(),
+        analyticsAPI.getSalesTrend(30),
       ]);
 
       setReports(reportsData ?? []);
@@ -367,9 +367,9 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({ userAPI, analytics
       }
 
       const [salesData, topTenData, trendData] = await Promise.all([
-        analyticsAPI.calculateSalesAnalysis(token, { analysisType, period: trimmedPeriod || undefined }),
-        analyticsAPI.getTopTen(token),
-        analyticsAPI.getSalesTrend(token, 30),
+        analyticsAPI.calculateSalesAnalysis({ analysisType, period: trimmedPeriod || undefined }),
+        analyticsAPI.getTopTen(),
+        analyticsAPI.getSalesTrend(30),
       ]);
 
       const lines = [
@@ -396,7 +396,7 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({ userAPI, analytics
         generatedBy: null,
       };
 
-      const created = await analyticsAPI.createReport(token, newReport);
+      const created = await analyticsAPI.createReport(newReport);
       setReports([created, ...reports]);
       setSalesSummary(salesData);
       setTopTenSummary(topTenData);
@@ -409,8 +409,8 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({ userAPI, analytics
   const handleExport = async (report: ReportAnalysisDTO) => {
     try {
       setError("");
-      await analyticsAPI.exportReport(token, report.id);
-      const reportData = report.pdfData ? report : await analyticsAPI.getReportById(token, report.id);
+      await analyticsAPI.exportReport(report.id);
+      const reportData = report.pdfData ? report : await analyticsAPI.getReportById(report.id);
       const blob = base64ToBlob(reportData.pdfData, "application/pdf");
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
