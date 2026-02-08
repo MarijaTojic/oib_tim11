@@ -82,6 +82,7 @@ export class GatewayController {
     // Sales routes (seller, manager)
     this.router.get("/sales/catalogue", authenticate, authorize("seller", "manager"),this.getCatalogue.bind(this));
     this.router.post("/sales/sell", authenticate, authorize("seller", "manager"), this.sell.bind(this));
+    this.router.post("/sales/catalogue/sync", this.allowInternalOrRoles("SALES_INTERNAL_KEY", "admin"), this.syncCatalogue.bind(this));
 
     // Packaging routes (seller, manager)
     this.router.post("/packaging", authenticate, authorize("seller", "manager"), this.packagePerfumes.bind(this));
@@ -606,6 +607,16 @@ export class GatewayController {
       res.status(500).json({ message: (err as Error).message });
     }
   }
+
+  private async syncCatalogue(req: Request, res: Response): Promise<void> {
+    try {
+      const result = await this.gatewayService.syncCatalogue();
+      res.status(200).json(result);
+    } catch (err) {
+      res.status(500).json({ message: (err as Error).message });
+    }
+  }
+
 
   //Packaging
   private async packagePerfumes(req: Request, res: Response): Promise<void>{
