@@ -59,8 +59,9 @@ export class PackagingService implements IPackagingService{
             
         if (!response.ok) throw new Error(`Processing service returned ${response.status}`);
             
-        const perfumes: PerfumeForPackagingDTO[] = await response.json() as PerfumeForPackagingDTO[];
+        let perfumes: PerfumeForPackagingDTO[] = await response.json() as PerfumeForPackagingDTO[];
             
+        perfumes = perfumes.slice(0, quantity);
         return perfumes;
     }
 
