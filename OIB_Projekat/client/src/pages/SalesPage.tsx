@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { CatalogueDTO } from "../models/catalogues/CatalogueDTO";
-import { CatalogueTable } from "../components/catalogues/Sales";
 import { useNavigate } from "react-router-dom";
 import { ISalesAPI } from "../api/sale/ISalesAPI";
 
@@ -8,7 +7,7 @@ const styles = {
   page: { padding: "24px", backgroundColor: "#f5f9ff", minHeight: "100vh" },
   window: { maxWidth: "900px", margin: "0 auto", backgroundColor: "#fff" },
   titleBar: { backgroundColor: "#1976d2", color: "#fff", padding: "12px 20px", fontWeight: 600 },
-  content: { padding: "24px" },
+  content: { color: "#000000", padding: "24px" },
   table: { width: "100%", borderCollapse: "collapse" as const, marginTop: "12px" },
   th: { padding: "10px", textAlign: "left" as const, borderBottom: "2px solid #bbdefb" },
   td: { padding: "8px", borderBottom: "1px solid #e0e0e0" },
@@ -34,7 +33,12 @@ export const SalesPage: React.FC<SalesPageProps> = ({ userId, salesAPI }) => {
     const loadCatalogue = async () => {
       try {
         const data = await salesAPI.getCatalogue();
-        setCatalogue(data);
+        setCatalogue(
+          data.map((p) => ({
+            ...p,
+            perfume_quantity: 0,
+          }))
+        );
       } catch (err) {
         console.error(err);
         alert("Failed to load catalogue");
@@ -86,26 +90,24 @@ export const SalesPage: React.FC<SalesPageProps> = ({ userId, salesAPI }) => {
     }
   };
 
-  const backToDashboard = () => navigate("/dashboard");
-
   return (
     <div style={styles.page}>
       <div style={styles.window}>
         <div style={styles.titleBar}>Sales</div>
+
         <div style={styles.content}>
           {catalogue.length > 0 ? (
             <>
-              <CatalogueTable catalogue={catalogue} />
-
               <table style={styles.table}>
                 <thead>
                   <tr>
                     <th style={styles.th}>Perfume</th>
-                    <th style={styles.th}>Buy quantity</th>
+                    <th style={styles.th}>Quantity</th>
                   </tr>
                 </thead>
+
                 <tbody>
-                  {catalogue.map(p => (
+                  {catalogue.map((p) => (
                     <tr key={p.id}>
                       <td style={styles.td}>{p.perfume_name}</td>
                       <td style={styles.td}>
@@ -114,7 +116,10 @@ export const SalesPage: React.FC<SalesPageProps> = ({ userId, salesAPI }) => {
                           min={0}
                           value={p.perfume_quantity}
                           onChange={(e) =>
-                            handleQuantityChange(p.id, Number(e.target.value))
+                            handleQuantityChange(
+                              p.id,
+                              Number(e.target.value)
+                            )
                           }
                           style={styles.input}
                         />
@@ -124,7 +129,11 @@ export const SalesPage: React.FC<SalesPageProps> = ({ userId, salesAPI }) => {
                 </tbody>
               </table>
 
-              <button style={styles.btn} onClick={handleBuy} disabled={loading}>
+              <button
+                style={styles.btn}
+                onClick={handleBuy}
+                disabled={loading}
+              >
                 {loading ? "Processing..." : "Buy"}
               </button>
 
@@ -140,7 +149,7 @@ export const SalesPage: React.FC<SalesPageProps> = ({ userId, salesAPI }) => {
           )}
         </div>
 
-        <button style={styles.backBtn} onClick={backToDashboard}>
+        <button style={styles.backBtn} onClick={() => navigate("/dashboard")}>
           ← Back to Dashboard
         </button>
       </div>

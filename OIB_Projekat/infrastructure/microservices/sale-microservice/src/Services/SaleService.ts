@@ -70,8 +70,8 @@ export class SalesService implements ISalesService {
     }));
   }
 
-  /** Prodaja parfema – smanjenje količine u sopstvenoj bazi i generisanje QR koda */
-  async sell(dto: CreateSaleDTO): Promise<{ success: boolean; message?: string; qrCode?: string }> {
+  /** Prodaja parfema – globalno
+  /*async sell(dto: CreateSaleDTO): Promise<{ success: boolean; message?: string; qrCode?: string }> {
     try {
       const catalogue = await this.getCatalogue();
 
@@ -131,5 +131,87 @@ export class SalesService implements ISalesService {
     } catch (err: any) {
       return { success: false, message: err.message };
     }
+  }*/
+
+    private async validateLocalSale(dto: CreateSaleDTO, catalogue: CatalogueDTO[]) {
+    for (const p of dto.perfumes) {
+      const exists = catalogue.find((c) => c.id === p.perfumeId);
+
+      if (!exists) {
+        throw new Error(`Perfume with id ${p.perfumeId} not found`);
+      }
+
+      if (exists.perfume_quantity < p.quantity) {
+        throw new Error(`Not enough quantity for perfume ${exists.perfume_name}`);
+      }
+    }
   }
+
+  private async generateLocalQRCode(dto: CreateSaleDTO, catalogue: CatalogueDTO[]) {
+    const PRICE = 50;
+
+    const lines: string[] = [];
+    let totalAmount = 0;
+
+    lines.push("🧾 PERFUME RECEIPT");
+    lines.push("--------------------------");
+    lines.push(`User ID: ${dto.userId}`);
+    lines.push("");
+
+    dto.perfumes.forEach((p, index) => {
+      const item = catalogue.find(c => c.id === p.perfumeId)!;
+
+      const total = PRICE * p.quantity;
+      totalAmount += total;
+
+      lines.push(`${index + 1}. ${item.perfume_name}`);
+      lines.push(`   Qty: ${p.quantity} × ${PRICE} = ${total}`);
+      lines.push("");
+    });
+
+    lines.push("--------------------------");
+    lines.push(`TOTAL: ${totalAmount}`);
+    lines.push("--------------------------");
+    lines.push(`Date: ${new Date().toLocaleString()}`);
+
+    const qrString = lines.join("\n");
+
+    return QRCode.toDataURL(qrString);
+  }
+
+  private async updateLocalStock(dto: CreateSaleDTO) {
+    for (const p of dto.perfumes) {
+      const dbEntry = await this.catalogueRepo.findOneBy({ id: p.perfumeId });
+
+      if (dbEntry) {
+        dbEntry.perfume_quantity -= p.quantity;
+
+        if (dbEntry.perfume_quantity < 0) {
+          dbEntry.perfume_quantity = 0;
+        }
+
+        await this.catalogueRepo.save(dbEntry);
+      }
+    }
+  }
+
+  /** ===========================
+   * ✅ SELL (LOKALNI MODE)
+   * =========================== */
+  async sell(dto: CreateSaleDTO): Promise<{ success: boolean; message?: string; qrCode?: string }> {
+    try {
+      const catalogue = await this.getCatalogue();
+
+      await this.validateLocalSale(dto, catalogue);
+
+      const qrCode = await this.generateLocalQRCode(dto, catalogue);
+
+      await this.updateLocalStock(dto);
+
+      return { success: true, qrCode };
+    } catch (err: any) {
+      return { success: false, message: err.message };
+    }
+  }
+
 }
