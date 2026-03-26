@@ -5,6 +5,9 @@ export class Catalogue {
   @PrimaryGeneratedColumn()
   id!: number;
 
+  @Column({ type: "int", default: 0 })
+  price!: number;
+
   @Column({ type: "varchar", length: 255 })
   perfume_name!: string;
 

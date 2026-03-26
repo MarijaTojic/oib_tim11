@@ -17,13 +17,17 @@ const styles = {
   qrCode: { marginTop: "16px", maxWidth: "250px" },
 };
 
+type CatalogueUI = CatalogueDTO & {
+  selectedQuantity: number; 
+};
+
 type SalesPageProps = {
   userId: number;
   salesAPI: ISalesAPI;
 };
 
 export const SalesPage: React.FC<SalesPageProps> = ({ userId, salesAPI }) => {
-  const [catalogue, setCatalogue] = useState<CatalogueDTO[]>([]);
+  const [catalogue, setCatalogue] = useState<CatalogueUI[]>([]);
   const [loading, setLoading] = useState(false);
   const [qrCode, setQrCode] = useState<string | null>(null);
 
@@ -33,10 +37,11 @@ export const SalesPage: React.FC<SalesPageProps> = ({ userId, salesAPI }) => {
     const loadCatalogue = async () => {
       try {
         const data = await salesAPI.getCatalogue();
+
         setCatalogue(
           data.map((p) => ({
             ...p,
-            perfume_quantity: 0,
+            selectedQuantity: 0, 
           }))
         );
       } catch (err) {
@@ -44,47 +49,64 @@ export const SalesPage: React.FC<SalesPageProps> = ({ userId, salesAPI }) => {
         alert("Failed to load catalogue");
       }
     };
+
     loadCatalogue();
   }, [salesAPI]);
 
-  useEffect(() => { console.log("CATALOGUE FROM API:", catalogue); }, [catalogue]);
-
-  const handleQuantityChange = (perfumeId: number, value: number) => {
-    setCatalogue(prev =>
-      prev.map(c => (c.id === perfumeId ? { ...c, perfume_quantity: value } : c))
+  const handleQuantityChange = (id: number, value: number) => {
+    setCatalogue((prev) =>
+      prev.map((c) =>
+        c.id === id ? { ...c, selectedQuantity: value } : c
+      )
     );
   };
 
   const handleBuy = async () => {
-    if (catalogue.length === 0) return;
+    const totalSelected = catalogue.reduce(
+      (sum, c) => sum + c.selectedQuantity,
+      0
+    );
 
-    // Provera da li je bar jedan parfem izabran (količina > 0)
-    const totalSelected = catalogue.reduce((sum, c) => sum + c.perfume_quantity, 0);
     if (totalSelected === 0) {
       alert("Select at least one perfume");
       return;
     }
 
     setLoading(true);
+
     try {
       const quantities: Record<number, number> = {};
-      catalogue.forEach(c => { if (c.perfume_quantity > 0) quantities[c.id] = c.perfume_quantity; });
+
+      catalogue.forEach((c) => {
+        if (c.selectedQuantity > 0) {
+          quantities[c.id] = c.selectedQuantity;
+        }
+      });
 
       const result = await salesAPI.sell(userId, quantities);
 
-      if (result.success) {
-        alert("Purchase successful!");
-        if (result.qrCode) setQrCode(result.qrCode);
-
-        // Osveži katalog
-        const updatedCatalogue = await salesAPI.getCatalogue();
-        setCatalogue(updatedCatalogue);
-      } else {
+      if (!result.success) {
         alert(result.message || "Purchase failed");
+        return;
       }
+
+      alert("Purchase successful!");
+
+      if (result.qrCode) {
+        setQrCode(result.qrCode);
+      }
+
+      const updated = await salesAPI.getCatalogue();
+
+      setCatalogue(
+        updated.map((p) => ({
+          ...p,
+          selectedQuantity: 0,
+        }))
+      );
     } catch (err: any) {
       console.error(err);
-      alert(err.message || "Unexpected error");
+      alert("Unexpected error");
     } finally {
       setLoading(false);
     }
@@ -102,6 +124,8 @@ export const SalesPage: React.FC<SalesPageProps> = ({ userId, salesAPI }) => {
                 <thead>
                   <tr>
                     <th style={styles.th}>Perfume</th>
+                    <th style={styles.th}>Price</th> 
+                    <th style={styles.th}>Stock</th> 
                     <th style={styles.th}>Quantity</th>
                   </tr>
                 </thead>
@@ -110,11 +134,14 @@ export const SalesPage: React.FC<SalesPageProps> = ({ userId, salesAPI }) => {
                   {catalogue.map((p) => (
                     <tr key={p.id}>
                       <td style={styles.td}>{p.perfume_name}</td>
+                      <td style={styles.td}>{p.price}</td>
+                      <td style={styles.td}>{p.perfume_quantity}</td>
                       <td style={styles.td}>
                         <input
                           type="number"
                           min={0}
-                          value={p.perfume_quantity}
+                          max={p.perfume_quantity} 
+                          value={p.selectedQuantity}
                           onChange={(e) =>
                             handleQuantityChange(
                               p.id,
